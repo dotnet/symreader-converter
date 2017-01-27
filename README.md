@@ -1,6 +1,6 @@
 # Microsoft.DiaSymReader.Converter
 
-Converts between Windows PDB and [Portable PDBs](https://github.com/dotnet/core/blob/master/Documentation/diagnostics/portable_pdb.md) formats.
+Converts between Windows PDB and [Portable PDB](https://github.com/dotnet/core/blob/master/Documentation/diagnostics/portable_pdb.md) formats.
 
 Pre-release builds are available on MyGet gallery: https://dotnet.myget.org/Gallery/symreader-converter.
 
