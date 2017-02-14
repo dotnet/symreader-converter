@@ -7,8 +7,8 @@ Pre-release builds are available on MyGet gallery: https://dotnet.myget.org/Gall
 [//]: # (Begin current test results)
 
 ### Windows - Unit Tests
-|Debug|Release|
-|:--:|:--:|
+||Debug|Release|
+|:--:|:--:|:--:|
 |**master**|[![Build Status](https://ci.dot.net/job/dotnet_symreader-converter/job/master/job/windows_debug/badge/icon)](https://ci.dot.net/job/dotnet_symreader-converter/job/master/job/windows_debug/)|[![Build Status](https://ci.dot.net/job/dotnet_symreader-converter/job/master/job/windows_release/badge/icon)](https://ci.dot.net/job/dotnet_symreader-converter/job/master/job/windows_release/)|
 
 [//]: # (End current test results)
