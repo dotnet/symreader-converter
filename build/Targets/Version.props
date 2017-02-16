@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <VersionBase>1.0.0</VersionBase>
+    <PreReleaseVersionLabel>beta1</PreReleaseVersionLabel>
+  </PropertyGroup>
+  <Import Project="..\Toolset\Version.props"/>
+</Project>
