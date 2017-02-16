@@ -17,7 +17,7 @@ static addArchival(def job, def filesToArchive, def filesToExclude) {
 static addGithubPRTriggerForBranch(def job, def branchName, def jobName) {
   def prContext = "prtest/${jobName.replace('_', '/')}"
   def triggerPhrase = "(?i)^\\s*(@?dotnet-bot\\s+)?(re)?test\\s+(${prContext})(\\s+please)?\\s*\$"
-  def triggerOnPhraseOnly = true
+  def triggerOnPhraseOnly = false
 
   Utilities.addGithubPRTriggerForBranch(job, branchName, prContext, triggerPhrase, triggerOnPhraseOnly)
 }
@@ -39,40 +39,6 @@ static addXUnitDotNETResults(def job, def configName) {
   def skipIfNoTestFiles = false
     
   Utilities.addXUnitDotNETResults(job, resultFilePattern, skipIfNoTestFiles)
-}
-
-static addExtendedEmailPublisher(def job) {
-  job.with {
-    publishers {
-      extendedEmail {
-        defaultContent('$DEFAULT_CONTENT')
-        defaultSubject('$DEFAULT_SUBJECT')
-        recipientList('$DEFAULT_RECIPIENTS, cc:tomat@microsoft.com')
-        triggers {
-          aborted {
-            content('$PROJECT_DEFAULT_CONTENT')
-            sendTo {
-              culprits()
-              developers()
-              recipientList()
-              requester()
-            }
-            subject('$PROJECT_DEFAULT_SUBJECT')
-          }
-          failure {
-            content('$PROJECT_DEFAULT_CONTENT')
-            sendTo {
-              culprits()
-              developers()
-              recipientList()
-              requester()
-            }
-            subject('$PROJECT_DEFAULT_SUBJECT')
-          }
-        }
-      }
-    }
-  }
 }
 
 static addBuildSteps(def job, def projectName, def opsysName, def configName, def isPR, def filesToArchive, def filesToExclude) {
