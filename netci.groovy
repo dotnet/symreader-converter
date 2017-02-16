@@ -94,10 +94,6 @@ static addBuildSteps(def job, def projectName, def opsysName, def configName, de
 
       Utilities.setMachineAffinity(myJob, 'Windows_NT', 'latest-or-auto-dev15-rc')
 
-      if (!isPR) {
-        addExtendedEmailPublisher(myJob)
-      }
-
       addBuildSteps(myJob, projectName, opsysName, configName, isPR, filesToArchive, filesToExclude)
     }
   }
