@@ -35,7 +35,7 @@ static addGithubPRCommitStatusForBranch(def job, def branchName, def jobName) {
 }
 
 static addXUnitDotNETResults(def job, def configName) {
-  def resultFilePattern = "**/artifacts/${configName}/TestResults/xUnit-*.xml"
+  def resultFilePattern = "**/artifacts/${configName}/TestResults/*.xml"
   def skipIfNoTestFiles = false
     
   Utilities.addXUnitDotNETResults(job, resultFilePattern, skipIfNoTestFiles)
