@@ -1,6 +1,5 @@
 ﻿<!-- Copyright (c)  Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information. -->
-<Project>
-  <Import Project="..\..\build\Targets\Settings.props" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
     <RootNamespace>Microsoft.DiaSymReader.Tools</RootNamespace>
@@ -14,5 +13,4 @@
       <Name>Microsoft.DiaSymReader.Converter</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="..\..\build\Targets\Imports.targets" />
 </Project>
