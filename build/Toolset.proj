@@ -1,13 +1,13 @@
 ﻿<!-- Copyright (c)  Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information. -->
 <Project>
-  <Import Project="Dependencies.props"/>
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <!-- Output dir for restore artifacts -->
-    <BaseIntermediateOutputPath>$(MSBuildThisProjectDirectory)..\..\Artifacts\Toolset</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisProjectDirectory)..\..\artifacts\Toolset</BaseIntermediateOutputPath>
   </PropertyGroup>
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
   <ItemGroup>
+    <PackageReference Include="RoslynTools.Microsoft.RepoToolset" Version="$(RoslynToolsMicrosoftRepoToolsetVersion)" />
     <PackageReference Include="MicroBuild.Core" Version="$(MicroBuildCoreVersion)" />
     <PackageReference Include="MicroBuild.Core.Sentinel" Version="1.0.0" />
     <PackageReference Include="MicroBuild.Plugins.SwixBuild" Version="$(MicroBuildPluginsSwixBuildVersion)" />

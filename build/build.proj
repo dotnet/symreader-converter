@@ -12,11 +12,13 @@
   <PropertyGroup>
     <SolutionPath Condition="'$(SolutionPath)' == ''">$(MSBuildThisFileDirectory)..\SymReaderConverter.sln</SolutionPath>
   </PropertyGroup>
+
+  <Import Project="..\Directory.build.props"/>
   
   <Target Name="Build">
-    <MSBuild Projects="Targets\Toolset.proj" Targets="Restore" Condition="'$(Restore)' == 'true'"/>
+    <MSBuild Projects="Toolset.proj" Targets="Restore" Condition="'$(Restore)' == 'true'"/>
 
-    <MSBuild Projects="Toolset\Build.proj" 
+    <MSBuild Projects="$(RepoToolsetDir)Build.proj" 
              Properties="SolutionPath=$(SolutionPath);Configuration=$(Configuration);OfficialBuild=$(OfficialBuild);Restore=$(Restore);Build=$(Build);Test=$(Test);Sign=$(Sign);Pack=$(Pack)" />
   </Target>
 </Project>
