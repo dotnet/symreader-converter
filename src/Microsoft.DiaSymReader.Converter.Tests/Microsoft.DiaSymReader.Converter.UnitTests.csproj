@@ -3,6 +3,11 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- 
+      We would need to download 32bit dotnet cli, which would add extra time to PR runs 
+      Testing 64bit only on Desktop suffixiently covers our interop code paths.  
+    -->
+    <TestArchitectures Condition="'$(TargetFramework)' == 'net46'">x64;x86</TestArchitectures>
   </PropertyGroup>
 
   <ItemGroup>
