@@ -22,18 +22,6 @@ static addGithubPRTriggerForBranch(def job, def branchName, def jobName) {
   Utilities.addGithubPRTriggerForBranch(job, branchName, prContext, triggerPhrase, triggerOnPhraseOnly)
 }
 
-static addGithubPRCommitStatusForBranch(def job, def branchName, def jobName) {
-  def prContext = "prtest/${jobName.replace('_', '/')}"
-
-  job.with {
-    wrappers {
-      downstreamCommitStatus {
-        context(prContext)
-      }
-    }
-  }
-}
-
 static addXUnitDotNETResults(def job, def configName) {
   def resultFilePattern = "**/artifacts/${configName}/TestResults/*.xml"
   def skipIfNoTestFiles = false
@@ -41,7 +29,7 @@ static addXUnitDotNETResults(def job, def configName) {
   Utilities.addXUnitDotNETResults(job, resultFilePattern, skipIfNoTestFiles)
 }
 
-static addBuildSteps(def job, def projectName, def opsysName, def configName, def isPR, def filesToArchive, def filesToExclude) {
+static addBuildSteps(def job, def projectName, def opsysName, def configName, def isPR) {
   def buildJobName = getJobName(opsysName, configName)
   def buildFullJobName = Utilities.getFullJobName(projectName, buildJobName, isPR)
 
@@ -53,15 +41,6 @@ static addBuildSteps(def job, def projectName, def opsysName, def configName, de
 
   job.with {
     steps {
-      copyArtifacts(buildFullJobName) {
-        includePatterns(filesToArchive)
-        excludePatterns(filesToExclude)
-        buildSelector {
-          upstreamBuild {
-            fallbackToLastSuccessful(false)
-          }
-        }
-      }
       batchFile(""".\\CIBuild.cmd -configuration ${configName} ${officialSwitch}""")
     }
   }
@@ -94,7 +73,7 @@ static addBuildSteps(def job, def projectName, def opsysName, def configName, de
 
       Utilities.setMachineAffinity(myJob, 'Windows_NT', 'latest-or-auto-dev15-rc')
 
-      addBuildSteps(myJob, projectName, opsysName, configName, isPR, filesToArchive, filesToExclude)
+      addBuildSteps(myJob, projectName, opsysName, configName, isPR)
     }
   }
 }
