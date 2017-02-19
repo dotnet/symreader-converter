@@ -33,15 +33,9 @@ static addBuildSteps(def job, def projectName, def opsysName, def configName, de
   def buildJobName = getJobName(opsysName, configName)
   def buildFullJobName = Utilities.getFullJobName(projectName, buildJobName, isPR)
 
-  def officialSwitch = ''
-
-  if (!isPR) {
-    officialSwitch = '-official'
-  }
-
   job.with {
     steps {
-      batchFile(""".\\CIBuild.cmd -configuration ${configName} ${officialSwitch}""")
+      batchFile(""".\\CIBuild.cmd -configuration ${configName}""")
     }
   }
 }
