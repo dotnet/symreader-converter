@@ -3,11 +3,12 @@
     Optional parameters:
       SolutionPath     Path to the solution to build
       Configuration    Build configuration: "Debug", "Release", etc.
-      OfficialBuild    "true" if building an official build in lab
+      CIBuild          "true" if building on CI server
       Restore          "true" to restore toolset and solution
       Build            "true" to build solution
       Test             "true" to run tests
       Sign             "true" to sign built binaries
+      Pack             "true" to build NuGet packages
   -->
   <PropertyGroup>
     <SolutionPath Condition="'$(SolutionPath)' == ''">$(MSBuildThisFileDirectory)..\SymReaderConverter.sln</SolutionPath>
@@ -19,6 +20,6 @@
     <MSBuild Projects="Toolset.proj" Targets="Restore" Condition="'$(Restore)' == 'true'"/>
 
     <MSBuild Projects="$(RepoToolsetDir)Build.proj" 
-             Properties="SolutionPath=$(SolutionPath);Configuration=$(Configuration);OfficialBuild=$(OfficialBuild);Restore=$(Restore);Build=$(Build);Test=$(Test);Sign=$(Sign);Pack=$(Pack)" />
+             Properties="SolutionPath=$(SolutionPath);Configuration=$(Configuration);CIBuild=$(CIBuild);Restore=$(Restore);Build=$(Build);Test=$(Test);Sign=$(Sign);Pack=$(Pack)" />
   </Target>
 </Project>
