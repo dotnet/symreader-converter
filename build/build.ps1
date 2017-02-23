@@ -8,8 +8,7 @@ Param(
   [switch] $test,
   [switch] $sign,
   [switch] $pack,
-  [switch] $ci,
-  [switch] $official
+  [switch] $ci
 )
 
 set-strictmode -version 2.0
