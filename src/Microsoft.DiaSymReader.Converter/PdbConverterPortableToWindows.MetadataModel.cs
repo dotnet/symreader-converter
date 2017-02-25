@@ -45,6 +45,11 @@ namespace Microsoft.DiaSymReader.Tools
 
             public bool TryGetStandaloneSignatureHandle(byte[] signature, out StandaloneSignatureHandle handle) =>
                 _lazyStandaloneSignatureMap.Value.TryGetValue(signature, out handle);
+
+            internal string GetSerializedTypeName(EntityHandle targetType)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

@@ -273,9 +273,9 @@ namespace Microsoft.DiaSymReader.Tools
                                 {
                                     // All dynamic constants have slot id == 0, 
                                     // but a variable can also have slot id == 0
-                                    if (!dynamicNames.ContainsKey(dynamicLocal.Name))
+                                    if (!dynamicNames.ContainsKey(dynamicLocal.LocalName))
                                     {
-                                        dynamicNames.Add(dynamicLocal.Name, dynamicLocal);
+                                        dynamicNames.Add(dynamicLocal.LocalName, dynamicLocal);
                                     }
                                     else
                                     {

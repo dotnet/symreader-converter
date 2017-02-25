@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection.Metadata;
@@ -280,6 +281,70 @@ namespace Microsoft.DiaSymReader
             catch (Exception ex)
             {
                 throw new PdbWritingException(ex);
+            }
+        }
+
+        public void UsingNamespace(string importString)
+        {
+            try
+            {
+                _symWriter.UsingNamespace(importString);
+            }
+            catch (Exception ex)
+            {
+                throw new PdbWritingException(ex);
+            }
+        }
+
+        public void SetAsyncInfo(
+            int moveNextMethodToken,
+            int kickoffMethodToken,
+            int catchHandlerOffset,
+            ImmutableArray<int> yieldOffsets,
+            ImmutableArray<int> resumeOffsets)
+        {
+            var asyncMethodPropertyWriter = _symWriter as ISymUnmanagedAsyncMethodPropertiesWriter;
+            if (asyncMethodPropertyWriter != null)
+            {
+                Debug.Assert(yieldOffsets.IsEmpty == resumeOffsets.IsEmpty);
+                if (!yieldOffsets.IsEmpty)
+                {
+                    int count = yieldOffsets.Length;
+
+                    uint[] yields = new uint[count];
+                    uint[] resumes = new uint[count];
+                    uint[] methods = new uint[count];
+
+                    for (int i = 0; i < count; i++)
+                    {
+                        yields[i] = (uint)yieldOffsets[i];
+                        resumes[i] = (uint)resumeOffsets[i];
+                        methods[i] = (uint)moveNextMethodToken;
+                    }
+
+                    try
+                    {
+                        asyncMethodPropertyWriter.DefineAsyncStepInfo((uint)count, yields, resumes, methods);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new PdbWritingException(ex);
+                    }
+                }
+
+                try
+                {
+                    if (catchHandlerOffset >= 0)
+                    {
+                        asyncMethodPropertyWriter.DefineCatchHandlerILOffset((uint)catchHandlerOffset);
+                    }
+
+                    asyncMethodPropertyWriter.DefineKickoffMethod((uint)kickoffMethodToken);
+                }
+                catch (Exception ex)
+                {
+                    throw new PdbWritingException(ex);
+                }
             }
         }
     }

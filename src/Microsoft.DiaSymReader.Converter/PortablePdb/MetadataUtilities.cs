@@ -2,9 +2,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
+using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Debugging;
 
 namespace Microsoft.DiaSymReader.PortablePdb
 {
@@ -56,6 +60,134 @@ namespace Microsoft.DiaSymReader.PortablePdb
             }
 
             return default(BlobHandle);
+        }
+
+        internal static string GetVisualBasicDefaultNamespace(MetadataReader reader)
+        {
+            foreach (var cdiHandle in reader.GetCustomDebugInformation(Handle.ModuleDefinition))
+            {
+                var cdi = reader.GetCustomDebugInformation(cdiHandle);
+                if (reader.GetGuid(cdi.Kind) == VbDefaultNamespaceId)
+                {
+                    return reader.GetStringUTF8(cdi.Value);
+                }
+            }
+
+            return null;
+        }
+
+        internal static string GetStringUTF8(this MetadataReader reader, BlobHandle handle)
+        {
+            var bytes = reader.GetBlobBytes(handle);
+            return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+        }
+
+        // Copied from Roslyn EE. Share Portable PDB blob decoders.
+
+        /// <exception cref="BadImageFormatException">Invalid data format.</exception>
+        public static ImmutableArray<StateMachineHoistedLocalScope> DecodeHoistedLocalScopes(BlobReader reader)
+        {
+            var result = ArrayBuilder<StateMachineHoistedLocalScope>.GetInstance();
+
+            do
+            {
+                int startOffset = reader.ReadInt32();
+                int length = reader.ReadInt32();
+
+                result.Add(new StateMachineHoistedLocalScope(startOffset, startOffset + length));
+            }
+            while (reader.RemainingBytes > 0);
+
+            return result.ToImmutableAndFree();
+        }
+
+        // Copied from Roslyn EE. Share Portable PDB blob decoders.
+
+        /// <exception cref="BadImageFormatException">Invalid data format.</exception>
+        public static ImmutableArray<bool> ReadDynamicCustomDebugInformation(MetadataReader reader, EntityHandle variableOrConstantHandle)
+        {
+            var blobHandle = GetCustomDebugInformation(reader, variableOrConstantHandle, PortableCustomDebugInfoKinds.DynamicLocalVariables);
+            if (blobHandle.IsNil)
+            {
+                return default(ImmutableArray<bool>);
+            }
+
+            return DecodeDynamicFlags(reader.GetBlobReader(blobHandle));
+        }
+
+        /// <exception cref="BadImageFormatException">Invalid data format.</exception>
+        private static ImmutableArray<bool> DecodeDynamicFlags(BlobReader reader)
+        {
+            var builder = ImmutableArray.CreateBuilder<bool>(reader.Length * 8);
+
+            while (reader.RemainingBytes > 0)
+            {
+                int b = reader.ReadByte();
+                for (int i = 1; i < 0x100; i <<= 1)
+                {
+                    builder.Add((b & i) != 0);
+                }
+            }
+
+            return builder.MoveToImmutable();
+        }
+
+        // TODO: Copied from PortablePdb. Share.
+
+        public static AsyncMethodData ReadAsyncMethodData(MetadataReader metadataReader, MethodDebugInformationHandle debugHandle)
+        {
+            var reader = metadataReader;
+            var body = reader.GetMethodDebugInformation(debugHandle);
+            var kickoffMethod = body.GetStateMachineKickoffMethod();
+
+            if (kickoffMethod.IsNil)
+            {
+                return AsyncMethodData.None;
+            }
+
+            var value = reader.GetCustomDebugInformation(debugHandle.ToDefinitionHandle(), MethodSteppingInformationBlobId);
+            if (value.IsNil)
+            {
+                return AsyncMethodData.None;
+            }
+
+            var blobReader = reader.GetBlobReader(value);
+
+            long catchHandlerOffset = blobReader.ReadUInt32();
+            if (catchHandlerOffset > (uint)int.MaxValue + 1)
+            {
+                throw new BadImageFormatException();
+            }
+
+            var yieldOffsets = ImmutableArray.CreateBuilder<int>();
+            var resultOffsets = ImmutableArray.CreateBuilder<int>();
+            var resumeMethods = ImmutableArray.CreateBuilder<int>();
+
+            while (blobReader.RemainingBytes > 0)
+            {
+                uint yieldOffset = blobReader.ReadUInt32();
+                if (yieldOffset > int.MaxValue)
+                {
+                    throw new BadImageFormatException();
+                }
+
+                uint resultOffset = blobReader.ReadUInt32();
+                if (resultOffset > int.MaxValue)
+                {
+                    throw new BadImageFormatException();
+                }
+
+                yieldOffsets.Add((int)yieldOffset);
+                resultOffsets.Add((int)resultOffset);
+                resumeMethods.Add(MethodDefToken(blobReader.ReadCompressedInteger()));
+            }
+
+            return new AsyncMethodData(
+                kickoffMethod,
+                (int)(catchHandlerOffset - 1),
+                yieldOffsets.ToImmutable(),
+                resultOffsets.ToImmutable(),
+                resumeMethods.ToImmutable());
         }
     }
 }
