@@ -8,9 +8,9 @@ using Roslyn.Utilities;
 
 namespace Microsoft.DiaSymReader.Tools
 {
-    internal sealed class ConstantSignatureConverter
+    internal static partial class PdbConverterWindowsToPortable
     {
-        public unsafe static void Convert(BlobBuilder builder, MetadataModel metadataModel, byte[] signature, object value)
+        private unsafe static void ConvertConstantSignature(BlobBuilder builder, MetadataModel metadataModel, byte[] signature, object value)
         {
             fixed (byte* sigPtr = signature)
             {

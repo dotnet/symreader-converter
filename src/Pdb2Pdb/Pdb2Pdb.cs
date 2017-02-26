@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -13,35 +12,39 @@ namespace Microsoft.DiaSymReader.Tools
         {
             if (args.Length < 1)
             {
-                Console.WriteLine("Usage: Pdb2Pdb <PE file> [/src:<PDB path>] [/dst:<Portable PDB path>]");
+                Console.Error.WriteLine(Resources.Pdb2PdbUsage);
                 return 1;
             }
 
             string peFile = args[0];
             var srcPdb = GetArgumentValue(args, "/src:") ?? Path.ChangeExtension(peFile, "pdb");
-            var dstPdb = GetArgumentValue(args, "/dst:") ?? Path.ChangeExtension(peFile, "pdbx");
+            var dstPdb = GetArgumentValue(args, "/dst:") ?? Path.ChangeExtension(peFile, "pdb2");
 
             if (!File.Exists(peFile))
             {
-                Console.WriteLine($"PE file not: {peFile}");
-                return 1;
-            }
-            
-            if (!File.Exists(srcPdb))
-            {
-                Console.WriteLine($"PDB file not: {srcPdb}");
-                return 1;
+                Console.Error.WriteLine(string.Format(Resources.FileNotFound, peFile));
+                return 2;
             }
 
-            using (var peStream = new FileStream(peFile, FileMode.Open, FileAccess.Read))
+            if (!File.Exists(srcPdb))
             {
-                using (var nativePdbStream = new FileStream(srcPdb, FileMode.Open, FileAccess.Read))
+                Console.Error.WriteLine(string.Format(Resources.FileNotFound, srcPdb));
+                return 2;
+            }
+
+            try
+            {
+                using (var peStream = new FileStream(peFile, FileMode.Open, FileAccess.Read))
+                using (var srcPdbStream = new FileStream(srcPdb, FileMode.Open, FileAccess.Read))
+                using (var dstPdbStream = new FileStream(dstPdb, FileMode.Create, FileAccess.ReadWrite))
                 {
-                    using (var portablePdbStream = new FileStream(dstPdb, FileMode.Create, FileAccess.ReadWrite))
-                    {
-                        PdbConverter.Convert(peStream, nativePdbStream, portablePdbStream);
-                    }
+                    PdbConverter.Convert(peStream, srcPdbStream, dstPdbStream);
                 }
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e.Message);
+                return 3;
             }
 
             return 0;
