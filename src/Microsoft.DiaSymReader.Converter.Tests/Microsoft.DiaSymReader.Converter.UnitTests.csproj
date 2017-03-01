@@ -101,9 +101,6 @@
     <EmbeddedResource Include="Resources\SourceLink.json">
       <LogicalName>SourceLink.json</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\SourceLink.Embedded.dll">
-      <LogicalName>SourceLink.Embedded.dll</LogicalName>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="$(NuGetPackageRoot)\Microsoft.DiaSymReader.Native\$(MicrosoftDiaSymReaderNativeVersion)\runtimes\win\native\Microsoft.DiaSymReader.Native.x86.dll">
