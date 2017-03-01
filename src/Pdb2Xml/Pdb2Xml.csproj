@@ -9,7 +9,7 @@
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.DiaSymReader.Converter\Microsoft.DiaSymReader.Converter.csproj" />
+    <ProjectReference Include="..\Microsoft.DiaSymReader.Converter.Xml\Microsoft.DiaSymReader.Converter.Xml.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources.Designer.cs">

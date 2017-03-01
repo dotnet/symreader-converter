@@ -7,22 +7,20 @@ using System.Text;
 using System.Collections.Generic;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
+using Microsoft.DiaSymReader.PortablePdb;
 using System.Reflection;
-using Microsoft.DiaSymReader.Tools;
-using System.Diagnostics;
 
-namespace Microsoft.DiaSymReader
+namespace Roslyn.Test.PdbUtilities
 {
-    /// <summary>
-    /// Minimal implementation of IMetadataImport that implements APIs used by SymReader and SymWriter.
-    /// </summary>
-    internal sealed class SymReaderMetadataImport : IMetadataImport, IMetadataEmit, IDisposable
+    // TODO: Remove. Need to unity PortablePdb.IMetadataImport and our IMetadataImport first
+
+    internal sealed class DummyMetadataImport : IMetadataImport, IDisposable
     {
         private readonly MetadataReader _metadataReaderOpt;
         private readonly IDisposable _metadataOwnerOpt;
         private readonly List<GCHandle> _pinnedBuffers;
 
-        public SymReaderMetadataImport(MetadataReader metadataReaderOpt, IDisposable metadataOwnerOpt)
+        public DummyMetadataImport(MetadataReader metadataReaderOpt, IDisposable metadataOwnerOpt)
         {
             _metadataReaderOpt = metadataReaderOpt;
             _pinnedBuffers = new List<GCHandle>();
@@ -45,17 +43,9 @@ namespace Microsoft.DiaSymReader
             }
         }
 
-        ~SymReaderMetadataImport()
+        ~DummyMetadataImport()
         {
             Dispose(false);
-        }
-
-        private void MetadataRequired()
-        {
-            if (_metadataReaderOpt == null)
-            {
-                throw new NotSupportedException(Resources.MetadataNotAvailable);
-            }
         }
 
         [PreserveSig]
@@ -64,7 +54,10 @@ namespace Microsoft.DiaSymReader
             out byte* ppvSig,   // return pointer to signature blob
             out int pcbSig)     // return size of signature
         {
-            MetadataRequired();
+            if (_metadataReaderOpt == null)
+            {
+                throw new NotSupportedException("Metadata not available");
+            }
 
             var sig = _metadataReaderOpt.GetStandaloneSignature((StandaloneSignatureHandle)MetadataTokens.Handle(tkSignature));
             var signature = _metadataReaderOpt.GetBlobBytes(sig.Signature);
@@ -77,15 +70,18 @@ namespace Microsoft.DiaSymReader
             return 0;
         }
 
-        public unsafe void GetTypeDefProps(
+        public void GetTypeDefProps(
             int typeDefinition,
             [MarshalAs(UnmanagedType.LPWStr), Out]StringBuilder qualifiedName,
             int qualifiedNameBufferLength,
             out int qualifiedNameLength,
             [MarshalAs(UnmanagedType.U4)]out TypeAttributes attributes,
-            [Out]int* baseType)
+            out int baseType)
         {
-            MetadataRequired();
+            if (_metadataReaderOpt == null)
+            {
+                throw new NotSupportedException("Metadata not available");
+            }
 
             var handle = (TypeDefinitionHandle)MetadataTokens.Handle(typeDefinition);
             var typeDef = _metadataReaderOpt.GetTypeDefinition(handle);
@@ -110,11 +106,7 @@ namespace Microsoft.DiaSymReader
                     _metadataReaderOpt.GetString(typeDef.Name).Length;
             }
 
-            if (baseType != null)
-            {
-                *baseType = MetadataTokens.GetToken(typeDef.BaseType);
-            }
-
+            baseType = MetadataTokens.GetToken(typeDef.BaseType);
             attributes = typeDef.Attributes;
         }
 
@@ -125,7 +117,10 @@ namespace Microsoft.DiaSymReader
             int qualifiedNameBufferLength,
             out int qualifiedNameLength)
         {
-            MetadataRequired();
+            if (_metadataReaderOpt == null)
+            {
+                throw new NotSupportedException("Metadata not available");
+            }
 
             var handle = (TypeReferenceHandle)MetadataTokens.Handle(typeReference);
             var typeRef = _metadataReaderOpt.GetTypeReference(handle);
@@ -151,51 +146,6 @@ namespace Microsoft.DiaSymReader
             }
 
             resolutionScope = MetadataTokens.GetToken(typeRef.ResolutionScope);
-        }
-
-        // The only purpose of this method is to get type name of the method and declaring type token (opaque for SymWriter), everything else is ignored by the SymWriter.
-        // "mb" is the token passed to OpenMethod. The token is remembered until the corresponding CloseMethod, which passes it to GetMethodProps.
-        // It's opaque for SymWriter.
-        public unsafe int GetMethodProps(
-            int methodDefinition, 
-            out int declaringTypeDefinition,
-            [Out]char* nameBuffer, 
-            int nameBufferLength, 
-            out int nameLength,
-            [Out]ushort* attributes,
-            [Out]byte* signature,
-            [Out]int* signatureLength, 
-            [Out]int* relativeVirtualAddress,
-            [Out]ushort* implAttributes)
-        {
-            Debug.Assert(nameBuffer != null);
-            Debug.Assert(attributes == null);
-            Debug.Assert(signature == null);
-            Debug.Assert(signatureLength == null);
-            Debug.Assert(relativeVirtualAddress == null);
-            Debug.Assert(implAttributes == null);
-
-            MetadataRequired();
-
-            var handle = (MethodDefinitionHandle)MetadataTokens.Handle(methodDefinition);
-            var methodDef = _metadataReaderOpt.GetMethodDefinition(handle);
-
-            string methodName = _metadataReaderOpt.GetString(methodDef.Name);
-
-            // if the buffer is too small to fit the name, truncate the name
-            int nameLengthIncludingNull = Math.Min(methodName.Length + 1, nameBufferLength);
-
-            // return the length of the name not including NUL
-            nameLength = nameLengthIncludingNull - 1;
-
-            int methodNameByteCount = nameLengthIncludingNull * sizeof(char);
-            fixed (char* methodNamePtr = methodName)
-            {
-                Buffer.MemoryCopy(methodNamePtr, nameBuffer, methodNameByteCount, methodNameByteCount);
-            }
-
-            declaringTypeDefinition = MetadataTokens.GetToken(methodDef.GetDeclaringType());
-            return 0;
         }
 
         #region Not Implemented
@@ -391,6 +341,11 @@ namespace Microsoft.DiaSymReader
         }
 
         public unsafe uint GetMemberRefProps(uint mr, ref uint ptk, StringBuilder stringMember, uint cchMember, out uint pchMember, out byte* ppvSigBlob)
+        {
+            throw new NotImplementedException();
+        }
+
+        public uint GetMethodProps(uint mb, out uint pointerClass, IntPtr stringMethod, uint cchMethod, out uint pchMethod, IntPtr pdwAttr, IntPtr ppvSigBlob, IntPtr pcbSigBlob, IntPtr pulCodeRVA)
         {
             throw new NotImplementedException();
         }

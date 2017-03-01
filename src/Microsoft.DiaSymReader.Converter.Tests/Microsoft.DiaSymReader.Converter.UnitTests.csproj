@@ -8,16 +8,119 @@
       Testing 64bit only on Desktop suffixiently covers our interop code paths.  
     -->
     <TestArchitectures Condition="'$(TargetFramework)' == 'net46'">x64;x86</TestArchitectures>
+
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.DiaSymReader.PortablePdb" Version="$(MicrosoftDiaSymReaderPortablePdbVersion)" />
+    <ProjectReference Include="..\Microsoft.DiaSymReader.Converter.Xml\Microsoft.DiaSymReader.Converter.Xml.csproj" />
     <ProjectReference Include="..\Microsoft.DiaSymReader.Converter\Microsoft.DiaSymReader.Converter.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.DiaSymReader.Native" Version="$(MicrosoftDiaSymReaderNativeVersion)" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Resources\**\*.cs" />
+    <Content Include="Resources\**\*.cs" />
+    <Content Include="Resources\**\*.cmd" />
+    <Content Include="Resources\**\*.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Async.dll">
+      <LogicalName>Async.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Async.pdb">
+      <LogicalName>Async.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Async.dllx">
+      <LogicalName>Async.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Async.pdbx">
+      <LogicalName>Async.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Documents.dll">
+      <LogicalName>Documents.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Documents.pdb">
+      <LogicalName>Documents.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Documents.dllx">
+      <LogicalName>Documents.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Documents.pdbx">
+      <LogicalName>Documents.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Scopes.dll">
+      <LogicalName>Scopes.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Scopes.pdb">
+      <LogicalName>Scopes.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Scopes.dllx">
+      <LogicalName>Scopes.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Scopes.pdbx">
+      <LogicalName>Scopes.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MethodBoundaries.dll">
+      <LogicalName>MethodBoundaries.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MethodBoundaries.pdb">
+      <LogicalName>MethodBoundaries.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MethodBoundaries.dllx">
+      <LogicalName>MethodBoundaries.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MethodBoundaries.pdbx">
+      <LogicalName>MethodBoundaries.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\EmbeddedSource.cs">
+      <LogicalName>EmbeddedSource.cs</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\EmbeddedSourceSmall.cs">
+      <LogicalName>EmbeddedSourceSmall.cs</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\EmbeddedSource.dll">
+      <LogicalName>EmbeddedSource.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\EmbeddedSource.pdb">
+      <LogicalName>EmbeddedSource.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\EmbeddedSource.dllx">
+      <LogicalName>EmbeddedSource.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\EmbeddedSource.pdbx">
+      <LogicalName>EmbeddedSource.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SourceLink.dllx">
+      <LogicalName>SourceLink.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SourceLink.pdbx">
+      <LogicalName>SourceLink.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SourceLink.json">
+      <LogicalName>SourceLink.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SourceLink.Embedded.dll">
+      <LogicalName>SourceLink.Embedded.dll</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(NuGetPackageRoot)\Microsoft.DiaSymReader.Native\$(MicrosoftDiaSymReaderNativeVersion)\runtimes\win\native\Microsoft.DiaSymReader.Native.x86.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+      <Link>Microsoft.DiaSymReader.Native.x86.dll</Link>
+    </Content>
+    <Content Include="$(NuGetPackageRoot)\Microsoft.DiaSymReader.Native\$(MicrosoftDiaSymReaderNativeVersion)\runtimes\win\native\Microsoft.DiaSymReader.Native.amd64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+      <Link>Microsoft.DiaSymReader.Native.amd64.dll</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
   
   <!-- Workaround for https://github.com/Microsoft/msbuild/issues/1721. -->
-  <Import Project="..\Directory.Build.targets" Condition="'$(TargetFramework)' == ''"/>
+  <Import Project="..\Directory.Build.targets" Condition="'$(TargetFramework)' == ''" />
 </Project>

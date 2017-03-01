@@ -33,14 +33,16 @@ namespace Microsoft.DiaSymReader.PortablePdb
             return qualifiedName;
         }
 
-        public static void GetTypeDefProps(this IMetadataImport importer, int typeDefinition, out string qualifiedName, out TypeAttributes attributes, out int baseType)
+        public static unsafe void GetTypeDefProps(this IMetadataImport importer, int typeDefinition, out string qualifiedName, out TypeAttributes attributes, out int baseType)
         {
             int bufferLength;
-            importer.GetTypeDefProps(typeDefinition, null, 0, out bufferLength, out attributes, out baseType);
+            importer.GetTypeDefProps(typeDefinition, null, 0, out bufferLength, out attributes, null);
 
             var buffer = new StringBuilder(bufferLength);
-            importer.GetTypeDefProps(typeDefinition, buffer, buffer.Capacity, out bufferLength, out attributes, out baseType);
+            int baseTypeValue;
+            importer.GetTypeDefProps(typeDefinition, buffer, buffer.Capacity, out bufferLength, out attributes, &baseTypeValue);
             qualifiedName = buffer.ToString();
+            baseType = baseTypeValue;
         }
 
         public static void GetTypeRefProps(this IMetadataImport importer, int typeReference, out int resolutionScope, out string qualifiedName)

@@ -67,7 +67,12 @@ namespace Microsoft.CodeAnalysis.Debugging
             AddRecord(
                 CustomDebugInfoKind.ForwardInfo,
                 methodHandle,
-                (mh, builder) => builder.WriteInt32(MetadataTokens.GetToken(mh)));
+                (mh, builder) => 
+                {
+                    int token = MetadataTokens.GetToken(mh);
+                    builder.WriteInt32(token);
+                }
+                );
         }
 
         public void AddReferenceToMethodWithModuleInfo(MethodDefinitionHandle methodHandle)

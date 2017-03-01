@@ -5,20 +5,27 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IsPackable>true</IsPackable>
-    <Description>Converter between Windows PDB and Portable PDB formats.</Description>
+    <Description>Converts content of Windows PDB to XML representation.</Description>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <PackageTags>DiaSymReader ISymUnmanagedReader Portable PDB debugging conversion</PackageTags>
+    <PackageTags>DiaSymReader ISymUnmanagedReader Windows PDB debugging XML Pdb2Xml</PackageTags>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\IMetadataEmit.cs" Link="SymReader\IMetadataEmit.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\IMetadataImport.cs" Link="SymReader\IMetadataImport.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\ISymUnmanagedSourceServerModule.cs" Link="SymReader\ISymUnmanagedSourceServerModule.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\ISymUnmanagedWriter.cs" Link="SymReader\ISymUnmanagedWriter.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\SuppressUnmanagedCodeSecurityAttribute.cs" Link="SymReader\SuppressUnmanagedCodeSecurityAttribute.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\SymReaderFactory.cs" Link="SymReader\SymReaderFactory.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\SymReaderMetadataImport.cs" Link="SymReader\SymReaderMetadataImport.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\Utilities\StreamUtilities.cs" Link="Utilities\StreamUtilities.cs" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.DiaSymReader" Version="$(MicrosoftDiaSymReaderVersion)" />
     <PackageReference Include="Microsoft.DiaSymReader.Native" Version="$(MicrosoftDiaSymReaderNativeVersion)" />
+    <PackageReference Include="Microsoft.DiaSymReader.PortablePdb" Version="1.2.0" />
     <PackageReference Include="System.Collections.Immutable" Version="$(SystemCollectionsImmutableVersion)" />
     <PackageReference Include="System.Reflection.Metadata" Version="$(SystemReflectionMetadataVersion)" />
     <PackageReference Include="System.ValueTuple" Version="$(SystemValueTupleVersion)" />
-    <PackageReference Include="System.Text.RegularExpressions" Version="$(SystemTextRegularExpressionsVersion)" />
-  </ItemGroup>
-  <ItemGroup>
-    <InternalsVisibleTo Include="Microsoft.DiaSymReader.Converter.UnitTests" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources.Designer.cs">
@@ -33,6 +40,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <CustomToolNamespace>Microsoft.DiaSymReader.Tools</CustomToolNamespace>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SymReader\" />
   </ItemGroup>
   <Import Project="..\Microsoft.CodeAnalysis.Metadata\Microsoft.CodeAnalysis.Metadata.projitems" />
   <Import Project="..\Microsoft.CodeAnalysis.PooledObjects\Microsoft.CodeAnalysis.PooledObjects.projitems" />

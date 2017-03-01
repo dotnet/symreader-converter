@@ -5,6 +5,9 @@ using System.IO;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
+using Microsoft.DiaSymReader.Tools;
+
+//[assembly: DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.ApplicationDirectory | DllImportSearchPath.UserDirectories)]
 
 namespace Microsoft.DiaSymReader
 {
@@ -28,7 +31,34 @@ namespace Microsoft.DiaSymReader
         [DllImport("Microsoft.DiaSymReader.Native.amd64.dll", EntryPoint = "CreateSymWriter")]
         private extern static void CreateSymWriter64(ref Guid id, [MarshalAs(UnmanagedType.IUnknown)]out object symWriter);
 
+        /// <exception cref="ArgumentException"/>
+        /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="IOException"/>
+        /// <exception cref="ObjectDisposedException"/>
+        public static bool IsPortable(Stream pdbStream)
+        {
+            StreamUtilities.ValidateStream(pdbStream, nameof(pdbStream), readRequired: true, seekRequired: true);
+
+            pdbStream.Position = 0;
+
+            bool isPortable;
+            isPortable = pdbStream.ReadByte() == 'B' && pdbStream.ReadByte() == 'S' && pdbStream.ReadByte() == 'J' && pdbStream.ReadByte() == 'B';
+            pdbStream.Position = 0;
+
+            return isPortable;
+        }
+
         public static ISymUnmanagedReader3 CreateWindowsPdbReader(Stream pdbStream, PEReader peReader)
+        {
+            return CreateWindowsPdbReader(pdbStream, new SymReaderMetadataImport(peReader.GetMetadataReader(), peReader));
+        }
+
+        public static ISymUnmanagedReader3 CreateWindowsPdbReader(Stream pdbStream, MetadataReader metadataReader, IDisposable metadataOwner)
+        {
+            return CreateWindowsPdbReader(pdbStream, new SymReaderMetadataImport(metadataReader, metadataOwner));
+        }
+
+        public static ISymUnmanagedReader3 CreateWindowsPdbReader(Stream pdbStream, object metadataImporter)
         {
             object symReader = null;
 
@@ -43,7 +73,7 @@ namespace Microsoft.DiaSymReader
             }
 
             var reader = (ISymUnmanagedReader3)symReader;
-            reader.Initialize(pdbStream, new SymReaderMetadataImport(peReader.GetMetadataReader(), peReader));
+            reader.Initialize(pdbStream, metadataImporter);
             return reader;
         }
 

@@ -31,7 +31,7 @@ namespace Microsoft.DiaSymReader
             int qualifiedNameBufferLength,
             out int qualifiedNameLength,
             [MarshalAs(UnmanagedType.U4)] out TypeAttributes attributes,
-            out int baseType);
+            [Out]int* baseType);
 
         uint GetInterfaceImplProps(uint impl, out uint pointerClass);
 
