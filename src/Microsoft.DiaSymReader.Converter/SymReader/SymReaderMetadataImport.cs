@@ -54,7 +54,7 @@ namespace Microsoft.DiaSymReader
         {
             if (_metadataReaderOpt == null)
             {
-                throw new NotSupportedException(Resources.MetadataNotAvailable);
+                throw new NotSupportedException(ConverterResources.MetadataNotAvailable);
             }
         }
 

@@ -21,16 +21,16 @@
     <InternalsVisibleTo Include="Microsoft.DiaSymReader.Converter.UnitTests" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Resources.Designer.cs">
+    <Compile Update="ConverterResources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
+      <DependentUpon>ConverterResources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Resources.resx">
+    <EmbeddedResource Update="ConverterResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <LastGenOutput>ConverterResources.Designer.cs</LastGenOutput>
       <CustomToolNamespace>Microsoft.DiaSymReader.Tools</CustomToolNamespace>
     </EmbeddedResource>
   </ItemGroup>

@@ -1567,7 +1567,7 @@ namespace Microsoft.DiaSymReader.Tools
                 return metadataReader.GetString(typeRef.Namespace) + "." + name;
             }
 
-            return string.Format("<unexpected token kind: {0}>", AsToken(metadataReader.GetToken(handle)));
+            return "<" + string.Format(PdbToXmlResources.UnexpectedTokenKind, AsToken(metadataReader.GetToken(handle))) + ">";
         }
 
         private unsafe void WriteSourceServerInformation()

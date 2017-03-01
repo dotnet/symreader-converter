@@ -117,4 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="MetadataNotAvailable" xml:space="preserve">
+    <value>Metadata not available</value>
+  </data>
+  <data name="StreamMustBeReadable" xml:space="preserve">
+    <value>Stream must be readable</value>
+  </data>
+  <data name="StreamMustBeSeakable" xml:space="preserve">
+    <value>Stream must be seakable</value>
+  </data>
+  <data name="StreamMustBeWritable" xml:space="preserve">
+    <value>Stream must be writable</value>
+  </data>
 </root>
