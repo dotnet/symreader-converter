@@ -6,7 +6,7 @@
     <PreReleaseVersionLabel>beta1</PreReleaseVersionLabel>
   
     <!-- Toolset -->
-    <RoslynToolsMicrosoftRepoToolsetVersion>1.0.0-alpha6</RoslynToolsMicrosoftRepoToolsetVersion>
+    <RoslynToolsMicrosoftRepoToolsetVersion>1.0.0-alpha7</RoslynToolsMicrosoftRepoToolsetVersion>
     <RoslynToolsMicrosoftXUnitLoggerVersion>1.0.0-alpha1</RoslynToolsMicrosoftXUnitLoggerVersion>
     <DotNetCliVersion>1.0.0-rc4-004777</DotNetCliVersion>
     <MicroBuildCoreVersion>0.2.0</MicroBuildCoreVersion>
