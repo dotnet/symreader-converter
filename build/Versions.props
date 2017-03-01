@@ -13,6 +13,7 @@
     <MicroBuildPluginsSwixBuildVersion>1.0.101</MicroBuildPluginsSwixBuildVersion>
     <RoslynToolsMicrosoftSignToolVersion>0.3.1-beta</RoslynToolsMicrosoftSignToolVersion>
     <ToolsetCompilerPackageVersion>2.0.0-rc4</ToolsetCompilerPackageVersion>
+    <MicrosoftBuildRuntimeVersion>15.1.0-preview-000545-01</MicrosoftBuildRuntimeVersion>
 
     <!-- Tests -->
     <MicrosoftNETTestSdkVersion>15.0.0-preview-20170125-04</MicrosoftNETTestSdkVersion>
