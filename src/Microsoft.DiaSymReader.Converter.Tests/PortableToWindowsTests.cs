@@ -85,10 +85,82 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 ");
         }
 
-        [Fact(Skip = "TODO: ExecutionEngineException")]
+        [Fact]
         public void Convert_Scopes()
         {
             VerifyWindowsPdb(TestResources.Scopes.DllAndPdb(portable: true), @"
+<?xml version=""1.0"" encoding=""utf-16""?>
+<symbols>
+  <methods>
+    <method containingType=""C`1"" name=""F"">
+      <customDebugInfo>
+        <using>
+          <namespace usingCount=""2"" />
+          <namespace usingCount=""0"" />
+        </using>
+      </customDebugInfo>
+      <scope startOffset=""0x0"" endOffset=""0x2"">
+        <namespace name=""System"" />
+        <namespace name=""System.Collections.Generic"" />
+      </scope>
+    </method>
+    <method containingType=""C`1"" name=""NestedScopes"">
+      <customDebugInfo>
+        <forward declaringType=""C`1"" methodName=""F"" />
+      </customDebugInfo>
+      <scope startOffset=""0x0"" endOffset=""0x13"">
+        <local name=""x0"" il_index=""0"" il_start=""0x0"" il_end=""0x13"" attributes=""0"" />
+        <local name=""y0"" il_index=""1"" il_start=""0x0"" il_end=""0x13"" attributes=""0"" />
+        <scope startOffset=""0x3"" endOffset=""0x7"">
+          <local name=""x1"" il_index=""2"" il_start=""0x3"" il_end=""0x7"" attributes=""0"" />
+        </scope>
+        <scope startOffset=""0x9"" endOffset=""0x12"">
+          <local name=""y1"" il_index=""3"" il_start=""0x9"" il_end=""0x12"" attributes=""0"" />
+          <scope startOffset=""0xc"" endOffset=""0x11"">
+            <local name=""y2"" il_index=""4"" il_start=""0xc"" il_end=""0x11"" attributes=""0"" />
+          </scope>
+        </scope>
+      </scope>
+    </method>
+    <method containingType=""C`1"" name=""NestedScopesLocals"">
+      <customDebugInfo>
+        <forward declaringType=""C`1"" methodName=""F"" />
+      </customDebugInfo>
+      <scope startOffset=""0x0"" endOffset=""0x36"">
+        <local name=""a"" il_index=""0"" il_start=""0x0"" il_end=""0x36"" attributes=""0"" />
+        <scope startOffset=""0x3"" endOffset=""0xf"">
+          <local name=""b"" il_index=""1"" il_start=""0x3"" il_end=""0xf"" attributes=""0"" />
+          <scope startOffset=""0x6"" endOffset=""0xa"">
+            <local name=""c"" il_index=""2"" il_start=""0x6"" il_end=""0xa"" attributes=""0"" />
+          </scope>
+          <scope startOffset=""0xa"" endOffset=""0xe"">
+            <local name=""d"" il_index=""3"" il_start=""0xa"" il_end=""0xe"" attributes=""0"" />
+          </scope>
+        </scope>
+        <scope startOffset=""0xf"" endOffset=""0x35"">
+          <local name=""e"" il_index=""4"" il_start=""0xf"" il_end=""0x35"" attributes=""0"" />
+          <scope startOffset=""0x14"" endOffset=""0x19"">
+            <local name=""f"" il_index=""5"" il_start=""0x14"" il_end=""0x19"" attributes=""0"" />
+          </scope>
+          <scope startOffset=""0x19"" endOffset=""0x26"">
+            <local name=""g"" il_index=""6"" il_start=""0x19"" il_end=""0x26"" attributes=""0"" />
+            <scope startOffset=""0x1d"" endOffset=""0x25"">
+              <local name=""h"" il_index=""7"" il_start=""0x1d"" il_end=""0x25"" attributes=""0"" />
+              <local name=""d"" il_index=""8"" il_start=""0x1d"" il_end=""0x25"" attributes=""0"" />
+            </scope>
+          </scope>
+          <scope startOffset=""0x26"" endOffset=""0x2b"">
+            <local name=""i"" il_index=""9"" il_start=""0x26"" il_end=""0x2b"" attributes=""0"" />
+          </scope>
+          <scope startOffset=""0x2c"" endOffset=""0x34"">
+            <local name=""j"" il_index=""10"" il_start=""0x2c"" il_end=""0x34"" attributes=""0"" />
+            <local name=""d"" il_index=""11"" il_start=""0x2c"" il_end=""0x34"" attributes=""0"" />
+          </scope>
+        </scope>
+      </scope>
+    </method>
+  </methods>
+</symbols>
 ");
         }
     }

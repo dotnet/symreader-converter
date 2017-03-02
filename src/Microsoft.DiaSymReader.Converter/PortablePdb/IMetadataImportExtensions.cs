@@ -3,6 +3,7 @@
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Microsoft.DiaSymReader.PortablePdb
@@ -35,23 +36,26 @@ namespace Microsoft.DiaSymReader.PortablePdb
 
         public static unsafe void GetTypeDefProps(this IMetadataImport importer, int typeDefinition, out string qualifiedName, out TypeAttributes attributes, out int baseType)
         {
-            int bufferLength;
-            importer.GetTypeDefProps(typeDefinition, null, 0, out bufferLength, out attributes, null);
+            Marshal.ThrowExceptionForHR(importer.GetTypeDefProps(typeDefinition, null, 0, out int bufferLength, null, null));
 
             var buffer = new StringBuilder(bufferLength);
             int baseTypeValue;
-            importer.GetTypeDefProps(typeDefinition, buffer, buffer.Capacity, out bufferLength, out attributes, &baseTypeValue);
+            TypeAttributes attributesValue;
+            Marshal.ThrowExceptionForHR(importer.GetTypeDefProps(typeDefinition, buffer, buffer.Capacity, out bufferLength, &attributesValue, &baseTypeValue));
+
             qualifiedName = buffer.ToString();
+            attributes = attributesValue;
             baseType = baseTypeValue;
         }
 
-        public static void GetTypeRefProps(this IMetadataImport importer, int typeReference, out int resolutionScope, out string qualifiedName)
+        public static unsafe void GetTypeRefProps(this IMetadataImport importer, int typeReference, out int resolutionScope, out string qualifiedName)
         {
-            int bufferLength;
-            importer.GetTypeRefProps(typeReference, out resolutionScope, null, 0, out bufferLength);
+            Marshal.ThrowExceptionForHR(importer.GetTypeRefProps(typeReference, null, null, 0, out int bufferLength));
 
             var buffer = new StringBuilder(bufferLength);
-            importer.GetTypeRefProps(typeReference, out resolutionScope, buffer, buffer.Capacity, out bufferLength);
+            int resolutionScopeValue;
+            Marshal.ThrowExceptionForHR(importer.GetTypeRefProps(typeReference, &resolutionScopeValue, buffer, buffer.Capacity, out bufferLength));
+            resolutionScope = resolutionScopeValue;
             qualifiedName = buffer.ToString();
         }
     }
