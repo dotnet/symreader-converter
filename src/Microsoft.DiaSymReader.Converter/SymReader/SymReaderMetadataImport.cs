@@ -205,12 +205,21 @@ namespace Microsoft.DiaSymReader
 
             // return the length of the name not including NUL
             *nameLength = nameLengthIncludingNull - 1;
+            
+#if TRUE // remove when not targeting net45
+            for (int i = 0; i < nameLengthIncludingNull - 1; i++)
+            {
+                name[i] = methodName[i];
+            }
 
+            name[nameLengthIncludingNull - 1] = '\0';
+#else
             int methodNameByteCount = nameLengthIncludingNull * sizeof(char);
             fixed (char* methodNamePtr = methodName)
             {
                 Buffer.MemoryCopy(methodNamePtr, name, methodNameByteCount, methodNameByteCount);
             }
+#endif
 
             *declaringTypeDef = MetadataTokens.GetToken(methodDefinition.GetDeclaringType());
 
