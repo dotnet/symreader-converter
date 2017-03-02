@@ -8,6 +8,8 @@ using System.Text;
 namespace Microsoft.DiaSymReader
 {
     // TODO: Copied from Roslyn. Share.
+    // TODO: unify on char* vs StringBuilder
+    // TODO: all should be preserve sig, review methods that aren't
 
     [ComVisible(false)]
     [ComImport]
@@ -15,29 +17,71 @@ namespace Microsoft.DiaSymReader
     [Guid("7DAC8207-D3AE-4c75-9B67-92801A497D44")]
     internal unsafe interface IMetadataImport
     {
-        void CloseEnum(uint handleEnum);
-        uint CountEnum(uint handleEnum);
-        void ResetEnum(uint handleEnum, uint ulongPos);
-        uint EnumTypeDefs(ref uint handlePointerEnum, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] uint[] arrayTypeDefs, uint countMax);
-        uint EnumInterfaceImpls(ref uint handlePointerEnum, uint td, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] uint[] arrayImpls, uint countMax);
-        uint EnumTypeRefs(ref uint handlePointerEnum, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] uint[] arrayTypeRefs, uint countMax);
-        uint FindTypeDefByName(string stringTypeDef, uint tokenEnclosingClass);
-        Guid GetScopeProps(StringBuilder stringName, uint cchName, out uint pchName);
-        uint GetModuleFromScope();
+        void CloseEnum(int enumHandle);
 
-        void GetTypeDefProps(
-            int typeDefinition,
+        [PreserveSig]
+        int CountEnum(int enumHandle, out int count);
+
+        [PreserveSig]
+        int ResetEnum(int enumHandle, int position);
+
+        [PreserveSig]
+        int EnumTypeDefs(
+            ref int enumHandle,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)]int[] typeDefs, 
+            int bufferLength,
+            out int count);
+
+        [PreserveSig]
+        int EnumInterfaceImpls(
+            ref int enumHandle,
+            int typeDefinition, 
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)]int[] interfaceImpls,
+            int bufferLength,
+            out int count);
+
+        [PreserveSig]
+        int EnumTypeRefs(
+            ref int enumHandle,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)]int[] typeRefs,
+            int bufferLength,
+            out int count);
+
+        [PreserveSig]
+        int FindTypeDefByName(
+            string name, 
+            int declaringTypeDefOrRef,
+            out int typeDef);
+
+        [PreserveSig]
+        int GetScopeProps(
+            [Out, MarshalAs(UnmanagedType.LPWStr)]StringBuilder name, 
+            int bufferLength, 
+            out int nameLength, 
+            [Out]Guid* mvid);
+
+        [PreserveSig]
+        int GetModuleFromScope(out int moduleDef);
+
+        [PreserveSig]
+        int GetTypeDefProps(
+            int typeDef,
             [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder qualifiedName,
             int qualifiedNameBufferLength,
             out int qualifiedNameLength,
-            [MarshalAs(UnmanagedType.U4)] out TypeAttributes attributes,
-            out int baseType);
+            [Out]TypeAttributes* attributes,
+            [Out]int* baseType);
 
-        uint GetInterfaceImplProps(uint impl, out uint pointerClass);
+        [PreserveSig]
+        int GetInterfaceImplProps(
+            int interfaceImpl, 
+            [Out]int* typeDef,
+            [Out]int* interfaceDefRefSpec);
 
-        void GetTypeRefProps(
-            int typeReference,
-            out int resolutionScope,
+        [PreserveSig]
+        int GetTypeRefProps(
+            int typeRef,
+            [Out]int* resolutionScope, // ModuleRef or AssemblyRef
             [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder qualifiedName,
             int qualifiedNameBufferLength,
             out int qualifiedNameLength);
@@ -58,12 +102,13 @@ namespace Microsoft.DiaSymReader
         uint FindField(uint td, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] voidPointerSigBlob, uint byteCountSigBlob);
         uint FindMemberRef(uint td, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] voidPointerSigBlob, uint byteCountSigBlob);
 
+        [PreserveSig]
         int GetMethodProps(
-           int methodDefinition,
-           out int declaringTypeDefinition,
-           [Out]char* nameBuffer,
+           int methodDef,
+           [Out]int* declaringTypeDef,
+           [Out]char* name, 
            int nameBufferLength,
-           out int nameLength,
+           [Out]int* nameLength,
            [Out]ushort* attributes,
            [Out]byte* signature,
            [Out]int* signatureLength,
@@ -82,10 +127,10 @@ namespace Microsoft.DiaSymReader
         uint GetPermissionSetProps(uint pm, out uint pdwAction, out void* ppvPermission);
 
         [PreserveSig]
-        unsafe int GetSigFromToken(
-            int tkSignature,    // Signature token.
-            out byte* ppvSig,   // return pointer to signature blob
-            out int pcbSig);    // return size of signature
+        int GetSigFromToken(
+            int standaloneSignature,
+            [Out]byte** signature,
+            [Out]int* signatureLength);
 
         uint GetModuleRefProps(uint mur, StringBuilder stringName, uint cchName);
         uint EnumModuleRefs(ref uint handlePointerEnum, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] uint[] arrayModuleRefs, uint cmax);

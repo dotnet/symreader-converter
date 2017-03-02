@@ -1,0 +1,60 @@
+﻿<!-- Copyright (c)  Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information. -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IsPackable>true</IsPackable>
+    <Description>Converts content of Windows PDB to XML representation.</Description>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageTags>DiaSymReader ISymUnmanagedReader Windows PDB debugging XML Pdb2Xml</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\IMetadataEmit.cs" Link="SymReader\IMetadataEmit.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\IMetadataImport.cs" Link="SymReader\IMetadataImport.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\ISymUnmanagedSourceServerModule.cs" Link="SymReader\ISymUnmanagedSourceServerModule.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\ISymUnmanagedWriter.cs" Link="SymReader\ISymUnmanagedWriter.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\SuppressUnmanagedCodeSecurityAttribute.cs" Link="SymReader\SuppressUnmanagedCodeSecurityAttribute.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\SymReaderFactory.cs" Link="SymReader\SymReaderFactory.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\SymReaderMetadataImport.cs" Link="SymReader\SymReaderMetadataImport.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\Utilities\StreamUtilities.cs" Link="Utilities\StreamUtilities.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DiaSymReader" Version="$(MicrosoftDiaSymReaderVersion)" />
+    <PackageReference Include="Microsoft.DiaSymReader.Native" Version="$(MicrosoftDiaSymReaderNativeVersion)" />
+    <PackageReference Include="Microsoft.DiaSymReader.PortablePdb" Version="1.2.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="$(SystemCollectionsImmutableVersion)" />
+    <PackageReference Include="System.Reflection.Metadata" Version="$(SystemReflectionMetadataVersion)" />
+    <PackageReference Include="System.ValueTuple" Version="$(SystemValueTupleVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="PdbToXmlResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PdbToXmlResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="PdbToXmlResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>PdbToXmlResources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>Microsoft.DiaSymReader.Tools</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="ConverterResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ConverterResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="ConverterResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ConverterResources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>Microsoft.DiaSymReader.Tools</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="..\Microsoft.CodeAnalysis.Metadata\Microsoft.CodeAnalysis.Metadata.projitems" />
+  <Import Project="..\Microsoft.CodeAnalysis.PooledObjects\Microsoft.CodeAnalysis.PooledObjects.projitems" />
+</Project>

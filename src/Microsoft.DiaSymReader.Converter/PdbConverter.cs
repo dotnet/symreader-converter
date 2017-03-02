@@ -11,18 +11,7 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="ArgumentNullException"/>
         /// <exception cref="IOException"/>
         /// <exception cref="ObjectDisposedException"/>
-        internal static bool IsPortable(Stream pdbStream)
-        {
-            StreamUtilities.ValidateStream(pdbStream, nameof(pdbStream), readRequired: true, seekRequired: true);
-
-            pdbStream.Position = 0;
-
-            bool isPortable;
-            isPortable = pdbStream.ReadByte() == 'B' && pdbStream.ReadByte() == 'S' && pdbStream.ReadByte() == 'J' && pdbStream.ReadByte() == 'B';
-            pdbStream.Position = 0;
-
-            return isPortable;
-        }
+        public static bool IsPortable(Stream pdbStream) => SymReaderFactory.IsPortable(pdbStream);
 
         /// <summary>
         /// Converts Windows PDB stream to Portable PDB and vice versa.
@@ -44,7 +33,7 @@ namespace Microsoft.DiaSymReader.Tools
             StreamUtilities.ValidateStream(sourcePdbStream, nameof(sourcePdbStream), readRequired: true, seekRequired: true);
             StreamUtilities.ValidateStream(targetPdbStream, nameof(targetPdbStream), writeRequired: true);
 
-            if (IsPortable(sourcePdbStream))
+            if (SymReaderFactory.IsPortable(sourcePdbStream))
             {
                 PdbConverterPortableToWindows.Convert(peStream, sourcePdbStream, targetPdbStream);
             }

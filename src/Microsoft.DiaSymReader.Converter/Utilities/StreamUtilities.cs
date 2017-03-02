@@ -16,17 +16,17 @@ namespace Microsoft.DiaSymReader.Tools
 
             if (readRequired && !stream.CanRead)
             {
-                throw new ArgumentException(Resources.StreamMustBeReadable, parameterName);
+                throw new ArgumentException(ConverterResources.StreamMustBeReadable, parameterName);
             }
 
             if (writeRequired && !stream.CanWrite)
             {
-                throw new ArgumentException(Resources.StreamMustBeWritable, parameterName);
+                throw new ArgumentException(ConverterResources.StreamMustBeWritable, parameterName);
             }
 
             if (seekRequired && !stream.CanSeek)
             {
-                throw new ArgumentException(Resources.StreamMustBeSeakable, parameterName);
+                throw new ArgumentException(ConverterResources.StreamMustBeSeakable, parameterName);
             }
         }
     }

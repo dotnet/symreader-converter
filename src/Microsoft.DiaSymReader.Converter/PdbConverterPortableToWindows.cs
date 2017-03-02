@@ -42,8 +42,8 @@ namespace Microsoft.DiaSymReader.Tools
 
         public static void Convert(Stream peStream, Stream sourcePdbStream, Stream targetPdbStream)
         {
-            using (var peReader = new PEReader(peStream))
-            using (var pdbReaderProvider = MetadataReaderProvider.FromPortablePdbStream(sourcePdbStream))
+            using (var peReader = new PEReader(peStream, PEStreamOptions.LeaveOpen))
+            using (var pdbReaderProvider = MetadataReaderProvider.FromPortablePdbStream(sourcePdbStream, MetadataStreamOptions.LeaveOpen))
             using (var pdbWriter = new PdbWriter(peReader.GetMetadataReader()))
             {
                 var metadataReader = peReader.GetMetadataReader();
@@ -58,6 +58,7 @@ namespace Microsoft.DiaSymReader.Tools
                 var importCountsPerScope = new List<int>();
                 var cdiBuilder = new BlobBuilder();
                 var dynamicLocals = new List<(string LocalName, byte[] Flags, int Count, int SlotIndex)>();
+                var openScopeEndOffsets = new Stack<int>();
 
                 // state for calculating import string forwarding:
                 var lastImportScopeHandle = default(ImportScopeHandle);
@@ -86,10 +87,10 @@ namespace Microsoft.DiaSymReader.Tools
                 }
 
                 var localScopeEnumerator = pdbReader.LocalScopes.GetEnumerator();
-                LocalScope currentLocalScope = NextLocalScope();
+                LocalScope? currentLocalScope = NextLocalScope();
 
-                LocalScope NextLocalScope() => 
-                    localScopeEnumerator.MoveNext() ? pdbReader.GetLocalScope(localScopeEnumerator.Current) : default(LocalScope);
+                LocalScope? NextLocalScope() => 
+                    localScopeEnumerator.MoveNext() ? pdbReader.GetLocalScope(localScopeEnumerator.Current) : default(LocalScope?);
 
                 var firstMethodDefHandle = default(MethodDefinitionHandle);
                 foreach (var methodDebugInfoHandle in pdbReader.MethodDebugInformation)
@@ -99,8 +100,10 @@ namespace Microsoft.DiaSymReader.Tools
                     int methodToken = MetadataTokens.GetToken(methodDefHandle);
                     var methodDef = metadataReader.GetMethodDefinition(methodDefHandle);
 
+                    Debug.WriteLine(metadataReader.GetString(methodDef.Name));
+
                     // methods without debug info:
-                    if ( methodDebugInfo.Document.IsNil && methodDebugInfo.SequencePointsBlob.IsNil)
+                    if (methodDebugInfo.Document.IsNil && methodDebugInfo.SequencePointsBlob.IsNil)
                     {
                         continue;
                     }
@@ -112,18 +115,40 @@ namespace Microsoft.DiaSymReader.Tools
                     }
 
                     var methodBody = peReader.GetMethodBody(methodDef.RelativeVirtualAddress);
+                    int methodBodyLength = methodBody.GetILReader().Length;
 
                     pdbWriter.OpenMethod(methodToken);
+                    Debug.WriteLine($"Open Method {methodToken:X8}");
 
                     var forwardImportScopesToMethodDef = default(MethodDefinitionHandle);
                     Debug.Assert(dynamicLocals.Count == 0);
+                    Debug.Assert(openScopeEndOffsets.Count == 0);
+
+                    void CloseOpenScopes(int currentScopeStartOffset)
+                    {
+                        // close all open scopes that end before this scope starts:
+                        while (openScopeEndOffsets.Count > 0 && currentScopeStartOffset >= openScopeEndOffsets.Peek())
+                        {
+                            int scopeEnd = openScopeEndOffsets.Pop();
+                            Debug.WriteLine($"Close Scope [.., {scopeEnd})");
+                            pdbWriter.CloseScope(scopeEnd - (vbSemantics ? 1 : 0));
+                        }
+                    }
 
                     bool isFirstMethodScope = true;
-                    while (currentLocalScope.Method == methodDefHandle)
+                    while (currentLocalScope.HasValue && currentLocalScope.Value.Method == methodDefHandle)
                     {
+                        var localScope = currentLocalScope.Value;
+
+                        CloseOpenScopes(localScope.StartOffset);
+
+                        Debug.WriteLine($"Open Scope [{localScope.StartOffset}, {localScope.EndOffset})");
+                        pdbWriter.OpenScope(localScope.StartOffset);
+                        openScopeEndOffsets.Push(localScope.EndOffset);
+
                         if (isFirstMethodScope)
                         {
-                            if (lastImportScopeHandle == currentLocalScope.ImportScope)
+                            if (lastImportScopeHandle == localScope.ImportScope)
                             {
                                 // forward to a method that has the same imports:
                                 forwardImportScopesToMethodDef = lastImportScopeMethodDefHandle;
@@ -134,7 +159,7 @@ namespace Microsoft.DiaSymReader.Tools
                                 Debug.Assert(declaredExternAliases.Count == 0);
                                 Debug.Assert(importCountsPerScope.Count == 0);
 
-                                AddImportStrings(importStringsBuilder, importCountsPerScope, declaredExternAliases, pdbReader, metadataModel, currentLocalScope.ImportScope, aliasedAssemblyRefs, vbDefaultNamespaceImportString);
+                                AddImportStrings(importStringsBuilder, importCountsPerScope, declaredExternAliases, pdbReader, metadataModel, localScope.ImportScope, aliasedAssemblyRefs, vbDefaultNamespaceImportString);
                                 var importStrings = importStringsBuilder.ToImmutableArray();
                                 importStringsBuilder.Clear();
 
@@ -150,7 +175,7 @@ namespace Microsoft.DiaSymReader.Tools
                                     lastImportScopeMethodDefHandle = methodDefHandle;
                                 }
 
-                                lastImportScopeHandle = currentLocalScope.ImportScope;
+                                lastImportScopeHandle = localScope.ImportScope;
                             }
 
                             if (vbSemantics && !forwardImportScopesToMethodDef.IsNil)
@@ -158,12 +183,8 @@ namespace Microsoft.DiaSymReader.Tools
                                 pdbWriter.UsingNamespace("@" + MetadataTokens.GetToken(forwardImportScopesToMethodDef));
                             }
                         }
-                        else
-                        {
-                            pdbWriter.OpenScope(currentLocalScope.StartOffset);
-                        }
 
-                        foreach (var localConstantHandle in currentLocalScope.GetLocalConstants())
+                        foreach (var localConstantHandle in localScope.GetLocalConstants())
                         {
                             var constant = pdbReader.GetLocalConstant(localConstantHandle);
                             string name = pdbReader.GetString(constant.Name);
@@ -195,7 +216,7 @@ namespace Microsoft.DiaSymReader.Tools
                             }
                         }
 
-                        foreach (var localVariableHandle in currentLocalScope.GetLocalVariables())
+                        foreach (var localVariableHandle in localScope.GetLocalVariables())
                         {
                             var variable = pdbReader.GetLocalVariable(localVariableHandle);
                             string name = pdbReader.GetString(variable.Name);
@@ -205,6 +226,8 @@ namespace Microsoft.DiaSymReader.Tools
                                 // TODO: report warning
                                 continue;
                             }
+
+                            // TODO: translate dummy VB hosited state machine locals to hosted scopes
 
                             int localSignatureToken = methodBody.LocalSignature.IsNil ? 0 : MetadataTokens.GetToken(methodBody.LocalSignature);
                             pdbWriter.DefineLocalVariable(variable.Index, name, variable.Attributes, localSignatureToken);
@@ -216,13 +239,15 @@ namespace Microsoft.DiaSymReader.Tools
                             }
                         }
 
-                        if (!isFirstMethodScope)
-                        {
-                            pdbWriter.CloseScope(currentLocalScope.EndOffset - (vbSemantics ? 1 : 0));
-                        }
-
                         currentLocalScope = NextLocalScope();
                         isFirstMethodScope = false;
+                    }
+
+                    CloseOpenScopes(methodBodyLength);
+                    if (openScopeEndOffsets.Count > 0)
+                    {
+                        // TODO: report warning: scope range exceeds size of the method body
+                        openScopeEndOffsets.Clear();
                     }
 
                     WriteSequencePoints(pdbWriter, documentWriters, symSequencePointBuilder, methodDebugInfo.GetSequencePoints());
@@ -285,6 +310,11 @@ namespace Microsoft.DiaSymReader.Tools
                     CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, PortableCustomDebugInfoKinds.EncLocalSlotMap, CustomDebugInfoKind.EditAndContinueLocalSlotMap);
                     CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, PortableCustomDebugInfoKinds.EncLambdaAndClosureMap, CustomDebugInfoKind.EditAndContinueLambdaMap);
 
+                    if (cdiEncoder.RecordCount > 0)
+                    {
+                        pdbWriter.DefineCustomMetadata("MD2", cdiBuilder.ToArray());
+                    }
+
                     cdiBuilder.Clear();
 
                     if (firstMethodDefHandle.IsNil)
@@ -298,7 +328,8 @@ namespace Microsoft.DiaSymReader.Tools
                         }
                     }
 
-                    pdbWriter.CloseMethod(methodBody.GetILReader().Length);
+                    Debug.WriteLine($"Close Method {methodToken:X8}");
+                    pdbWriter.CloseMethod();
                 }
 
                 pdbWriter.WriteTo(targetPdbStream);
@@ -616,7 +647,11 @@ namespace Microsoft.DiaSymReader.Tools
 
                 if (currentDocumentWriterIndex != documentWriterIndex)
                 {
-                    symSequencePointBuilder.WriteSequencePoints(pdbWriter, documentWriters[currentDocumentWriterIndex]);
+                    if (currentDocumentWriterIndex >= 0)
+                    {
+                        symSequencePointBuilder.WriteSequencePoints(pdbWriter, documentWriters[currentDocumentWriterIndex]);
+                    }
+
                     currentDocumentWriterIndex = documentWriterIndex;
                 }
 
