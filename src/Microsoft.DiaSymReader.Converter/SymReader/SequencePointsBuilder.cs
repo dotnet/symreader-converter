@@ -54,7 +54,7 @@ namespace Microsoft.DiaSymReader
             _count = 0;
         }
 
-        public void WriteSequencePoints(PdbWriter pdbWriter, ISymUnmanagedDocumentWriter symDocument)
+        public void WriteSequencePoints<TDocumentWriter>(PdbWriter<TDocumentWriter> pdbWriter, TDocumentWriter symDocument)
         {
             if (_count == 0)
             {

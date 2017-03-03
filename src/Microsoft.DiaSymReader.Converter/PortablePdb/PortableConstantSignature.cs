@@ -11,7 +11,7 @@ namespace Microsoft.DiaSymReader.PortablePdb
     {
         private static readonly object s_nullReferenceValue = 0;
 
-        public static (object Value, byte[] Signature) GetConstantValueAndSignature(MetadataReader mdReader, LocalConstantHandle handle, IMetadataImport metadataImport)
+        public static (object Value, byte[] Signature) GetConstantValueAndSignature(MetadataReader mdReader, LocalConstantHandle handle, Func<EntityHandle, string> getQualifiedTypeName)
         {
             var constant = mdReader.GetLocalConstant(handle);
 
@@ -45,7 +45,7 @@ namespace Microsoft.DiaSymReader.PortablePdb
             {
                 var typeHandle = sigReader.ReadTypeHandle();
 
-                string qualifiedName = metadataImport.GetQualifiedTypeName(typeHandle);
+                string qualifiedName = getQualifiedTypeName(typeHandle);
                 if (qualifiedName == "System.Decimal")
                 {
                     translatedValue = sigReader.ReadDecimal();

@@ -8,14 +8,19 @@ using System.Security;
 
 namespace Microsoft.DiaSymReader
 {
-    [ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("FC073774-1739-4232-BD56-A027294BEC15"), SuppressUnmanagedCodeSecurity]
+    [ComImport]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    [Guid("FC073774-1739-4232-BD56-A027294BEC15")]
+    [SuppressUnmanagedCodeSecurity]
     internal interface ISymUnmanagedAsyncMethodPropertiesWriter
     {
-        void DefineKickoffMethod(uint kickoffMethod);
-        void DefineCatchHandlerILOffset(uint catchHandlerOffset);
-        void DefineAsyncStepInfo(uint count,
-                                 [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] uint[] yieldOffsets,
-                                 [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] uint[] breakpointOffset,
-                                 [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] uint[] breakpointMethod);
+        void DefineKickoffMethod(int kickoffMethod);
+        void DefineCatchHandlerILOffset(int catchHandlerOffset);
+
+        void DefineAsyncStepInfo(
+            int count,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] int[] yieldOffsets,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] int[] breakpointOffset,
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] int[] breakpointMethod);
     }
 }

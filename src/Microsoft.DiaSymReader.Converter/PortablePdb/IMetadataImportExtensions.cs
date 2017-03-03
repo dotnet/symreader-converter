@@ -12,19 +12,53 @@ namespace Microsoft.DiaSymReader.PortablePdb
 
     internal static class IMetadataImportExtensions
     {
-        public static string GetQualifiedTypeName(this IMetadataImport importer, Handle typeDefOrRef)
+        public static string GetQualifiedTypeName(this IMetadataImport importer, EntityHandle typeDefOrRef)
         {
             string qualifiedName;
             if (typeDefOrRef.Kind == HandleKind.TypeDefinition)
             {
-                TypeAttributes attributes;
-                int baseType;
-                importer.GetTypeDefProps(MetadataTokens.GetToken(typeDefOrRef), out qualifiedName, out attributes, out baseType);
+                importer.GetTypeDefProps(MetadataTokens.GetToken(typeDefOrRef), out qualifiedName, out _, out _);
             }
             else if (typeDefOrRef.Kind == HandleKind.TypeReference)
             {
-                int resolutionScope;
-                importer.GetTypeRefProps(MetadataTokens.GetToken(typeDefOrRef), out resolutionScope, out qualifiedName);
+                importer.GetTypeRefProps(MetadataTokens.GetToken(typeDefOrRef), out _, out qualifiedName);
+            }
+            else
+            {
+                qualifiedName = null;
+            }
+
+            return qualifiedName;
+        }
+
+        // Doesn't handle nested types.
+        public static string GetQualifiedTypeName(this MetadataReader reader, EntityHandle typeDefOrRef)
+        {
+            string qualifiedName;
+            if (typeDefOrRef.Kind == HandleKind.TypeDefinition)
+            {
+                var typeDef = reader.GetTypeDefinition((TypeDefinitionHandle)typeDefOrRef);
+                if (typeDef.Namespace.IsNil)
+                {
+                    return reader.GetString(typeDef.Name);
+                }
+                else
+                {
+                    return reader.GetString(typeDef.Namespace) + "." + reader.GetString(typeDef.Name);
+                }
+
+            }
+            else if (typeDefOrRef.Kind == HandleKind.TypeReference)
+            {
+                var typeRef = reader.GetTypeReference((TypeReferenceHandle)typeDefOrRef);
+                if (typeRef.Namespace.IsNil)
+                {
+                    return reader.GetString(typeRef.Name);
+                }
+                else
+                {
+                    return reader.GetString(typeRef.Namespace) + "." + reader.GetString(typeRef.Name);
+                }
             }
             else
             {
