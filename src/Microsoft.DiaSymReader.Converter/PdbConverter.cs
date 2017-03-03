@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
-using System.IO;
 using System;
+using System.IO;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 
 namespace Microsoft.DiaSymReader.Tools
 {
@@ -35,7 +37,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             if (SymReaderFactory.IsPortable(sourcePdbStream))
             {
-                PdbConverterPortableToWindows.Convert(peStream, sourcePdbStream, targetPdbStream);
+                ConvertPortableToWindows(peStream, sourcePdbStream, targetPdbStream);
             }
             else
             {
@@ -81,10 +83,34 @@ namespace Microsoft.DiaSymReader.Tools
         public static void ConvertPortableToWindows(Stream peStream, Stream sourcePdbStream, Stream targetPdbStream)
         {
             StreamUtilities.ValidateStream(peStream, nameof(peStream), readRequired: true, seekRequired: true);
-            StreamUtilities.ValidateStream(sourcePdbStream, nameof(sourcePdbStream), readRequired: true);
             StreamUtilities.ValidateStream(targetPdbStream, nameof(targetPdbStream), writeRequired: true);
 
-            PdbConverterPortableToWindows.Convert(peStream, sourcePdbStream, targetPdbStream);
+            using (var peReader = new PEReader(peStream, PEStreamOptions.LeaveOpen))
+            using (var pdbWriter = new SymUnmanagedWriter(peReader.GetMetadataReader()))
+            {
+                ConvertPortableToWindows(peReader, sourcePdbStream, pdbWriter);
+                pdbWriter.WriteTo(targetPdbStream);
+            }
+        }
+
+        public static void ConvertPortableToWindows<TDocumentWriter>(PEReader peReader, Stream sourcePdbStream, PdbWriter<TDocumentWriter> pdbWriter)
+        {
+            if (peReader == null)
+            {
+                throw new ArgumentNullException(nameof(peReader));
+            }
+
+            if (pdbWriter == null)
+            {
+                throw new ArgumentNullException(nameof(pdbWriter));
+            }
+
+            StreamUtilities.ValidateStream(sourcePdbStream, nameof(sourcePdbStream), readRequired: true);
+
+            using (var pdbReaderProvider = MetadataReaderProvider.FromPortablePdbStream(sourcePdbStream, MetadataStreamOptions.LeaveOpen))
+            {
+                PdbConverterPortableToWindows<TDocumentWriter>.Convert(peReader, pdbReaderProvider.GetMetadataReader(), pdbWriter);
+            }
         }
     }
 }

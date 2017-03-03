@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.Collections;
 
 namespace Microsoft.DiaSymReader.Tools
 {
-    internal static partial class PdbConverterPortableToWindows
+    internal static partial class PdbConverterPortableToWindows<TDocumentWriter>
     {
         private sealed class MetadataModel
         {
