@@ -1017,22 +1017,31 @@ namespace Microsoft.DiaSymReader.Tools
             foreach (ISymUnmanagedConstant constant in scope.GetConstants())
             {
                 string name = constant.GetName();
-                byte[] signature = constant.GetSignature();
+
+                // Constant signatures might be missing in Windows PDB that were produced by a conversion from Portable PDBs.
+                // Check for HResult explicitly to avoid exceptions.
+                int hr = constant.GetSignature(0, out _, null);
+                byte[] signature = (hr == 0) ? constant.GetSignature() : Array.Empty<byte>();
+
                 object value = constant.GetValue();
 
                 _writer.WriteStartElement("constant");
                 _writer.WriteAttributeString("name", name);
 
-                if (value is int &&
-                    (int)value == 0 &&
-                    (signature[0] == (byte)ConstantTypeCode.NullReference ||
+                if (value is int && (int)value == 0 &&
+                    (signature.Length == 0 ||
+                     signature[0] == (byte)ConstantTypeCode.NullReference ||
                      signature[0] == (int)SignatureTypeCode.Object ||
                      signature[0] == (int)SignatureTypeCode.String ||
                      (signature.Length > 2 && signature[0] == (int)SignatureTypeCode.GenericTypeInstance && signature[1] == (byte)ConstantTypeCode.NullReference)))
                 {
                     _writer.WriteAttributeString("value", "null");
 
-                    if (signature[0] == (int)SignatureTypeCode.String)
+                    if (signature.Length == 0)
+                    {
+                        _writer.WriteAttributeString("unknown-signature", "");
+                    }
+                    else if (signature[0] == (int)SignatureTypeCode.String)
                     {
                         _writer.WriteAttributeString("type", "String");
                     }
@@ -1048,7 +1057,7 @@ namespace Microsoft.DiaSymReader.Tools
                 else if (value == null)
                 {
                     // empty string
-                    if (signature[0] == (byte)SignatureTypeCode.String)
+                    if (signature.Length > 0 && signature[0] == (byte)SignatureTypeCode.String)
                     {
                         _writer.WriteAttributeString("value", "");
                         _writer.WriteAttributeString("type", "String");
@@ -1065,7 +1074,7 @@ namespace Microsoft.DiaSymReader.Tools
                     _writer.WriteAttributeString("value", ((decimal)value).ToString(CultureInfo.InvariantCulture));
                     _writer.WriteAttributeString("type", value.GetType().Name);
                 }
-                else if (value is double && signature[0] != (byte)SignatureTypeCode.Double)
+                else if (value is double && signature.Length > 0 && signature[0] != (byte)SignatureTypeCode.Double)
                 {
                     // TODO: check that the signature is a TypeRef
                     _writer.WriteAttributeString("value", DateTimeUtilities.ToDateTime((double)value).ToString(CultureInfo.InvariantCulture));
@@ -1073,7 +1082,7 @@ namespace Microsoft.DiaSymReader.Tools
                 }
                 else
                 {
-                    string str = value as string;
+                    var str = value as string;
                     if (str != null)
                     {
                         _writer.WriteAttributeString("value", StringUtilities.EscapeNonPrintableCharacters(str));
@@ -1083,21 +1092,29 @@ namespace Microsoft.DiaSymReader.Tools
                         _writer.WriteAttributeString("value", string.Format(CultureInfo.InvariantCulture, "{0}", value));
                     }
 
-                    var runtimeType = GetConstantRuntimeType(signature);
-                    if (runtimeType == null &&
-                        (value is sbyte || value is byte || value is short || value is ushort ||
-                         value is int || value is uint || value is long || value is ulong))
-                    {
-                        _writer.WriteAttributeString("signature", FormatLocalConstantSignature(signature));
-                    }
-                    else if (runtimeType == value.GetType())
-                    {
-                        _writer.WriteAttributeString("type", ((SignatureTypeCode)signature[0]).ToString());
-                    }
-                    else
+                    if (signature.Length == 0)
                     {
                         _writer.WriteAttributeString("runtime-type", value.GetType().Name);
                         _writer.WriteAttributeString("unknown-signature", BitConverter.ToString(signature.ToArray()));
+                    }
+                    else
+                    {
+                        var runtimeType = GetConstantRuntimeType(signature);
+                        if (runtimeType == null &&
+                            (value is sbyte || value is byte || value is short || value is ushort ||
+                             value is int || value is uint || value is long || value is ulong))
+                        {
+                            _writer.WriteAttributeString("signature", FormatLocalConstantSignature(signature));
+                        }
+                        else if (runtimeType == value.GetType())
+                        {
+                            _writer.WriteAttributeString("type", ((SignatureTypeCode)signature[0]).ToString());
+                        }
+                        else
+                        {
+                            _writer.WriteAttributeString("runtime-type", value.GetType().Name);
+                            _writer.WriteAttributeString("unknown-signature", BitConverter.ToString(signature.ToArray()));
+                        }
                     }
                 }
 

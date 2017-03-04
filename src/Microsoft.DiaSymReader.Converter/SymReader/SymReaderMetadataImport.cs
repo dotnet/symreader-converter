@@ -58,6 +58,14 @@ namespace Microsoft.DiaSymReader
             }
         }
 
+        int IMetadataEmit.GetTokenFromSig(byte* voidPointerSig, int byteCountSig)
+        {
+            // Only used when building constant signature. 
+            // We trick SymWriter into embedding NIL token into the PDB if 
+            // we don't have a real signature token matching the constant type.
+            return MetadataTokens.GetToken(default(StandaloneSignatureHandle));
+        }
+
         public int GetSigFromToken(
             int standaloneSignature, 
             [Out]byte** signature,
@@ -65,7 +73,27 @@ namespace Microsoft.DiaSymReader
         {
             MetadataRequired();
 
-            var sig = _metadataReaderOpt.GetStandaloneSignature((StandaloneSignatureHandle)MetadataTokens.Handle(standaloneSignature));
+            var sigHandle = (StandaloneSignatureHandle)MetadataTokens.Handle(standaloneSignature);
+
+            // happens when a constant doesn't have a signature:
+            if (sigHandle.IsNil)
+            {
+                if (signature != null)
+                {
+                    *signature = null;
+                }
+
+                if (signatureLength != null)
+                {
+                    *signatureLength = 0;
+                }
+
+                // The caller expect the signature to have at least one byte on success, 
+                // so we need to fail here. Otherwise AV happens.
+                return HResult.E_INVALIDARG;
+            }
+
+            var sig = _metadataReaderOpt.GetStandaloneSignature(sigHandle);
             var bytes = _metadataReaderOpt.GetBlobBytes(sig.Signature);
 
             var pinnedBuffer = GCHandle.Alloc(bytes, GCHandleType.Pinned);
@@ -80,7 +108,7 @@ namespace Microsoft.DiaSymReader
             }
 
             _pinnedBuffers.Add(pinnedBuffer);
-            return 0;
+            return HResult.S_OK;
         }
 
         public int GetTypeDefProps(
@@ -126,7 +154,7 @@ namespace Microsoft.DiaSymReader
                 *baseType = MetadataTokens.GetToken(typeDefinition.BaseType);
             }
 
-            return 0;
+            return HResult.S_OK;
         }
 
         public int GetTypeRefProps(
@@ -166,7 +194,7 @@ namespace Microsoft.DiaSymReader
                 *resolutionScope = MetadataTokens.GetToken(typeReference.ResolutionScope);
             }
 
-            return 0;
+            return HResult.S_OK;
         }
 
         // The only purpose of this method is to get type name of the method and declaring type token (opaque for SymWriter), everything else is ignored by the SymWriter.
@@ -223,7 +251,7 @@ namespace Microsoft.DiaSymReader
 
             *declaringTypeDef = MetadataTokens.GetToken(methodDefinition.GetDeclaringType());
 
-            return 0;
+            return HResult.S_OK;
         }
 
         #region Not Implemented
@@ -517,6 +545,59 @@ namespace Microsoft.DiaSymReader
         {
             throw new NotImplementedException();
         }
+
+        #endregion
+
+        #region IMetadataEmit
+
+        void IMetadataEmit.__SetModuleProps() => throw new NotImplementedException();
+        void IMetadataEmit.__Save() => throw new NotImplementedException();
+        void IMetadataEmit.__SaveToStream() => throw new NotImplementedException();
+        uint IMetadataEmit.__GetSaveSize() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefineTypeDef() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefineNestedType() => throw new NotImplementedException();
+        void IMetadataEmit.__SetHandler() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefineMethod() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineMethodImpl() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefineTypeRefByName() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefineImportType() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefineMemberRef() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefineImportMember() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefineEvent() => throw new NotImplementedException();
+        void IMetadataEmit.__SetClassLayout() => throw new NotImplementedException();
+        void IMetadataEmit.__DeleteClassLayout() => throw new NotImplementedException();
+        void IMetadataEmit.__SetFieldMarshal() => throw new NotImplementedException();
+        void IMetadataEmit.__DeleteFieldMarshal() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefinePermissionSet() => throw new NotImplementedException();
+        void IMetadataEmit.__SetRVA() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefineModuleRef() => throw new NotImplementedException();
+        void IMetadataEmit.__SetParent() => throw new NotImplementedException();
+        uint IMetadataEmit.__GetTokenFromTypeSpec() => throw new NotImplementedException();
+        void IMetadataEmit.__SaveToMemory() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefineUserString() => throw new NotImplementedException();
+        void IMetadataEmit.__DeleteToken() => throw new NotImplementedException();
+        void IMetadataEmit.__SetMethodProps() => throw new NotImplementedException();
+        void IMetadataEmit.__SetTypeDefProps() => throw new NotImplementedException();
+        void IMetadataEmit.__SetEventProps() => throw new NotImplementedException();
+        uint IMetadataEmit.__SetPermissionSetProps() => throw new NotImplementedException();
+        void IMetadataEmit.__DefinePinvokeMap() => throw new NotImplementedException();
+        void IMetadataEmit.__SetPinvokeMap() => throw new NotImplementedException();
+        void IMetadataEmit.__DeletePinvokeMap() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefineCustomAttribute() => throw new NotImplementedException();
+        void IMetadataEmit.__SetCustomAttributeValue() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefineField() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefineProperty() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefineParam() => throw new NotImplementedException();
+        void IMetadataEmit.__SetFieldProps() => throw new NotImplementedException();
+        void IMetadataEmit.__SetPropertyProps() => throw new NotImplementedException();
+        void IMetadataEmit.__SetParamProps() => throw new NotImplementedException();
+        uint IMetadataEmit.__DefineSecurityAttributeSet() => throw new NotImplementedException();
+        void IMetadataEmit.__ApplyEditAndContinue() => throw new NotImplementedException();
+        uint IMetadataEmit.__TranslateSigWithScope() => throw new NotImplementedException();
+        void IMetadataEmit.__SetMethodImplFlags() => throw new NotImplementedException();
+        void IMetadataEmit.__SetFieldRVA() => throw new NotImplementedException();
+        void IMetadataEmit.__Merge() => throw new NotImplementedException();
+        void IMetadataEmit.__MergeEnd() => throw new NotImplementedException();
 
         #endregion
     }

@@ -17,6 +17,7 @@
     <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\SuppressUnmanagedCodeSecurityAttribute.cs" Link="SymReader\SuppressUnmanagedCodeSecurityAttribute.cs" />
     <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\SymReaderFactory.cs" Link="SymReader\SymReaderFactory.cs" />
     <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\SymReaderMetadataImport.cs" Link="SymReader\SymReaderMetadataImport.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\Utilities\HResult.cs" Link="Utilities\HResult.cs" />
     <Compile Include="..\Microsoft.DiaSymReader.Converter\Utilities\StreamUtilities.cs" Link="Utilities\StreamUtilities.cs" />
   </ItemGroup>
   <ItemGroup>

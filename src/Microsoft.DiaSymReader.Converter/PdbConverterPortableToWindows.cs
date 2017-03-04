@@ -192,13 +192,8 @@ namespace Microsoft.DiaSymReader.Tools
                         var (value, signature) = PortableConstantSignature.GetConstantValueAndSignature(pdbReader, localConstantHandle, metadataReader.GetQualifiedTypeName);
                         if (!metadataModel.TryGetStandaloneSignatureHandle(signature, out var constantSignatureHandle))
                         {
-                            // TODO: report warning
-
-                            // TODO: 
-                            // Currently the EEs require signature to match exactly the type of the value. 
-                            // We could relax that and use the type of the value regardless of the signature for primitive types.
-                            // Then we could use any signature here.
-                            continue;
+                            // Signature will be unspecified. At least we store the name and the value.
+                            constantSignatureHandle = default(StandaloneSignatureHandle);
                         }
 
                         pdbWriter.DefineLocalConstant(name, value, MetadataTokens.GetToken(constantSignatureHandle));
@@ -452,7 +447,13 @@ namespace Microsoft.DiaSymReader.Tools
                     importStringCount++;
                 }
 
-                importCountsPerScope.Add(importStringCount);
+                // Skip C# project-level scope if it doesn't include namespaces.
+                // Currently regular (non-scripting) C# doesn't support project-level namespace imports.
+                if (vbSemantics || !isProjectLevel || importStringCount > 0)
+                {
+                    importCountsPerScope.Add(importStringCount);
+                }
+
                 importScopeHandle = importScope.Parent;
             }
 
@@ -654,7 +655,7 @@ namespace Microsoft.DiaSymReader.Tools
                     endColumn: sequencePoint.EndColumn);
             }
 
-            if (currentDocumentWriterIndex > 0)
+            if (currentDocumentWriterIndex >= 0)
             {
                 symSequencePointBuilder.WriteSequencePoints(pdbWriter, documentWriters[currentDocumentWriterIndex]);
             }
