@@ -7,9 +7,12 @@ using System.Text;
 
 namespace Microsoft.DiaSymReader
 {
-    // TODO: Copied from Roslyn. Share.
-    // TODO: unify on char* vs StringBuilder
-    // TODO: all should be preserve sig, review methods that aren't
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct MetadataImportFieldOffset
+    {
+        public int FieldDef;
+        public uint Offset;
+    }
 
     [ComVisible(false)]
     [ComImport]
@@ -17,6 +20,7 @@ namespace Microsoft.DiaSymReader
     [Guid("7DAC8207-D3AE-4c75-9B67-92801A497D44")]
     internal unsafe interface IMetadataImport
     {
+        [PreserveSig]
         void CloseEnum(int enumHandle);
 
         [PreserveSig]
@@ -28,47 +32,48 @@ namespace Microsoft.DiaSymReader
         [PreserveSig]
         int EnumTypeDefs(
             ref int enumHandle,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)]int[] typeDefs, 
+            [Out]int* typeDefs, 
             int bufferLength,
-            out int count);
+            [Out]int* count);
 
         [PreserveSig]
         int EnumInterfaceImpls(
             ref int enumHandle,
-            int typeDefinition, 
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)]int[] interfaceImpls,
+            int typeDef,
+            [Out]int* interfaceImpls,
             int bufferLength,
-            out int count);
+            [Out]int* count);
 
         [PreserveSig]
         int EnumTypeRefs(
             ref int enumHandle,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)]int[] typeRefs,
+            [Out]int* typeRefs,
             int bufferLength,
-            out int count);
+            [Out]int* count);
 
         [PreserveSig]
         int FindTypeDefByName(
             string name, 
-            int declaringTypeDefOrRef,
-            out int typeDef);
+            int enclosingClass,
+            out int typeDef); // must be specified
 
         [PreserveSig]
         int GetScopeProps(
-            [Out, MarshalAs(UnmanagedType.LPWStr)]StringBuilder name, 
+            [Out]char* name, 
             int bufferLength, 
-            out int nameLength, 
+            [Out]int* nameLength, 
             [Out]Guid* mvid);
 
         [PreserveSig]
-        int GetModuleFromScope(out int moduleDef);
+        int GetModuleFromScope(
+            out int moduleDef); // must be specified
 
         [PreserveSig]
         int GetTypeDefProps(
             int typeDef,
-            [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder qualifiedName,
+            [Out]char* qualifiedName,
             int qualifiedNameBufferLength,
-            out int qualifiedNameLength,
+            [Out]int* qualifiedNameLength,
             [Out]TypeAttributes* attributes,
             [Out]int* baseType);
 
@@ -82,25 +87,154 @@ namespace Microsoft.DiaSymReader
         int GetTypeRefProps(
             int typeRef,
             [Out]int* resolutionScope, // ModuleRef or AssemblyRef
-            [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder qualifiedName,
+            [Out]char* qualifiedName,
             int qualifiedNameBufferLength,
-            out int qualifiedNameLength);
+            [Out]int* qualifiedNameLength);
 
-        uint ResolveTypeRef(uint tr, [In] ref Guid riid, [MarshalAs(UnmanagedType.Interface)] out object ppIScope);
-        uint EnumMembers(ref uint handlePointerEnum, uint cl, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] uint[] arrayMembers, uint countMax);
-        uint EnumMembersWithName(ref uint handlePointerEnum, uint cl, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] uint[] arrayMembers, uint countMax);
-        uint EnumMethods(ref uint handlePointerEnum, uint cl, uint* arrayMethods, uint countMax);
-        uint EnumMethodsWithName(ref uint handlePointerEnum, uint cl, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] uint[] arrayMethods, uint countMax);
-        uint EnumFields(ref uint handlePointerEnum, uint cl, uint* arrayFields, uint countMax);
-        uint EnumFieldsWithName(ref uint handlePointerEnum, uint cl, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] uint[] arrayFields, uint countMax);
-        uint EnumParams(ref uint handlePointerEnum, uint mb, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] uint[] arrayParams, uint countMax);
-        uint EnumMemberRefs(ref uint handlePointerEnum, uint tokenParent, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] uint[] arrayMemberRefs, uint countMax);
-        uint EnumMethodImpls(ref uint handlePointerEnum, uint td, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] uint[] arrayMethodBody, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] uint[] arrayMethodDecl, uint countMax);
-        uint EnumPermissionSets(ref uint handlePointerEnum, uint tk, uint dwordActions, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] uint[] arrayPermission, uint countMax);
-        uint FindMember(uint td, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] voidPointerSigBlob, uint byteCountSigBlob);
-        uint FindMethod(uint td, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] voidPointerSigBlob, uint byteCountSigBlob);
-        uint FindField(uint td, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] voidPointerSigBlob, uint byteCountSigBlob);
-        uint FindMemberRef(uint td, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] voidPointerSigBlob, uint byteCountSigBlob);
+        /// <summary>
+        /// Resolves type reference.
+        /// </summary>
+        /// <param name="typeRef">The TypeRef metadata token to return the referenced type information for.</param>
+        /// <param name="scopeInterfaceId">The IID of the interface to return in scope. Typically, this would be IID_IMetaDataImport.</param>
+        /// <param name="scope">An interface to the module scope in which the referenced type is defined.</param>
+        /// <param name="typeDef">A pointer to a TypeDef token that represents the referenced type.</param>
+        /// <remarks>
+        /// TypeDefs define a type within a scope. TypeRefs refer to type-defs in other scopes
+        /// and allow you to import a type from another scope. This function attempts to determine
+        /// which type-def a type-ref points to.
+        /// 
+        /// This resolve (type-ref, this cope) --> (type-def=*ptd, other scope=*ppIScope)
+        /// 
+        /// However, this resolution requires knowing what modules have been loaded, which is not decided
+        /// until runtime via loader / fusion policy. Thus this interface can't possibly be correct since
+        /// it doesn't have that knowledge. Furthermore, when inspecting metadata from another process
+        /// (such as a debugger inspecting the debuggee's metadata), this API can be truly misleading.
+        /// 
+        /// This API usage should be avoided.
+        /// </remarks>
+        [PreserveSig]
+        int ResolveTypeRef(
+            int typeRef, 
+            [In] ref Guid scopeInterfaceId,
+            [MarshalAs(UnmanagedType.Interface)] out object scope, // must be specified
+            out int typeDef); // must be specified
+
+        [PreserveSig]
+        int EnumMembers(
+            ref int enumHandle,
+            int typeDef,
+            [Out]int* memberDefs,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int EnumMembersWithName(
+            ref int enumHandle, 
+            int typeDef,
+            string name,
+            [Out]int* memberDefs,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int EnumMethods(
+            ref int enumHandle,
+            int typeDef,
+            [Out]int* methodDefs,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int EnumMethodsWithName(
+            ref int enumHandle,
+            int typeDef,
+            string name,
+            [Out]int* methodDefs,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int EnumFields(
+            ref int enumHandle,
+            int typeDef,
+            [Out]int* fieldDefs,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int EnumFieldsWithName(
+            ref int enumHandle,
+            int typeDef,
+            string name,
+            [Out]int* fieldDefs,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int EnumParams(
+            ref int enumHandle,
+            int methodDef,
+            [Out]int* paramDefs,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int EnumMemberRefs(
+            ref int enumHandle,
+            int parentToken,
+            [Out]int* memberRefs,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int EnumMethodImpls(
+            ref int enumHandle, 
+            int typeDef,
+            [Out]int* implementationTokens, 
+            [Out]int* declarationTokens,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int EnumPermissionSets(
+            ref int enumHandle, 
+            int token, // TypeDef, MethodDef or Assembly
+            uint action, // DeclarativeSecurityAction
+            [Out]int* declSecurityTokens,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int FindMember(
+            int typeDef,
+            string name,
+            [In]byte* signature, 
+            int signatureLength,
+            out int memberDef);
+
+        [PreserveSig]
+        int FindMethod(
+            int typeDef, 
+            string name,
+            [In]byte* signature, 
+            int signatureLength,
+            out int methodDef);
+
+        [PreserveSig]
+        int FindField(
+            int typeDef,
+            string name,
+            [In]byte* signature,
+            int signatureLength,
+            out int fieldDef);
+
+        [PreserveSig]
+        int FindMemberRef(
+            int typeDef, 
+            string name,
+            [In]byte* signature,
+            int signatureLength,
+            out int memberRef);
 
         [PreserveSig]
         int GetMethodProps(
@@ -109,54 +243,286 @@ namespace Microsoft.DiaSymReader
            [Out]char* name, 
            int nameBufferLength,
            [Out]int* nameLength,
-           [Out]ushort* attributes,
-           [Out]byte* signature,
+           [Out]MethodAttributes* attributes,
+           [Out]byte** signature, // returns pointer to signature blob
            [Out]int* signatureLength,
            [Out]int* relativeVirtualAddress,
-           [Out]ushort* implAttributes);
+           [Out]MethodImplAttributes* implAttributes);
 
-        uint GetMemberRefProps(uint mr, ref uint ptk, StringBuilder stringMember, uint cchMember, out uint pchMember, out byte* ppvSigBlob);
-        uint EnumProperties(ref uint handlePointerEnum, uint td, uint* arrayProperties, uint countMax);
-        uint EnumEvents(ref uint handlePointerEnum, uint td, uint* arrayEvents, uint countMax);
-        uint GetEventProps(uint ev, out uint pointerClass, StringBuilder stringEvent, uint cchEvent, out uint pchEvent, out uint pdwEventFlags, out uint ptkEventType, out uint pmdAddOn, out uint pmdRemoveOn, out uint pmdFire, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 11)] uint[] rmdOtherMethod, uint countMax);
-        uint EnumMethodSemantics(ref uint handlePointerEnum, uint mb, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] uint[] arrayEventProp, uint countMax);
-        uint GetMethodSemantics(uint mb, uint tokenEventProp);
-        uint GetClassLayout(uint td, out uint pdwPackSize, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] ulong[] arrayFieldOffset, uint countMax, out uint countPointerFieldOffset);
-        uint GetFieldMarshal(uint tk, out byte* ppvNativeType);
-        uint GetRVA(uint tk, out uint pulCodeRVA);
-        uint GetPermissionSetProps(uint pm, out uint pdwAction, out void* ppvPermission);
+        [PreserveSig]
+        int GetMemberRefProps(
+            int memberRef,
+            [Out]int* declaringType, // TypeDef or TypeRef
+            [Out]char* name,
+            int nameBufferLength,
+            [Out]int* nameLength,
+            [Out]byte** signature, // returns pointer to signature blob
+            [Out]int* signatureLength);
+
+        [PreserveSig]
+        int EnumProperties(
+           ref int enumHandle,
+           int typeDef,
+           [Out]int* properties,
+           int bufferLength,
+           [Out]int* count);
+
+        [PreserveSig]
+        uint EnumEvents(
+           ref int enumHandle,
+           int typeDef,
+           [Out]int* events,
+           int bufferLength,
+           [Out]int* count);
+
+        [PreserveSig]
+        int GetEventProps(
+            int @event, 
+            [Out]int* declaringTypeDef,
+            [Out]char* name, 
+            int nameBufferLength, 
+            [Out]int* nameLength, 
+            [Out]int* attributes,
+            [Out]int* eventType,
+            [Out]int* adderMethodDef, 
+            [Out]int* removerMethodDef,
+            [Out]int* raiserMethodDef, 
+            [Out]int* otherMethodDefs, 
+            int otherMethodDefBufferLength,
+            [Out]int* methodMethodDefsLength);
+
+        [PreserveSig]
+        int EnumMethodSemantics(
+            ref int enumHandle,
+            int methodDef,
+            [Out]int* eventsAndProperties,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int GetMethodSemantics(
+            int methodDef, 
+            int eventOrProperty,
+            [Out]int* semantics);
+
+        [PreserveSig]
+        int GetClassLayout(
+            int typeDef, 
+            [Out]int* packSize,  // 1, 2, 4, 8, or 16
+            [Out]MetadataImportFieldOffset* fieldOffsets,
+            int bufferLength,
+            [Out]int* count,
+            [Out]int* typeSize);
+
+        [PreserveSig]
+        int GetFieldMarshal(
+            int fieldDef,
+            [Out]byte** nativeTypeSignature, // returns pointer to signature blob
+            [Out]int* nativeTypeSignatureLengvth);
+
+        [PreserveSig]
+        int GetRVA(
+            int methodDef, 
+            [Out]int* relativeVirtualAddress,
+            [Out]int* implAttributes);
+
+        [PreserveSig]
+        int GetPermissionSetProps(
+            int declSecurity,
+            [Out]uint* action,
+            [Out]byte** permissionBlob, // returns pointer to permission blob
+            [Out]int* permissionBlobLength);
 
         [PreserveSig]
         int GetSigFromToken(
             int standaloneSignature,
-            [Out]byte** signature,
+            [Out]byte** signature, // returns pointer to signature blob
             [Out]int* signatureLength);
 
-        uint GetModuleRefProps(uint mur, StringBuilder stringName, uint cchName);
-        uint EnumModuleRefs(ref uint handlePointerEnum, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] uint[] arrayModuleRefs, uint cmax);
-        uint GetTypeSpecFromToken(uint typespec, out byte* ppvSig);
-        uint GetNameFromToken(uint tk);
-        uint EnumUnresolvedMethods(ref uint handlePointerEnum, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] uint[] arrayMethods, uint countMax);
-        uint GetUserString(uint stk, StringBuilder stringString, uint cchString);
-        uint GetPinvokeMap(uint tk, out uint pdwMappingFlags, StringBuilder stringImportName, uint cchImportName, out uint pchImportName);
-        uint EnumSignatures(ref uint handlePointerEnum, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] uint[] arraySignatures, uint cmax);
-        uint EnumTypeSpecs(ref uint handlePointerEnum, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] uint[] arrayTypeSpecs, uint cmax);
-        uint EnumUserStrings(ref uint handlePointerEnum, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] uint[] arrayStrings, uint cmax);
-        int GetParamForMethodIndex(uint md, uint ulongParamSeq, out uint pointerParam);
-        uint EnumCustomAttributes(ref uint handlePointerEnum, uint tk, uint tokenType, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] uint[] arrayCustomAttributes, uint countMax);
-        uint GetCustomAttributeProps(uint cv, out uint ptkObj, out uint ptkType, out void* ppBlob);
-        uint FindTypeRef(uint tokenResolutionScope, string stringName);
-        uint GetMemberProps(uint mb, out uint pointerClass, StringBuilder stringMember, uint cchMember, out uint pchMember, out uint pdwAttr, out byte* ppvSigBlob, out uint pcbSigBlob, out uint pulCodeRVA, out uint pdwImplFlags, out uint pdwCPlusTypeFlag, out void* ppValue);
-        uint GetFieldProps(uint mb, out uint pointerClass, StringBuilder stringField, uint cchField, out uint pchField, out uint pdwAttr, out byte* ppvSigBlob, out uint pcbSigBlob, out uint pdwCPlusTypeFlag, out void* ppValue);
-        uint GetPropertyProps(uint prop, out uint pointerClass, StringBuilder stringProperty, uint cchProperty, out uint pchProperty, out uint pdwPropFlags, out byte* ppvSig, out uint bytePointerSig, out uint pdwCPlusTypeFlag, out void* ppDefaultValue, out uint pcchDefaultValue, out uint pmdSetter, out uint pmdGetter, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 14)] uint[] rmdOtherMethod, uint countMax);
-        uint GetParamProps(uint tk, out uint pmd, out uint pulSequence, StringBuilder stringName, uint cchName, out uint pchName, out uint pdwAttr, out uint pdwCPlusTypeFlag, out void* ppValue);
-        uint GetCustomAttributeByName(uint tokenObj, string stringName, out void* ppData);
-        bool IsValidToken(uint tk);
+        [PreserveSig]
+        int GetModuleRefProps(
+            int moduleRef, 
+            [Out]char* name,
+            int nameBufferLength,
+            [Out]int* nameLength);
 
         [PreserveSig]
-        uint GetNestedClassProps(uint typeDefNestedClass);
+        int EnumModuleRefs(
+            ref int enumHandle,
+            [Out]int* moduleRefs,
+            int bufferLength,
+            [Out]int* count);
 
-        uint GetNativeCallConvFromSig(void* voidPointerSig, uint byteCountSig);
-        int IsGlobal(uint pd);
+        [PreserveSig]
+        int GetTypeSpecFromToken(
+            int typeSpec, 
+            [Out]byte** signature, // returns pointer to signature blob
+            [Out]int* signatureLength);
+
+        [PreserveSig]
+        int GetNameFromToken(
+            int token,
+            [Out]byte* nameUTF8); // name on the #String heap
+
+        [PreserveSig]
+        int EnumUnresolvedMethods(
+            ref int enumHandle,
+            [Out]int* methodDefs,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int GetUserString(
+            int userStringToken,
+            [Out]char* buffer, 
+            int bufferLength,
+            [Out]int* length);
+
+        [PreserveSig]
+        int GetPinvokeMap(
+            int memberDef,  // FieldDef, MethodDef
+            [Out]int* attributes, 
+            [Out]char* importName,
+            int importNameBufferLength, 
+            [Out]int* importNameLength,
+            [Out]int* moduleRef);
+
+        [PreserveSig]
+        int EnumSignatures(
+            ref int enumHandle,
+            [Out]int* signatureTokens,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int EnumTypeSpecs(
+            ref int enumHandle,
+            [Out]int* typeSpecs,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int EnumUserStrings(
+            ref int enumHandle,
+            [Out]int* userStrings,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int GetParamForMethodIndex(
+            int methodDef,
+            int sequenceNumber, 
+            out int parameterToken); // must be specified
+
+        [PreserveSig]
+        int EnumCustomAttributes(
+            ref int enumHandle,
+            int parent, 
+            int attributeType,
+            [Out]int* customAttributes,
+            int bufferLength,
+            [Out]int* count);
+
+        [PreserveSig]
+        int GetCustomAttributeProps(
+            int customAttribute,
+            [Out]int* parent, 
+            [Out]int* constructor,  // MethodDef, MethodRef
+            [Out]byte** value, // returns pointer to a value blob
+            [Out]int* valueLength);
+
+        [PreserveSig]
+        int FindTypeRef(
+            int resolutionScope, 
+            string name,
+            out int typeRef); // must be specified
+
+        [PreserveSig]
+        int GetMemberProps(
+            int member, // Field or Property
+            [Out]int* declaringTypeDef,
+            [Out]char* name, 
+            int nameBufferLength, 
+            [Out]int* nameLength, 
+            [Out]int* attributes,
+            [Out]byte** signature, // returns pointer to signature blob 
+            [Out]int* signatureLength,
+            [Out]int* relativeVirtualAddress,
+            [Out]int* implAttributes,
+            [Out]int* constantType, 
+            [Out]byte** constantValue, // returns pointer to constant value blob
+            [Out]int* constantValueLength);
+
+        [PreserveSig]
+        int GetFieldProps(
+            int fieldDef,
+            [Out]int* declaringTypeDef,
+            [Out]char* name,
+            int nameBufferLength,
+            [Out]int* nameLength,
+            [Out]int* attributes,
+            [Out]byte** signature, // returns pointer to signature blob 
+            [Out]int* signatureLength,
+            [Out]int* constantType,
+            [Out]byte** constantValue, // returns pointer to constant value blob
+            [Out]int* constantValueLength);
+
+        [PreserveSig]
+        int GetPropertyProps(
+            int propertyDef,
+            [Out]int* declaringTypeDef,
+            [Out]char* name,
+            int nameBufferLength,
+            [Out]int* nameLength,
+            [Out]int* attributes,
+            [Out]byte** signature, // returns pointer to signature blob 
+            [Out]int* signatureLength,
+            [Out]int* constantType,
+            [Out]byte** constantValue, // returns pointer to constant value blob
+            [Out]int* constantValueLength,
+            [Out]int* setterMethodDef,
+            [Out]int* getterMethodDef,
+            [Out]int* outerMethodDefs,
+            int outerMethodDefsBufferLength,
+            [Out]int* otherMethodDefCount);
+
+        [PreserveSig]
+        int GetParamProps(
+            int parameter, 
+            [Out]int* declaringMethodDef, 
+            [Out]int* sequenceNumber,
+            [Out]char* name,
+            int nameBufferLength, 
+            [Out]int* nameLength,
+            [Out]int* attributes,
+            [Out]int* constantType,
+            [Out]byte** constantValue, // returns pointer to constant value blob
+            [Out]int* constantValueLength);
+
+        [PreserveSig]
+        int GetCustomAttributeByName(
+            int parent, 
+            string name, 
+            [Out]byte** value, // returns pointer to a value blob
+            [Out]int* valueLength);
+
+        [PreserveSig]
+        bool IsValidToken(int token);
+
+        [PreserveSig]
+        int GetNestedClassProps(
+            int nestedClass,
+            out int enclosingClass);
+
+        [PreserveSig]
+        int GetNativeCallConvFromSig(
+            [In]byte* signature,
+            int signatureLength,
+            [Out]int* callingConvention);
+
+        [PreserveSig]
+        int IsGlobal(
+            int token,
+            [Out]bool value); 
     }
 }

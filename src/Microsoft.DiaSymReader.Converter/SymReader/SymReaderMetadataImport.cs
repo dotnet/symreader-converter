@@ -1,9 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Collections.Generic;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
@@ -66,7 +64,7 @@ namespace Microsoft.DiaSymReader
             return MetadataTokens.GetToken(default(StandaloneSignatureHandle));
         }
 
-        public int GetSigFromToken(
+        int IMetadataImport.GetSigFromToken(
             int standaloneSignature, 
             [Out]byte** signature,
             [Out]int* signatureLength)
@@ -111,11 +109,11 @@ namespace Microsoft.DiaSymReader
             return HResult.S_OK;
         }
 
-        public int GetTypeDefProps(
+        int IMetadataImport.GetTypeDefProps(
             int typeDef,
-            [MarshalAs(UnmanagedType.LPWStr), Out]StringBuilder qualifiedName,
+            [Out]char* qualifiedName,
             int qualifiedNameBufferLength,
-            out int qualifiedNameLength,
+            [Out]int* qualifiedNameLength,
             [Out]TypeAttributes* attributes,
             [Out]int* baseType)
         {
@@ -124,24 +122,13 @@ namespace Microsoft.DiaSymReader
             var handle = (TypeDefinitionHandle)MetadataTokens.Handle(typeDef);
             var typeDefinition = _metadataReaderOpt.GetTypeDefinition(handle);
 
-            if (qualifiedName != null)
+            if (qualifiedNameLength != null || qualifiedName != null)
             {
-                qualifiedName.Clear();
-
-                if (!typeDefinition.Namespace.IsNil)
-                {
-                    qualifiedName.Append(_metadataReaderOpt.GetString(typeDefinition.Namespace));
-                    qualifiedName.Append('.');
-                }
-
-                qualifiedName.Append(_metadataReaderOpt.GetString(typeDefinition.Name));
-                qualifiedNameLength = qualifiedName.Length;
-            }
-            else
-            {
-                qualifiedNameLength =
-                    (typeDefinition.Namespace.IsNil ? 0 : _metadataReaderOpt.GetString(typeDefinition.Namespace).Length + 1) +
-                    _metadataReaderOpt.GetString(typeDefinition.Name).Length;
+                InteropUtilities.CopyQualifiedTypeName(
+                    qualifiedName,
+                    qualifiedNameLength,
+                    _metadataReaderOpt.GetString(typeDefinition.Namespace),
+                    _metadataReaderOpt.GetString(typeDefinition.Name));
             }
 
             if (attributes != null)
@@ -157,36 +144,25 @@ namespace Microsoft.DiaSymReader
             return HResult.S_OK;
         }
 
-        public int GetTypeRefProps(
+        int IMetadataImport.GetTypeRefProps(
             int typeRef,
-            [Out]int* resolutionScope,
-            [MarshalAs(UnmanagedType.LPWStr), Out]StringBuilder qualifiedName,
+            [Out]int* resolutionScope, // ModuleRef or AssemblyRef
+            [Out]char* qualifiedName,
             int qualifiedNameBufferLength,
-            out int qualifiedNameLength)
+            [Out]int* qualifiedNameLength)
         {
             MetadataRequired();
 
             var handle = (TypeReferenceHandle)MetadataTokens.Handle(typeRef);
             var typeReference = _metadataReaderOpt.GetTypeReference(handle);
 
-            if (qualifiedName != null)
+            if (qualifiedNameLength != null || qualifiedName != null)
             {
-                qualifiedName.Clear();
-
-                if (!typeReference.Namespace.IsNil)
-                {
-                    qualifiedName.Append(_metadataReaderOpt.GetString(typeReference.Namespace));
-                    qualifiedName.Append('.');
-                }
-
-                qualifiedName.Append(_metadataReaderOpt.GetString(typeReference.Name));
-                qualifiedNameLength = qualifiedName.Length;
-            }
-            else
-            {
-                qualifiedNameLength =
-                    (typeReference.Namespace.IsNil ? 0 : _metadataReaderOpt.GetString(typeReference.Namespace).Length + 1) +
-                    _metadataReaderOpt.GetString(typeReference.Name).Length;
+                InteropUtilities.CopyQualifiedTypeName(
+                    qualifiedName,
+                    qualifiedNameLength,
+                    _metadataReaderOpt.GetString(typeReference.Namespace),
+                    _metadataReaderOpt.GetString(typeReference.Name));
             }
 
             if (resolutionScope != null)
@@ -200,404 +176,166 @@ namespace Microsoft.DiaSymReader
         // The only purpose of this method is to get type name of the method and declaring type token (opaque for SymWriter), everything else is ignored by the SymWriter.
         // "mb" is the token passed to OpenMethod. The token is remembered until the corresponding CloseMethod, which passes it to GetMethodProps.
         // It's opaque for SymWriter.
-        public int GetMethodProps(
+        int IMetadataImport.GetMethodProps(
             int methodDef, 
             [Out] int* declaringTypeDef, 
             [Out] char* name, 
             int nameBufferLength, 
             [Out] int* nameLength, 
-            [Out] ushort* attributes,
-            [Out] byte* signature,
+            [Out] MethodAttributes* attributes,
+            [Out] byte** signature,
             [Out] int* signatureLength, 
             [Out] int* relativeVirtualAddress,
-            [Out] ushort* implAttributes)
+            [Out] MethodImplAttributes* implAttributes)
         {
-            Debug.Assert(name != null);
-            Debug.Assert(nameLength != null);
-            Debug.Assert(declaringTypeDef != null);
+            MetadataRequired();
+
             Debug.Assert(attributes == null);
             Debug.Assert(signature == null);
             Debug.Assert(signatureLength == null);
             Debug.Assert(relativeVirtualAddress == null);
             Debug.Assert(implAttributes == null);
 
-            MetadataRequired();
-
             var handle = (MethodDefinitionHandle)MetadataTokens.Handle(methodDef);
             var methodDefinition = _metadataReaderOpt.GetMethodDefinition(handle);
 
-            string methodName = _metadataReaderOpt.GetString(methodDefinition.Name);
-
-            // if the buffer is too small to fit the name, truncate the name
-            int nameLengthIncludingNull = Math.Min(methodName.Length + 1, nameBufferLength);
-
-            // return the length of the name not including NUL
-            *nameLength = nameLengthIncludingNull - 1;
-            
-#if TRUE // remove when not targeting net45
-            for (int i = 0; i < nameLengthIncludingNull - 1; i++)
+            if (name != null || nameLength != null)
             {
-                name[i] = methodName[i];
+                string nameStr = _metadataReaderOpt.GetString(methodDefinition.Name);
+
+                // if the buffer is too small to fit the name, truncate the name.
+                // -1 to account for a NUL terminator.
+                int adjustedLength = Math.Min(nameStr.Length, nameBufferLength - 1);
+
+                // return the length of the name not including NUL
+                if (nameLength != null)
+                {
+                    *nameLength = adjustedLength;
+                }
+
+                if (name != null)
+                {
+                    InteropUtilities.StringCopy(name, nameStr, adjustedLength);
+                }
             }
 
-            name[nameLengthIncludingNull - 1] = '\0';
-#else
-            int methodNameByteCount = nameLengthIncludingNull * sizeof(char);
-            fixed (char* methodNamePtr = methodName)
+            if (declaringTypeDef != null)
             {
-                Buffer.MemoryCopy(methodNamePtr, name, methodNameByteCount, methodNameByteCount);
+                *declaringTypeDef = MetadataTokens.GetToken(methodDefinition.GetDeclaringType());
             }
-#endif
-
-            *declaringTypeDef = MetadataTokens.GetToken(methodDefinition.GetDeclaringType());
 
             return HResult.S_OK;
         }
 
-        #region Not Implemented
-
-        public void CloseEnum(int enumHandle)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int CountEnum(int enumHandle, out int count)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int ResetEnum(int enumHandle, int position)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int EnumTypeDefs(ref int enumHandle, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] int[] typeDefs, int bufferLength, out int count)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int EnumInterfaceImpls(ref int enumHandle, int typeDefinition, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] int[] interfaceImpls, int bufferLength, out int count)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int EnumTypeRefs(ref int enumHandle, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] int[] typeRefs, int bufferLength, out int count)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int FindTypeDefByName(string name, int declaringTypeDefOrRef, out int typeDef)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe int GetScopeProps([MarshalAs(UnmanagedType.LPWStr), Out] StringBuilder name, int bufferLength, out int nameLength, [Out] Guid* mvid)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int GetModuleFromScope(out int moduleDef)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe int GetInterfaceImplProps(int interfaceImpl, [Out] int* typeDef, [Out] int* interfaceDefRefSpec)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint ResolveTypeRef(uint tr, [In] ref Guid riid, [MarshalAs(UnmanagedType.Interface)] out object ppIScope)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint EnumMembers(ref uint handlePointerEnum, uint cl, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] uint[] arrayMembers, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint EnumMembersWithName(ref uint handlePointerEnum, uint cl, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] uint[] arrayMembers, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe uint EnumMethods(ref uint handlePointerEnum, uint cl, uint* arrayMethods, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint EnumMethodsWithName(ref uint handlePointerEnum, uint cl, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] uint[] arrayMethods, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe uint EnumFields(ref uint handlePointerEnum, uint cl, uint* arrayFields, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint EnumFieldsWithName(ref uint handlePointerEnum, uint cl, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] uint[] arrayFields, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint EnumParams(ref uint handlePointerEnum, uint mb, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] uint[] arrayParams, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint EnumMemberRefs(ref uint handlePointerEnum, uint tokenParent, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] uint[] arrayMemberRefs, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint EnumMethodImpls(ref uint handlePointerEnum, uint td, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] uint[] arrayMethodBody, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] uint[] arrayMethodDecl, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint EnumPermissionSets(ref uint handlePointerEnum, uint tk, uint dwordActions, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] uint[] arrayPermission, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint FindMember(uint td, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] voidPointerSigBlob, uint byteCountSigBlob)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint FindMethod(uint td, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] voidPointerSigBlob, uint byteCountSigBlob)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint FindField(uint td, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] voidPointerSigBlob, uint byteCountSigBlob)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint FindMemberRef(uint td, string stringName, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] byte[] voidPointerSigBlob, uint byteCountSigBlob)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe uint GetMemberRefProps(uint mr, ref uint ptk, StringBuilder stringMember, uint cchMember, out uint pchMember, out byte* ppvSigBlob)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe uint EnumProperties(ref uint handlePointerEnum, uint td, uint* arrayProperties, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe uint EnumEvents(ref uint handlePointerEnum, uint td, uint* arrayEvents, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint GetEventProps(uint ev, out uint pointerClass, StringBuilder stringEvent, uint cchEvent, out uint pchEvent, out uint pdwEventFlags, out uint ptkEventType, out uint pmdAddOn, out uint pmdRemoveOn, out uint pmdFire, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 11)] uint[] rmdOtherMethod, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint EnumMethodSemantics(ref uint handlePointerEnum, uint mb, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] uint[] arrayEventProp, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint GetMethodSemantics(uint mb, uint tokenEventProp)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint GetClassLayout(uint td, out uint pdwPackSize, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] ulong[] arrayFieldOffset, uint countMax, out uint countPointerFieldOffset)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe uint GetFieldMarshal(uint tk, out byte* ppvNativeType)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint GetRVA(uint tk, out uint pulCodeRVA)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe uint GetPermissionSetProps(uint pm, out uint pdwAction, out void* ppvPermission)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint GetModuleRefProps(uint mur, StringBuilder stringName, uint cchName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint EnumModuleRefs(ref uint handlePointerEnum, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] uint[] arrayModuleRefs, uint cmax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe uint GetTypeSpecFromToken(uint typespec, out byte* ppvSig)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint GetNameFromToken(uint tk)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint EnumUnresolvedMethods(ref uint handlePointerEnum, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] uint[] arrayMethods, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint GetUserString(uint stk, StringBuilder stringString, uint cchString)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint GetPinvokeMap(uint tk, out uint pdwMappingFlags, StringBuilder stringImportName, uint cchImportName, out uint pchImportName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint EnumSignatures(ref uint handlePointerEnum, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] uint[] arraySignatures, uint cmax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint EnumTypeSpecs(ref uint handlePointerEnum, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] uint[] arrayTypeSpecs, uint cmax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint EnumUserStrings(ref uint handlePointerEnum, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] uint[] arrayStrings, uint cmax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int GetParamForMethodIndex(uint md, uint ulongParamSeq, out uint pointerParam)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint EnumCustomAttributes(ref uint handlePointerEnum, uint tk, uint tokenType, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] uint[] arrayCustomAttributes, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe uint GetCustomAttributeProps(uint cv, out uint ptkObj, out uint ptkType, out void* ppBlob)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint FindTypeRef(uint tokenResolutionScope, string stringName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe uint GetMemberProps(uint mb, out uint pointerClass, StringBuilder stringMember, uint cchMember, out uint pchMember, out uint pdwAttr, out byte* ppvSigBlob, out uint pcbSigBlob, out uint pulCodeRVA, out uint pdwImplFlags, out uint pdwCPlusTypeFlag, out void* ppValue)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe uint GetFieldProps(uint mb, out uint pointerClass, StringBuilder stringField, uint cchField, out uint pchField, out uint pdwAttr, out byte* ppvSigBlob, out uint pcbSigBlob, out uint pdwCPlusTypeFlag, out void* ppValue)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe uint GetPropertyProps(uint prop, out uint pointerClass, StringBuilder stringProperty, uint cchProperty, out uint pchProperty, out uint pdwPropFlags, out byte* ppvSig, out uint bytePointerSig, out uint pdwCPlusTypeFlag, out void* ppDefaultValue, out uint pcchDefaultValue, out uint pmdSetter, out uint pmdGetter, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 14)] uint[] rmdOtherMethod, uint countMax)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe uint GetParamProps(uint tk, out uint pmd, out uint pulSequence, StringBuilder stringName, uint cchName, out uint pchName, out uint pdwAttr, out uint pdwCPlusTypeFlag, out void* ppValue)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe uint GetCustomAttributeByName(uint tokenObj, string stringName, out void* ppData)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsValidToken(uint tk)
-        {
-            throw new NotImplementedException();
-        }
-
-        public uint GetNestedClassProps(uint typeDefNestedClass)
-        {
-            throw new NotImplementedException();
-        }
-
-        public unsafe uint GetNativeCallConvFromSig(void* voidPointerSig, uint byteCountSig)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int IsGlobal(uint pd)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
-        #region IMetadataEmit
+        #region Not implemented
 
         void IMetadataEmit.__SetModuleProps() => throw new NotImplementedException();
         void IMetadataEmit.__Save() => throw new NotImplementedException();
         void IMetadataEmit.__SaveToStream() => throw new NotImplementedException();
-        uint IMetadataEmit.__GetSaveSize() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefineTypeDef() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefineNestedType() => throw new NotImplementedException();
+        void IMetadataEmit.__GetSaveSize() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineTypeDef() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineNestedType() => throw new NotImplementedException();
         void IMetadataEmit.__SetHandler() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefineMethod() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineMethod() => throw new NotImplementedException();
         void IMetadataEmit.__DefineMethodImpl() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefineTypeRefByName() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefineImportType() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefineMemberRef() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefineImportMember() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefineEvent() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineTypeRefByName() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineImportType() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineMemberRef() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineImportMember() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineEvent() => throw new NotImplementedException();
         void IMetadataEmit.__SetClassLayout() => throw new NotImplementedException();
         void IMetadataEmit.__DeleteClassLayout() => throw new NotImplementedException();
         void IMetadataEmit.__SetFieldMarshal() => throw new NotImplementedException();
         void IMetadataEmit.__DeleteFieldMarshal() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefinePermissionSet() => throw new NotImplementedException();
+        void IMetadataEmit.__DefinePermissionSet() => throw new NotImplementedException();
         void IMetadataEmit.__SetRVA() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefineModuleRef() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineModuleRef() => throw new NotImplementedException();
         void IMetadataEmit.__SetParent() => throw new NotImplementedException();
-        uint IMetadataEmit.__GetTokenFromTypeSpec() => throw new NotImplementedException();
+        void IMetadataEmit.__GetTokenFromTypeSpec() => throw new NotImplementedException();
         void IMetadataEmit.__SaveToMemory() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefineUserString() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineUserString() => throw new NotImplementedException();
         void IMetadataEmit.__DeleteToken() => throw new NotImplementedException();
         void IMetadataEmit.__SetMethodProps() => throw new NotImplementedException();
         void IMetadataEmit.__SetTypeDefProps() => throw new NotImplementedException();
         void IMetadataEmit.__SetEventProps() => throw new NotImplementedException();
-        uint IMetadataEmit.__SetPermissionSetProps() => throw new NotImplementedException();
+        void IMetadataEmit.__SetPermissionSetProps() => throw new NotImplementedException();
         void IMetadataEmit.__DefinePinvokeMap() => throw new NotImplementedException();
         void IMetadataEmit.__SetPinvokeMap() => throw new NotImplementedException();
         void IMetadataEmit.__DeletePinvokeMap() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefineCustomAttribute() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineCustomAttribute() => throw new NotImplementedException();
         void IMetadataEmit.__SetCustomAttributeValue() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefineField() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefineProperty() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefineParam() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineField() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineProperty() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineParam() => throw new NotImplementedException();
         void IMetadataEmit.__SetFieldProps() => throw new NotImplementedException();
         void IMetadataEmit.__SetPropertyProps() => throw new NotImplementedException();
         void IMetadataEmit.__SetParamProps() => throw new NotImplementedException();
-        uint IMetadataEmit.__DefineSecurityAttributeSet() => throw new NotImplementedException();
+        void IMetadataEmit.__DefineSecurityAttributeSet() => throw new NotImplementedException();
         void IMetadataEmit.__ApplyEditAndContinue() => throw new NotImplementedException();
-        uint IMetadataEmit.__TranslateSigWithScope() => throw new NotImplementedException();
+        void IMetadataEmit.__TranslateSigWithScope() => throw new NotImplementedException();
         void IMetadataEmit.__SetMethodImplFlags() => throw new NotImplementedException();
         void IMetadataEmit.__SetFieldRVA() => throw new NotImplementedException();
         void IMetadataEmit.__Merge() => throw new NotImplementedException();
         void IMetadataEmit.__MergeEnd() => throw new NotImplementedException();
+
+        void IMetadataImport.CloseEnum(int enumHandle) => throw new NotImplementedException();
+        int IMetadataImport.CountEnum(int enumHandle, out int count) => throw new NotImplementedException();
+        int IMetadataImport.ResetEnum(int enumHandle, int position) => throw new NotImplementedException();
+        int IMetadataImport.EnumTypeDefs(ref int enumHandle, int* typeDefs, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.EnumInterfaceImpls(ref int enumHandle, int typeDef, int* interfaceImpls, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.EnumTypeRefs(ref int enumHandle, int* typeRefs, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.FindTypeDefByName(string name, int enclosingClass, out int typeDef) => throw new NotImplementedException();
+        int IMetadataImport.GetScopeProps(char* name, int bufferLength, int* nameLength, Guid* mvid) => throw new NotImplementedException();
+        int IMetadataImport.GetModuleFromScope(out int moduleDef) => throw new NotImplementedException();
+        int IMetadataImport.GetInterfaceImplProps(int interfaceImpl, int* typeDef, int* interfaceDefRefSpec) => throw new NotImplementedException();
+        int IMetadataImport.ResolveTypeRef(int typeRef, ref Guid scopeInterfaceId, out object scope, out int typeDef) => throw new NotImplementedException();
+        int IMetadataImport.EnumMembers(ref int enumHandle, int typeDef, int* memberDefs, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.EnumMembersWithName(ref int enumHandle, int typeDef, string name, int* memberDefs, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.EnumMethods(ref int enumHandle, int typeDef, int* methodDefs, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.EnumMethodsWithName(ref int enumHandle, int typeDef, string name, int* methodDefs, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.EnumFields(ref int enumHandle, int typeDef, int* fieldDefs, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.EnumFieldsWithName(ref int enumHandle, int typeDef, string name, int* fieldDefs, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.EnumParams(ref int enumHandle, int methodDef, int* paramDefs, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.EnumMemberRefs(ref int enumHandle, int parentToken, int* memberRefs, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.EnumMethodImpls(ref int enumHandle, int typeDef, int* implementationTokens, int* declarationTokens, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.EnumPermissionSets(ref int enumHandle, int token, uint action, int* declSecurityTokens, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.FindMember(int typeDef, string name, byte* signature, int signatureLength, out int memberDef) => throw new NotImplementedException();
+        int IMetadataImport.FindMethod(int typeDef, string name, byte* signature, int signatureLength, out int methodDef) => throw new NotImplementedException();
+        int IMetadataImport.FindField(int typeDef, string name, byte* signature, int signatureLength, out int fieldDef) => throw new NotImplementedException();
+        int IMetadataImport.FindMemberRef(int typeDef, string name, byte* signature, int signatureLength, out int memberRef) => throw new NotImplementedException();
+        int IMetadataImport.GetMemberRefProps(int memberRef, int* declaringType, char* name, int nameBufferLength, int* nameLength, byte** signature, int* signatureLength) => throw new NotImplementedException();
+        int IMetadataImport.EnumProperties(ref int enumHandle, int typeDef, int* properties, int bufferLength, int* count) => throw new NotImplementedException();
+        uint IMetadataImport.EnumEvents(ref int enumHandle, int typeDef, int* events, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.GetEventProps(int @event, int* declaringTypeDef, char* name, int nameBufferLength, int* nameLength, int* attributes, int* eventType, int* adderMethodDef, int* removerMethodDef, int* raiserMethodDef, int* otherMethodDefs, int otherMethodDefBufferLength, int* methodMethodDefsLength) => throw new NotImplementedException();
+        int IMetadataImport.EnumMethodSemantics(ref int enumHandle, int methodDef, int* eventsAndProperties, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.GetMethodSemantics(int methodDef, int eventOrProperty, int* semantics) => throw new NotImplementedException();
+        int IMetadataImport.GetClassLayout(int typeDef, int* packSize, MetadataImportFieldOffset* fieldOffsets, int bufferLength, int* count, int* typeSize) => throw new NotImplementedException();
+        int IMetadataImport.GetFieldMarshal(int fieldDef, byte** nativeTypeSignature, int* nativeTypeSignatureLengvth) => throw new NotImplementedException();
+        int IMetadataImport.GetRVA(int methodDef, int* relativeVirtualAddress, int* implAttributes) => throw new NotImplementedException();
+        int IMetadataImport.GetPermissionSetProps(int declSecurity, uint* action, byte** permissionBlob, int* permissionBlobLength) => throw new NotImplementedException();
+        int IMetadataImport.GetModuleRefProps(int moduleRef, char* name, int nameBufferLength, int* nameLength) => throw new NotImplementedException();
+        int IMetadataImport.EnumModuleRefs(ref int enumHandle, int* moduleRefs, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.GetTypeSpecFromToken(int typeSpec, byte** signature, int* signatureLength) => throw new NotImplementedException();
+        int IMetadataImport.GetNameFromToken(int token, byte* nameUTF8) => throw new NotImplementedException();
+        int IMetadataImport.EnumUnresolvedMethods(ref int enumHandle, int* methodDefs, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.GetUserString(int userStringToken, char* buffer, int bufferLength, int* length) => throw new NotImplementedException();
+        int IMetadataImport.GetPinvokeMap(int memberDef, int* attributes, char* importName, int importNameBufferLength, int* importNameLength, int* moduleRef) => throw new NotImplementedException();
+        int IMetadataImport.EnumSignatures(ref int enumHandle, int* signatureTokens, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.EnumTypeSpecs(ref int enumHandle, int* typeSpecs, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.EnumUserStrings(ref int enumHandle, int* userStrings, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.GetParamForMethodIndex(int methodDef, int sequenceNumber, out int parameterToken) => throw new NotImplementedException();
+        int IMetadataImport.EnumCustomAttributes(ref int enumHandle, int parent, int attributeType, int* customAttributes, int bufferLength, int* count) => throw new NotImplementedException();
+        int IMetadataImport.GetCustomAttributeProps(int customAttribute, int* parent, int* constructor, byte** value, int* valueLength) => throw new NotImplementedException();
+        int IMetadataImport.FindTypeRef(int resolutionScope, string name, out int typeRef) => throw new NotImplementedException();
+        int IMetadataImport.GetMemberProps(int member, int* declaringTypeDef, char* name, int nameBufferLength, int* nameLength, int* attributes, byte** signature, int* signatureLength, int* relativeVirtualAddress, int* implAttributes, int* constantType, byte** constantValue, int* constantValueLength) => throw new NotImplementedException();
+        int IMetadataImport.GetFieldProps(int fieldDef, int* declaringTypeDef, char* name, int nameBufferLength, int* nameLength, int* attributes, byte** signature, int* signatureLength, int* constantType, byte** constantValue, int* constantValueLength) => throw new NotImplementedException();
+        int IMetadataImport.GetPropertyProps(int propertyDef, int* declaringTypeDef, char* name, int nameBufferLength, int* nameLength, int* attributes, byte** signature, int* signatureLength, int* constantType, byte** constantValue, int* constantValueLength, int* setterMethodDef, int* getterMethodDef, int* outerMethodDefs, int outerMethodDefsBufferLength, int* otherMethodDefCount) => throw new NotImplementedException();
+        int IMetadataImport.GetParamProps(int parameter, int* declaringMethodDef, int* sequenceNumber, char* name, int nameBufferLength, int* nameLength, int* attributes, int* constantType, byte** constantValue, int* constantValueLength) => throw new NotImplementedException();
+        int IMetadataImport.GetCustomAttributeByName(int parent, string name, byte** value, int* valueLength) => throw new NotImplementedException();
+        bool IMetadataImport.IsValidToken(int token) => throw new NotImplementedException();
+        int IMetadataImport.GetNestedClassProps(int nestedClass, out int enclosingClass) => throw new NotImplementedException();
+        int IMetadataImport.GetNativeCallConvFromSig(byte* signature, int signatureLength, int* callingConvention) => throw new NotImplementedException();
+        int IMetadataImport.IsGlobal(int token, bool value) => throw new NotImplementedException();
 
         #endregion
     }
