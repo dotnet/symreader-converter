@@ -62,7 +62,7 @@ namespace Microsoft.DiaSymReader.Tools
             var aliasedAssemblyRefs = GetAliasedAssemblyRefs(pdbReader);
             var kickOffMethodToMoveNextMethodMap = GetStateMachineMethodMap(pdbReader);
 
-            string vbDefaultNamespace = MetadataUtilities.GetVisualBasicDefaultNamespace(metadataReader);
+            string vbDefaultNamespace = MetadataUtilities.GetVisualBasicDefaultNamespace(pdbReader);
             bool vbSemantics = vbDefaultNamespace != null;
             string vbDefaultNamespaceImportString = vbSemantics ? "*" + vbDefaultNamespace : null;
 
