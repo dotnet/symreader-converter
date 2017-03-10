@@ -301,7 +301,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                 if (cdiEncoder.RecordCount > 0)
                 {
-                    pdbWriter.DefineCustomMetadata("MD2", cdiBuilder.ToArray());
+                    pdbWriter.DefineCustomMetadata("MD2", cdiEncoder.ToArray());
                 }
 
                 cdiBuilder.Clear();
