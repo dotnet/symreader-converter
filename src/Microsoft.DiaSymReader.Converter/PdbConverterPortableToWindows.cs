@@ -249,8 +249,8 @@ namespace Microsoft.DiaSymReader.Tools
                         moveNextMethodToken: methodToken, 
                         kickoffMethodToken: MetadataTokens.GetToken(asyncData.KickoffMethod),
                         catchHandlerOffset: asyncData.CatchHandlerOffset,
-                        yieldOffsets: ImmutableArrayInterop<int>.DangerousGetUnderlyingArray(asyncData.YieldOffsets),
-                        resumeOffsets: ImmutableArrayInterop<int>.DangerousGetUnderlyingArray(asyncData.ResumeOffsets));
+                        yieldOffsets: asyncData.YieldOffsets.ToArray(),
+                        resumeOffsets: asyncData.ResumeOffsets.ToArray());
                 }
 
                 // custom debug information:
