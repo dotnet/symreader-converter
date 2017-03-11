@@ -6,19 +6,17 @@
     <PreReleaseVersionLabel>beta1</PreReleaseVersionLabel>
   
     <!-- Toolset -->
-    <RoslynToolsMicrosoftRepoToolsetVersion>1.0.0-alpha7</RoslynToolsMicrosoftRepoToolsetVersion>
+    <RoslynToolsMicrosoftRepoToolsetVersion>1.0.0-alpha9</RoslynToolsMicrosoftRepoToolsetVersion>
     <RoslynToolsMicrosoftXUnitLoggerVersion>1.0.0-alpha1</RoslynToolsMicrosoftXUnitLoggerVersion>
+    <RoslynToolsMicrosoftSignToolVersion>0.3.2-beta</RoslynToolsMicrosoftSignToolVersion>
     <DotNetCliVersion>1.0.0-rc4-004777</DotNetCliVersion>
     <MicroBuildCoreVersion>0.2.0</MicroBuildCoreVersion>
     <MicroBuildPluginsSwixBuildVersion>1.0.101</MicroBuildPluginsSwixBuildVersion>
-    <RoslynToolsMicrosoftSignToolVersion>0.3.1-beta</RoslynToolsMicrosoftSignToolVersion>
-    <ToolsetCompilerPackageVersion>2.0.0-rc4</ToolsetCompilerPackageVersion>
-    <MicrosoftBuildRuntimeVersion>15.1.0-preview-000545-01</MicrosoftBuildRuntimeVersion>
+    <ToolsetCompilerPackageVersion>2.0.1</ToolsetCompilerPackageVersion>
 
     <!-- Tests -->
     <MicrosoftNETTestSdkVersion>15.0.0-preview-20170125-04</MicrosoftNETTestSdkVersion>
     <XUnitVersion>2.2.0-beta4-build3444</XUnitVersion>
-    <XUnitRunnerConsoleVersion>2.2.0-beta4-build3444</XUnitRunnerConsoleVersion>
     <XUnitRunnerVisualStudioVersion>2.2.0-beta4-build1194</XUnitRunnerVisualStudioVersion>
     
     <!-- symreader -->
