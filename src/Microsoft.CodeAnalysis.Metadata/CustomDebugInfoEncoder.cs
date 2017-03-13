@@ -48,13 +48,13 @@ namespace Microsoft.CodeAnalysis.Debugging
             return Builder.ToArray();
         }
 
-        public void AddReferenceToIteratorClass(string iteratorClassName)
+        public void AddStateMachineTypeName(string typeName)
         {
-            Debug.Assert(iteratorClassName != null);
+            Debug.Assert(typeName != null);
 
             AddRecord(
-                CustomDebugInfoKind.ForwardIterator,
-                iteratorClassName,
+                CustomDebugInfoKind.StateMachineTypeName,
+                typeName,
                 (name, builder) => 
                 {
                     builder.WriteUTF16(name);
@@ -62,41 +62,36 @@ namespace Microsoft.CodeAnalysis.Debugging
                 });
         }
 
-        public void AddReferenceToPreviousMethodWithUsingInfo(MethodDefinitionHandle methodHandle)
+        public void AddForwardMethodInfo(MethodDefinitionHandle methodHandle)
         {
             AddRecord(
-                CustomDebugInfoKind.ForwardInfo,
-                methodHandle,
-                (mh, builder) => 
-                {
-                    int token = MetadataTokens.GetToken(mh);
-                    builder.WriteInt32(token);
-                }
-                );
-        }
-
-        public void AddReferenceToMethodWithModuleInfo(MethodDefinitionHandle methodHandle)
-        {
-            AddRecord(
-                CustomDebugInfoKind.ForwardToModuleInfo,
+                CustomDebugInfoKind.ForwardMethodInfo,
                 methodHandle,
                 (mh, builder) => builder.WriteInt32(MetadataTokens.GetToken(mh)));
         }
 
-        public void AddUsingInfo(IReadOnlyCollection<int> usingCounts)
+        public void AddForwardModuleInfo(MethodDefinitionHandle methodHandle)
         {
-            Debug.Assert(usingCounts.Count <= ushort.MaxValue);
+            AddRecord(
+                CustomDebugInfoKind.ForwardModuleInfo,
+                methodHandle,
+                (mh, builder) => builder.WriteInt32(MetadataTokens.GetToken(mh)));
+        }
+
+        public void AddUsingGroups(IReadOnlyCollection<int> groupSizes)
+        {
+            Debug.Assert(groupSizes.Count <= ushort.MaxValue);
            
             // This originally wrote (uint)12, (ushort)1, (ushort)0 in the
             // case where usingCounts was empty, but I'm not sure why.
-            if (usingCounts.Count == 0)
+            if (groupSizes.Count == 0)
             {
                 return;
             }
 
             AddRecord(
-                CustomDebugInfoKind.UsingInfo,
-                usingCounts,
+                CustomDebugInfoKind.UsingGroups,
+                groupSizes,
                 (uc, builder) =>
                 {
                     builder.WriteUInt16((ushort)uc.Count);
@@ -108,9 +103,9 @@ namespace Microsoft.CodeAnalysis.Debugging
                 });
         }
 
-        public void AddStateMachineLocalScopes(ImmutableArray<StateMachineHoistedLocalScope> scopes)
+        public void AddStateMachineHoistedLocalScopes(ImmutableArray<StateMachineHoistedLocalScope> scopes)
         {
-            if (scopes.IsEmpty)
+            if (scopes.IsDefaultOrEmpty)
             {
                 return;
             }

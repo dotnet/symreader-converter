@@ -17,7 +17,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)CustomDebugInfoRecord.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DynamicLocalInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ImportTargetKind.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PooledBlobBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PortableCustomDebugInfoKinds.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StateMachineHoistedLocalScope.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TupleElementNamesInfo.cs" />

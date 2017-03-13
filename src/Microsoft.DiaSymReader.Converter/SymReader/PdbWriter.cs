@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Immutable;
-using System.IO;
 using System.Reflection.Metadata;
 
 namespace Microsoft.DiaSymReader
@@ -19,6 +17,6 @@ namespace Microsoft.DiaSymReader
         public abstract void DefineLocalConstant(string name, object value, int constantSignatureToken);
         public abstract void UsingNamespace(string importString);
         public abstract void SetAsyncInfo(int moveNextMethodToken, int kickoffMethodToken, int catchHandlerOffset, int[] yieldOffsets, int[] resumeOffsets);
-        public abstract void DefineCustomMetadata(string name, byte[] metadata);
+        public abstract void DefineCustomMetadata(byte[] metadata);
     }
 }

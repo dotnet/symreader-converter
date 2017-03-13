@@ -335,14 +335,14 @@ namespace Microsoft.DiaSymReader
             }
         }
 
-        public override unsafe void DefineCustomMetadata(string name, byte[] metadata)
+        public override unsafe void DefineCustomMetadata(byte[] metadata)
         {
             fixed (byte* pb = metadata)
             {
                 try
                 {
                     // parent parameter is not used, it must be zero or the current method token passed to OpenMethod.
-                    _symWriter.SetSymAttribute(0, name, (uint)metadata.Length, (IntPtr)pb);
+                    _symWriter.SetSymAttribute(0, "MD2", (uint)metadata.Length, (IntPtr)pb);
                 }
                 catch (Exception ex)
                 {

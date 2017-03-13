@@ -318,5 +318,98 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 </symbols>
 ");
         }
+
+        [Fact]
+        public void Convert_Async()
+        {
+            VerifyWindowsPdb(
+                TestResources.Async.DllAndPdb(portable: true),
+                TestResources.Async.DllAndPdb(portable: false),
+@"<?xml version=""1.0"" encoding=""utf-16""?>
+<symbols>
+  <files>
+    <file id=""1"" name=""C:\Async.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
+  </files>
+  <methods>
+    <method containingType=""C"" name=""M1"">
+      <customDebugInfo>
+        <forwardIterator name=""&lt;M1&gt;d__0"" />
+      </customDebugInfo>
+    </method>
+    <method containingType=""C"" name=""M2"">
+      <customDebugInfo>
+        <forwardIterator name=""&lt;M2&gt;d__1"" />
+      </customDebugInfo>
+    </method>
+    <method containingType=""C+&lt;M1&gt;d__0"" name=""MoveNext"">
+       <customDebugInfo>
+        <using>
+          <namespace usingCount=""1"" />
+        </using>
+        <encLocalSlotMap>
+          <slot kind=""27"" offset=""0"" />
+          <slot kind=""20"" offset=""0"" />
+          <slot kind=""33"" offset=""5"" />
+          <slot kind=""temp"" />
+          <slot kind=""33"" offset=""35"" />
+          <slot kind=""33"" offset=""65"" />
+          <slot kind=""temp"" />
+        </encLocalSlotMap>
+      </customDebugInfo>
+      <sequencePoints>
+        <entry offset=""0x0"" hidden=""true"" document=""1"" />
+        <entry offset=""0x7"" hidden=""true"" document=""1"" />
+        <entry offset=""0x27"" startLine=""8"" startColumn=""2"" endLine=""8"" endColumn=""3"" document=""1"" />
+        <entry offset=""0x28"" startLine=""9"" startColumn=""3"" endLine=""9"" endColumn=""28"" document=""1"" />
+        <entry offset=""0x34"" hidden=""true"" document=""1"" />
+        <entry offset=""0x90"" startLine=""10"" startColumn=""3"" endLine=""10"" endColumn=""28"" document=""1"" />
+        <entry offset=""0x9d"" hidden=""true"" document=""1"" />
+        <entry offset=""0xfb"" startLine=""11"" startColumn=""3"" endLine=""11"" endColumn=""28"" document=""1"" />
+        <entry offset=""0x108"" hidden=""true"" document=""1"" />
+        <entry offset=""0x163"" startLine=""13"" startColumn=""3"" endLine=""13"" endColumn=""12"" document=""1"" />
+        <entry offset=""0x167"" hidden=""true"" document=""1"" />
+        <entry offset=""0x181"" startLine=""14"" startColumn=""5"" endLine=""14"" endColumn=""6"" document=""1"" />
+        <entry offset=""0x189"" hidden=""true"" document=""1"" />
+      </sequencePoints>
+      <scope startOffset=""0x0"" endOffset=""0x197"">
+        <namespace name=""System.Threading.Tasks"" />
+      </scope>
+      <asyncInfo>
+        <kickoffMethod declaringType=""C"" methodName=""M1"" />
+        <await yield=""0x46"" resume=""0x64"" declaringType=""C+&lt;M1&gt;d__0"" methodName=""MoveNext"" />
+        <await yield=""0xaf"" resume=""0xce"" declaringType=""C+&lt;M1&gt;d__0"" methodName=""MoveNext"" />
+        <await yield=""0x11a"" resume=""0x136"" declaringType=""C+&lt;M1&gt;d__0"" methodName=""MoveNext"" />
+      </asyncInfo>
+    </method>
+    <method containingType=""C+&lt;M2&gt;d__1"" name=""MoveNext"">
+      <customDebugInfo>
+        <forward declaringType=""C+&lt;M1&gt;d__0"" methodName=""MoveNext"" />
+        <encLocalSlotMap>
+          <slot kind=""27"" offset=""0"" />
+          <slot kind=""33"" offset=""5"" />
+          <slot kind=""temp"" />
+          <slot kind=""temp"" />
+        </encLocalSlotMap>
+      </customDebugInfo>
+      <sequencePoints>
+        <entry offset=""0x0"" hidden=""true"" document=""1"" />
+        <entry offset=""0x7"" hidden=""true"" document=""1"" />
+        <entry offset=""0xe"" startLine=""17"" startColumn=""2"" endLine=""17"" endColumn=""3"" document=""1"" />
+        <entry offset=""0xf"" startLine=""18"" startColumn=""3"" endLine=""18"" endColumn=""28"" document=""1"" />
+        <entry offset=""0x1b"" hidden=""true"" document=""1"" />
+        <entry offset=""0x76"" hidden=""true"" document=""1"" />
+        <entry offset=""0x8e"" startLine=""19"" startColumn=""5"" endLine=""19"" endColumn=""6"" document=""1"" />
+        <entry offset=""0x96"" hidden=""true"" document=""1"" />
+      </sequencePoints>
+      <asyncInfo>
+        <catchHandler offset=""0x76"" />
+        <kickoffMethod declaringType=""C"" methodName=""M2"" />
+        <await yield=""0x2d"" resume=""0x48"" declaringType=""C+&lt;M2&gt;d__1"" methodName=""MoveNext"" />
+      </asyncInfo>
+    </method>
+  </methods>
+</symbols>
+");
+        }
     }
 }
