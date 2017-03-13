@@ -290,20 +290,20 @@ namespace Microsoft.DiaSymReader.Tools
                 {
                     switch (record.Kind)
                     {
-                        case CustomDebugInfoKind.UsingInfo:
-                            WriteUsingCustomDebugInfo(record);
+                        case CustomDebugInfoKind.UsingGroups:
+                            WriteUsingGroupsCustomDebugInfo(record);
                             break;
-                        case CustomDebugInfoKind.ForwardInfo:
-                            WriteForwardCustomDebugInfo(record);
+                        case CustomDebugInfoKind.ForwardMethodInfo:
+                            WriteForwardMethodInfoCustomDebugInfo(record);
                             break;
-                        case CustomDebugInfoKind.ForwardToModuleInfo:
-                            WriteForwardToModuleCustomDebugInfo(record);
+                        case CustomDebugInfoKind.ForwardModuleInfo:
+                            WriteForwardModuleInfoCustomDebugInfo(record);
                             break;
                         case CustomDebugInfoKind.StateMachineHoistedLocalScopes:
                             WriteStateMachineHoistedLocalScopesCustomDebugInfo(record);
                             break;
-                        case CustomDebugInfoKind.ForwardIterator:
-                            WriteForwardIteratorCustomDebugInfo(record);
+                        case CustomDebugInfoKind.StateMachineTypeName:
+                            WriteStateMachineTypeNameCustomDebugInfo(record);
                             break;
                         case CustomDebugInfoKind.DynamicLocals:
                             WriteDynamicLocalsCustomDebugInfo(record);
@@ -357,9 +357,9 @@ namespace Microsoft.DiaSymReader.Tools
         /// <remarks>
         /// There's always at least one entry (for the global namespace).
         /// </remarks>
-        private void WriteUsingCustomDebugInfo(CustomDebugInfoRecord record)
+        private void WriteUsingGroupsCustomDebugInfo(CustomDebugInfoRecord record)
         {
-            Debug.Assert(record.Kind == CustomDebugInfoKind.UsingInfo);
+            Debug.Assert(record.Kind == CustomDebugInfoKind.UsingGroups);
 
             _writer.WriteStartElement("using");
 
@@ -382,9 +382,9 @@ namespace Microsoft.DiaSymReader.Tools
         /// <remarks>
         /// Emitting tokens makes tests more fragile.
         /// </remarks>
-        private void WriteForwardCustomDebugInfo(CustomDebugInfoRecord record)
+        private void WriteForwardMethodInfoCustomDebugInfo(CustomDebugInfoRecord record)
         {
-            Debug.Assert(record.Kind == CustomDebugInfoKind.ForwardInfo);
+            Debug.Assert(record.Kind == CustomDebugInfoKind.ForwardMethodInfo);
 
             _writer.WriteStartElement("forward");
 
@@ -402,9 +402,9 @@ namespace Microsoft.DiaSymReader.Tools
         /// Appears when there are extern aliases and edit-and-continue is disabled.
         /// Emitting tokens makes tests more fragile.
         /// </remarks>
-        private void WriteForwardToModuleCustomDebugInfo(CustomDebugInfoRecord record)
+        private void WriteForwardModuleInfoCustomDebugInfo(CustomDebugInfoRecord record)
         {
-            Debug.Assert(record.Kind == CustomDebugInfoKind.ForwardToModuleInfo);
+            Debug.Assert(record.Kind == CustomDebugInfoKind.ForwardModuleInfo);
 
             _writer.WriteStartElement("forwardToModule");
 
@@ -453,9 +453,9 @@ namespace Microsoft.DiaSymReader.Tools
         /// <remarks>
         /// Appears when are iterator methods.
         /// </remarks>
-        private void WriteForwardIteratorCustomDebugInfo(CustomDebugInfoRecord record)
+        private void WriteStateMachineTypeNameCustomDebugInfo(CustomDebugInfoRecord record)
         {
-            Debug.Assert(record.Kind == CustomDebugInfoKind.ForwardIterator);
+            Debug.Assert(record.Kind == CustomDebugInfoKind.StateMachineTypeName);
 
             _writer.WriteStartElement("forwardIterator");
 

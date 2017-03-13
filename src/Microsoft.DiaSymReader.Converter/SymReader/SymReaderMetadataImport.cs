@@ -173,6 +173,25 @@ namespace Microsoft.DiaSymReader
             return HResult.S_OK;
         }
 
+        int IMetadataImport.GetNestedClassProps(int nestedClass, out int enclosingClass)
+        {
+            MetadataRequired();
+
+            var nestedTypeDef = _metadataReaderOpt.GetTypeDefinition(MetadataTokens.TypeDefinitionHandle(nestedClass));
+            var declaringTypeHandle = nestedTypeDef.GetDeclaringType();
+
+            if (declaringTypeHandle.IsNil)
+            {
+                enclosingClass = 0;
+                return HResult.E_FAIL;
+            }
+            else
+            {
+                enclosingClass = MetadataTokens.GetToken(declaringTypeHandle);
+                return HResult.S_OK;
+            }
+        }
+
         // The only purpose of this method is to get type name of the method and declaring type token (opaque for SymWriter), everything else is ignored by the SymWriter.
         // "mb" is the token passed to OpenMethod. The token is remembered until the corresponding CloseMethod, which passes it to GetMethodProps.
         // It's opaque for SymWriter.
@@ -333,7 +352,6 @@ namespace Microsoft.DiaSymReader
         int IMetadataImport.GetParamProps(int parameter, int* declaringMethodDef, int* sequenceNumber, char* name, int nameBufferLength, int* nameLength, int* attributes, int* constantType, byte** constantValue, int* constantValueLength) => throw new NotImplementedException();
         int IMetadataImport.GetCustomAttributeByName(int parent, string name, byte** value, int* valueLength) => throw new NotImplementedException();
         bool IMetadataImport.IsValidToken(int token) => throw new NotImplementedException();
-        int IMetadataImport.GetNestedClassProps(int nestedClass, out int enclosingClass) => throw new NotImplementedException();
         int IMetadataImport.GetNativeCallConvFromSig(byte* signature, int signatureLength, int* callingConvention) => throw new NotImplementedException();
         int IMetadataImport.IsGlobal(int token, bool value) => throw new NotImplementedException();
 
