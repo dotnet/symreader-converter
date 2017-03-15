@@ -38,6 +38,18 @@
     <EmbeddedResource Include="Resources\Async.pdbx">
       <LogicalName>Async.pdbx</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Iterator.dll">
+      <LogicalName>Iterator.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Iterator.pdb">
+      <LogicalName>Iterator.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Iterator.dllx">
+      <LogicalName>Iterator.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Iterator.pdbx">
+      <LogicalName>Iterator.pdbx</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Documents.dll">
       <LogicalName>Documents.dll</LogicalName>
     </EmbeddedResource>

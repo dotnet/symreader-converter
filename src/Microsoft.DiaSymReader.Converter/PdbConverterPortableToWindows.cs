@@ -60,7 +60,7 @@ namespace Microsoft.DiaSymReader.Tools
             var importStringsMap = new Dictionary<ImmutableArray<string>, MethodDefinitionHandle>();
 
             var aliasedAssemblyRefs = GetAliasedAssemblyRefs(pdbReader);
-            var kickOffMethodToMoveNextMethodMap = GetStateMachineMethodMap(pdbReader);
+            // var kickOffMethodToMoveNextMethodMap = GetStateMachineMethodMap(pdbReader);
 
             string vbDefaultNamespace = MetadataUtilities.GetVisualBasicDefaultNamespace(pdbReader);
             bool vbSemantics = vbDefaultNamespace != null;
@@ -97,17 +97,27 @@ namespace Microsoft.DiaSymReader.Tools
                 int methodToken = MetadataTokens.GetToken(methodDefHandle);
                 var methodDef = metadataReader.GetMethodDefinition(methodDefHandle);
 
+                void SkipLocalScopes()
+                {
+                    while (currentLocalScope.HasValue && currentLocalScope.Value.Method == methodDefHandle)
+                    {
+                        currentLocalScope = NextLocalScope();
+                    }
+                }
+
                 // methods without method body don't currently have any debug information:
                 if (methodDef.RelativeVirtualAddress == 0)
                 {
+                    SkipLocalScopes();
                     continue;
                 }
 
-                bool isKickOffMethod = kickOffMethodToMoveNextMethodMap.TryGetValue(methodDefHandle, out var moveNextHandle);
+                bool isKickOffMethod = metadataModel.TryGetStateMachineMoveNextMethod(methodDefHandle, out var moveNextHandle);
 
                 // methods without debug info:
                 if (!isKickOffMethod && methodDebugInfo.Document.IsNil && methodDebugInfo.SequencePointsBlob.IsNil)
                 {
+                    SkipLocalScopes();
                     continue;
                 }
 
@@ -299,12 +309,12 @@ namespace Microsoft.DiaSymReader.Tools
                         cdiEncoder.AddDynamicLocals(dynamicLocals);
                         dynamicLocals.Clear();
                     }
-
-                    // the following blobs map 1:1
-                    CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, PortableCustomDebugInfoKinds.TupleElementNames, CustomDebugInfoKind.TupleElementNames);
-                    CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, PortableCustomDebugInfoKinds.EncLocalSlotMap, CustomDebugInfoKind.EditAndContinueLocalSlotMap);
-                    CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, PortableCustomDebugInfoKinds.EncLambdaAndClosureMap, CustomDebugInfoKind.EditAndContinueLambdaMap);
                 }
+
+                // the following blobs map 1:1
+                CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, PortableCustomDebugInfoKinds.TupleElementNames, CustomDebugInfoKind.TupleElementNames);
+                CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, PortableCustomDebugInfoKinds.EncLocalSlotMap, CustomDebugInfoKind.EditAndContinueLocalSlotMap);
+                CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, PortableCustomDebugInfoKinds.EncLambdaAndClosureMap, CustomDebugInfoKind.EditAndContinueLambdaMap);
 
                 if (cdiEncoder.RecordCount > 0)
                 {
