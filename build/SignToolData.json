@@ -5,6 +5,9 @@
       "strongName": "MsSharedLib72",
       "values": [
         "Microsoft.DiaSymReader.Converter/netstandard1.3/Microsoft.DiaSymReader.Converter.dll",
+        "Microsoft.DiaSymReader.Converter/net45/Microsoft.DiaSymReader.Converter.dll",
+        "Microsoft.DiaSymReader.Converter.Xml/netstandard1.3/Microsoft.DiaSymReader.Converter.Xml.dll",
+        "Pdb2Xml/net46/Pdb2Xml.exe",
         "Pdb2Pdb/net46/Pdb2Pdb.exe"
       ]
     }
