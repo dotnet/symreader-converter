@@ -413,12 +413,81 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         }
 
         [Fact]
+        public void Convert_Iterator()
+        {
+            VerifyWindowsPdb(
+               TestResources.Iterator.DllAndPdb(portable: true),
+               TestResources.Iterator.DllAndPdb(portable: false),
+@"<?xml version=""1.0"" encoding=""utf-16""?>
+<symbols>
+  <files>
+    <file id=""1"" name=""C:\Iterator.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
+  </files>
+  <methods>
+    <method containingType=""C"" name=""M"">
+      <customDebugInfo>
+        <forwardIterator name=""&lt;M&gt;d__0"" />
+        <encLocalSlotMap>
+          <slot kind=""0"" offset=""15"" />
+          <slot kind=""0"" offset=""66"" />
+          <slot kind=""0"" offset=""144"" />
+        </encLocalSlotMap>
+      </customDebugInfo>
+    </method>
+    <method containingType=""C+&lt;M&gt;d__0"" name=""MoveNext"">
+      <customDebugInfo>
+        <using>
+          <namespace usingCount=""1"" />
+        </using>
+        <hoistedLocalScopes>
+          <slot startOffset=""0x1f"" endOffset=""0x85"" />
+          <slot startOffset=""0x27"" endOffset=""0x83"" />
+          <slot startOffset=""0x30"" endOffset=""0x65"" />
+        </hoistedLocalScopes>
+        <encLocalSlotMap>
+          <slot kind=""27"" offset=""0"" />
+          <slot kind=""temp"" />
+          <slot kind=""1"" offset=""57"" />
+        </encLocalSlotMap>
+      </customDebugInfo>
+      <sequencePoints>
+        <entry offset=""0x0"" hidden=""true"" document=""1"" />
+        <entry offset=""0x1f"" startLine=""8"" startColumn=""5"" endLine=""8"" endColumn=""6"" document=""1"" />
+        <entry offset=""0x20"" startLine=""9"" startColumn=""9"" endLine=""9"" endColumn=""19"" document=""1"" />
+        <entry offset=""0x27"" startLine=""11"" startColumn=""14"" endLine=""11"" endColumn=""23"" document=""1"" />
+        <entry offset=""0x2e"" hidden=""true"" document=""1"" />
+        <entry offset=""0x30"" startLine=""12"" startColumn=""9"" endLine=""12"" endColumn=""10"" document=""1"" />
+        <entry offset=""0x31"" startLine=""14"" startColumn=""13"" endLine=""14"" endColumn=""23"" document=""1"" />
+        <entry offset=""0x38"" startLine=""15"" startColumn=""13"" endLine=""15"" endColumn=""44"" document=""1"" />
+        <entry offset=""0x5d"" hidden=""true"" document=""1"" />
+        <entry offset=""0x64"" startLine=""16"" startColumn=""9"" endLine=""16"" endColumn=""10"" document=""1"" />
+        <entry offset=""0x65"" startLine=""11"" startColumn=""33"" endLine=""11"" endColumn=""36"" document=""1"" />
+        <entry offset=""0x75"" startLine=""11"" startColumn=""25"" endLine=""11"" endColumn=""31"" document=""1"" />
+        <entry offset=""0x80"" hidden=""true"" document=""1"" />
+        <entry offset=""0x83"" startLine=""17"" startColumn=""5"" endLine=""17"" endColumn=""6"" document=""1"" />
+      </sequencePoints>
+      <scope startOffset=""0x0"" endOffset=""0x85"">
+        <namespace name=""System.Collections.Generic"" />
+        <scope startOffset=""0x1f"" endOffset=""0x85"">
+          <constant name=""x"" value=""1"" runtime-type=""Int32"" unknown-signature="""" />
+          <scope startOffset=""0x30"" endOffset=""0x65"">
+            <constant name=""y"" value=""2"" runtime-type=""Int32"" unknown-signature="""" />
+          </scope>
+        </scope>
+      </scope>
+    </method>
+  </methods>
+</symbols>
+");
+        }
+
+        [Fact]
         public void Convert_MethodBoundaries()
         {
             VerifyWindowsPdb(
                 TestResources.MethodBoundaries.DllAndPdb(portable: true),
                 TestResources.MethodBoundaries.DllAndPdb(portable: false),
-@"<?xml version=""1.0"" encoding=""utf-16""?>
+@" <?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
     <file id=""1"" name=""C:\MethodBoundaries1.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
