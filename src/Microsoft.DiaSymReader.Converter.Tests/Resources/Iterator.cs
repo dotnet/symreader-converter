@@ -3,17 +3,25 @@
 
 using System.Collections.Generic;
 
-class C
+class C<U>
 {
-    IEnumerable<int> M()
+    class D<V>
     {
-        int a = 1;
-        const int x = 1;
-        for (int i = 0; i < 10; i++)
+        IEnumerable<int> M<T>()
         {
-            const int y = 2;
-            int b = 2;
-            yield return x + y + i + a + b;
+            int a = 1;
+            const int x = 1;
+            for (int i = 0; i < 10; i++)
+            {
+                const int y = 2;
+                int b = 2;
+                yield return x + y + i + a + b;
+            }
+        }
+
+        IEnumerable<int> M<S, T>()
+        {
+            yield return 1;
         }
     }
 }
