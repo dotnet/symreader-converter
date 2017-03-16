@@ -62,7 +62,7 @@ namespace Microsoft.DiaSymReader.Tools
                             // EnumTypeCode ::= BOOLEAN | CHAR | I1 | U1 | I2 | U2 | I4 | U4 | I8 | U8
                             // EnumType     ::= TypeDefOrRefOrSpecEncoded
 
-                            var enumTypeCode = MetadataHelpers.GetConstantTypeCode(value);
+                            var enumTypeCode = AssemblyDisplayNameBuilder.GetConstantTypeCode(value);
                             builder.WriteByte((byte)enumTypeCode);
                             builder.WriteConstant(value);
                             builder.WriteCompressedInteger(typeRefDefSpec);

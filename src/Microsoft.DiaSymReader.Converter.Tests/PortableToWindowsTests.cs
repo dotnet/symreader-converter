@@ -9,17 +9,22 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 {
     public class PortableToWindowsTests
     {
-        private static void VerifyWindowsPdb(TestResource portable, TestResource? windows, string expectedXml)
+        private static void VerifyWindowsPdb(TestResource portable, TestResource windows, string expectedXml)
         {
             var portablePEStream = new MemoryStream(portable.PE);
             var portablePdbStream = new MemoryStream(portable.Pdb);
             var convertedWindowsPdbStream = new MemoryStream();
 
             PdbConverter.ConvertPortableToWindows(portablePEStream, portablePdbStream, convertedWindowsPdbStream);
-            VerifyPdb(convertedWindowsPdbStream, portablePEStream, expectedXml);
 
-            var windowsPEStream = new MemoryStream(windows.Value.PE);
-            var windowsPdbStream = new MemoryStream(windows.Value.Pdb);
+            VerifyPdb(convertedWindowsPdbStream, portablePEStream, expectedXml);
+            VerifyWindowsMatchesConverted(windows, expectedXml);
+        }
+
+        private static void VerifyWindowsMatchesConverted(TestResource windows, string expectedXml)
+        {
+            var windowsPEStream = new MemoryStream(windows.PE);
+            var windowsPdbStream = new MemoryStream(windows.Pdb);
             var actualXml = PdbToXmlConverter.ToXml(windowsPdbStream, windowsPEStream);
 
             var adjustedExpectedXml = AdjustForInherentDifferences(expectedXml);
@@ -482,12 +487,57 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         }
 
         [Fact]
+        public void Convert_Imports()
+        {
+            VerifyWindowsPdb(
+               TestResources.Imports.DllAndPdb(portable: true),
+               TestResources.Imports.DllAndPdb(portable: false),
+@"<?xml version=""1.0"" encoding=""utf-16""?>
+<symbols>
+  <files>
+    <file id=""1"" name=""C:\Imports.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
+  </files>
+  <methods>
+    <method containingType=""X.A"" name=""M"">
+      <customDebugInfo>
+        <using>
+          <namespace usingCount=""0"" />
+          <namespace usingCount=""13"" />
+        </using>
+      </customDebugInfo>
+      <sequencePoints>
+        <entry offset=""0x0"" startLine=""23"" startColumn=""18"" endLine=""23"" endColumn=""19"" document=""1"" />
+        <entry offset=""0x1"" startLine=""23"" startColumn=""20"" endLine=""23"" endColumn=""21"" document=""1"" />
+      </sequencePoints>
+      <scope startOffset=""0x0"" endOffset=""0x2"">
+        <extern alias=""ExternAlias1"" />
+        <namespace name=""System"" />
+        <namespace name=""System.Linq"" />
+        <type name=""System.Math, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" />
+        <type name=""System.Linq.Queryable, System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" />
+        <alias name=""AliasedNamespace1"" target=""System"" kind=""namespace"" />
+        <alias name=""AliasedNamespace2"" target=""System.IO"" kind=""namespace"" />
+        <alias name=""AliasedType1"" target=""System.Char, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" kind=""type"" />
+        <alias name=""AliasedType2"" target=""System.Linq.ParallelEnumerable, System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" kind=""type"" />
+        <alias name=""AliasedType3"" target=""X.A+B"" kind=""type"" />
+        <alias name=""AliasedType4"" target=""System.Action`2[[System.Action`9[X.A+B**[,,][],[System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Byte, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.SByte, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Int16, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.UInt16, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Char, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.UInt32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Action`8[[System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.UIntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Int64, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.UInt64, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Double, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" kind=""type"" />
+        <alias name=""AliasedType5"" target=""System.TypedReference, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" kind=""type"" />
+        <alias name=""AliasedType6"" target=""System.Action`1[[System.Int32[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" kind=""type"" />
+        <externinfo alias=""ExternAlias1"" assembly=""System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" />
+      </scope>
+    </method>
+  </methods>
+</symbols>
+");
+        }
+
+        [Fact]
         public void Convert_MethodBoundaries()
         {
             VerifyWindowsPdb(
                 TestResources.MethodBoundaries.DllAndPdb(portable: true),
                 TestResources.MethodBoundaries.DllAndPdb(portable: false),
-@" <?xml version=""1.0"" encoding=""utf-16""?>
+@"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
     <file id=""1"" name=""C:\MethodBoundaries1.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />

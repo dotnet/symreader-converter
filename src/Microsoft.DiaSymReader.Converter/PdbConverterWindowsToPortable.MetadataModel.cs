@@ -53,7 +53,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                 foreach (var handle in Reader.AssemblyReferences)
                 {
-                    var displayName = MetadataHelpers.GetAssemblyDisplayName(Reader, Reader.GetAssemblyReference(handle));
+                    var displayName = AssemblyDisplayNameBuilder.GetAssemblyDisplayName(Reader, Reader.GetAssemblyReference(handle));
 
                     assemblyNames[MetadataTokens.GetRowNumber(handle)] = displayName;
                     assemblyRefsByName.Add(displayName, handle);

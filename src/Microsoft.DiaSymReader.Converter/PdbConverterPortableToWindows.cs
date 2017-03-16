@@ -40,7 +40,7 @@ namespace Microsoft.DiaSymReader.Tools
                 s_languageVendorMicrosoft : default(Guid);
         }
 
-        public static void Convert(PEReader peReader, MetadataReader pdbReader, PdbWriter<TDocumentWriter> pdbWriter)
+        internal static void Convert(PEReader peReader, MetadataReader pdbReader, PdbWriter<TDocumentWriter> pdbWriter)
         {
             var metadataReader = peReader.GetMetadataReader();
             var metadataModel = new MetadataModel(metadataReader);
@@ -192,6 +192,16 @@ namespace Microsoft.DiaSymReader.Tools
                             {
                                 pdbWriter.UsingNamespace("@" + MetadataTokens.GetToken(forwardImportScopesToMethodDef));
                             }
+
+                            // This is the method that's gonna have AssemblyRef aliases attached:
+                            if (methodDefHandleWithAssemblyRefAliases.IsNil)
+                            {
+                                foreach (var (assemblyRefHandle, alias) in aliasedAssemblyRefs)
+                                {
+                                    var assemblyRef = metadataReader.GetAssemblyReference(assemblyRefHandle);
+                                    pdbWriter.UsingNamespace("Z" + alias + " " + AssemblyDisplayNameBuilder.GetAssemblyDisplayName(metadataReader, assemblyRef));
+                                }
+                            }
                         }
 
                         foreach (var localConstantHandle in localScope.GetLocalConstants())
@@ -326,12 +336,6 @@ namespace Microsoft.DiaSymReader.Tools
                 if (!isKickOffMethod && methodDefHandleWithAssemblyRefAliases.IsNil)
                 {
                     methodDefHandleWithAssemblyRefAliases = methodDefHandle;
-
-                    foreach (var (assemblyRefHandle, alias) in aliasedAssemblyRefs)
-                    {
-                        var assemblyRef = metadataReader.GetAssemblyReference(assemblyRefHandle);
-                        pdbWriter.UsingNamespace("Z" + alias + " " + MetadataHelpers.GetAssemblyDisplayName(metadataReader, assemblyRef));
-                    }
                 }
 
                 Debug.WriteLine($"Close Method {methodToken:X8}");
@@ -524,7 +528,8 @@ namespace Microsoft.DiaSymReader.Tools
                 case ImportDefinitionKind.ImportType:
                     // C#, VB
 
-                    if (import.TargetType.Kind == HandleKind.TypeSpecification)
+                    // VB doesn't support generics in imports:
+                    if (vbSemantics && import.TargetType.Kind == HandleKind.TypeSpecification)
                     {
                         return null;
                     }

@@ -11,7 +11,7 @@ using Roslyn.Utilities;
 
 namespace Roslyn.Utilities
 {
-    public static class MetadataHelpers
+    public static class AssemblyDisplayNameBuilder
     {
         internal static string GetAssemblyDisplayName(MetadataReader reader, AssemblyReference assemblyRef)
         {

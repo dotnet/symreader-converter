@@ -50,6 +50,18 @@
     <EmbeddedResource Include="Resources\Iterator.pdbx">
       <LogicalName>Iterator.pdbx</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Imports.dll">
+      <LogicalName>Imports.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Imports.pdb">
+      <LogicalName>Imports.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Imports.dllx">
+      <LogicalName>Imports.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Imports.pdbx">
+      <LogicalName>Imports.pdbx</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Documents.dll">
       <LogicalName>Documents.dll</LogicalName>
     </EmbeddedResource>
