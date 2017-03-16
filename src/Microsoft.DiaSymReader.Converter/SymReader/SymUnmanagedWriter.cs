@@ -233,7 +233,7 @@ namespace Microsoft.DiaSymReader
             // ISymUnmanagedWriter2 doesn't handle unicode strings with unmatched unicode surrogates.
             // We use the .NET UTF8 encoder to replace unmatched unicode surrogates with unicode replacement character.
 
-            if (!MetadataHelpers.IsValidUnicodeString(value))
+            if (!AssemblyDisplayNameBuilder.IsValidUnicodeString(value))
             {
                 byte[] bytes = Encoding.UTF8.GetBytes(value);
                 encodedLength = bytes.Length;
