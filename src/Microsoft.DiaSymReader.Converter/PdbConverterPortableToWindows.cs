@@ -10,6 +10,7 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Collections;
 using Microsoft.CodeAnalysis.Debugging;
 using Microsoft.DiaSymReader.PortablePdb;
 using Roslyn.Utilities;
@@ -57,7 +58,7 @@ namespace Microsoft.DiaSymReader.Tools
             // state for calculating import string forwarding:
             var lastImportScopeHandle = default(ImportScopeHandle);
             var lastImportScopeMethodDefHandle = default(MethodDefinitionHandle);
-            var importStringsMap = new Dictionary<ImmutableArray<string>, MethodDefinitionHandle>();
+            var importStringsMap = new Dictionary<ImmutableArray<string>, MethodDefinitionHandle>(SequenceComparer<string>.Instance);
 
             var aliasedAssemblyRefs = GetAliasedAssemblyRefs(pdbReader);
 
@@ -182,6 +183,7 @@ namespace Microsoft.DiaSymReader.Tools
                                     // attach import strings to the current method:
                                     WriteImports(pdbWriter, importStrings);
                                     lastImportScopeMethodDefHandle = methodDefHandle;
+                                    importStringsMap[importStrings] = methodDefHandle;
                                 }
 
                                 lastImportScopeHandle = localScope.ImportScope;
