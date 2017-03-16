@@ -224,7 +224,7 @@ namespace Microsoft.DiaSymReader.Tools
                         }
 
                         // custom debug information:
-                        var dynamicLocals = default(ImmutableArray<DynamicLocalInfo>);
+                        var dynamicLocals = ImmutableArray<DynamicLocalInfo>.Empty;
 
                         byte[] customDebugInfoBytes = symReader.GetCustomDebugInfo(methodToken, methodVersion: 1);
                         if (customDebugInfoBytes != null)
