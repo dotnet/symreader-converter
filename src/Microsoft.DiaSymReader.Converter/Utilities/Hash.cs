@@ -40,63 +40,18 @@ namespace Roslyn.Utilities
             return hash;
         }
 
-        internal static int CombineValues<T>(IEnumerable<T> values, int maxItemsToHash = int.MaxValue)
-        {
-            if (values == null)
-            {
-                return 0;
-            }
-
-            var hashCode = 0;
-            var count = 0;
-            foreach (var value in values)
-            {
-                if (count++ >= maxItemsToHash)
-                {
-                    break;
-                }
-
-                // Should end up with a constrained virtual call to object.GetHashCode (i.e. avoid boxing where possible).
-                if (value != null)
-                {
-                    hashCode = Hash.Combine(value.GetHashCode(), hashCode);
-                }
-            }
-
-            return hashCode;
-        }
-
-        internal static int CombineValues<T>(T[] values, int maxItemsToHash = int.MaxValue)
-        {
-            if (values == null)
-            {
-                return 0;
-            }
-
-            var maxSize = Math.Min(maxItemsToHash, values.Length);
-            var hashCode = 0;
-
-            for (int i = 0; i < maxSize; i++)
-            {
-                T value = values[i];
-
-                // Should end up with a constrained virtual call to object.GetHashCode (i.e. avoid boxing where possible).
-                if (value != null)
-                {
-                    hashCode = Hash.Combine(value.GetHashCode(), hashCode);
-                }
-            }
-
-            return hashCode;
-        }
-
-        internal static int CombineValues<T>(ImmutableArray<T> values, int maxItemsToHash = int.MaxValue)
+        internal static int CombineValues<T>(ImmutableArray<T> values, IEqualityComparer<T> comparer = null, int maxItemsToHash = int.MaxValue)
         {
             if (values.IsDefaultOrEmpty)
             {
                 return 0;
             }
 
+            if (comparer == null)
+            {
+                comparer = EqualityComparer<T>.Default;
+            }
+
             var hashCode = 0;
             var count = 0;
             foreach (var value in values)
@@ -109,18 +64,23 @@ namespace Roslyn.Utilities
                 // Should end up with a constrained virtual call to object.GetHashCode (i.e. avoid boxing where possible).
                 if (value != null)
                 {
-                    hashCode = Hash.Combine(value.GetHashCode(), hashCode);
+                    hashCode = Combine(comparer.GetHashCode(value), hashCode);
                 }
             }
 
             return hashCode;
         }
 
-        internal static int CombineValues(IEnumerable<string> values, StringComparer stringComparer, int maxItemsToHash = int.MaxValue)
+        internal static int CombineValues<T>(IEnumerable<T> values, IEqualityComparer<T> comparer = null, int maxItemsToHash = int.MaxValue)
         {
             if (values == null)
             {
                 return 0;
+            }
+
+            if (comparer == null)
+            {
+                comparer = EqualityComparer<T>.Default;
             }
 
             var hashCode = 0;
@@ -134,7 +94,7 @@ namespace Roslyn.Utilities
 
                 if (value != null)
                 {
-                    hashCode = Hash.Combine(stringComparer.GetHashCode(value), hashCode);
+                    hashCode = Combine(comparer.GetHashCode(value), hashCode);
                 }
             }
 
