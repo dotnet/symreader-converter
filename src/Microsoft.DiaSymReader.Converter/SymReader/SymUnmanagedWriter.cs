@@ -350,5 +350,17 @@ namespace Microsoft.DiaSymReader
                 }
             }
         }
+
+        public override void SetEntryPoint(int entryMethodToken)
+        {
+            try
+            {
+                _symWriter.SetUserEntryPoint(entryMethodToken);
+            }
+            catch (Exception ex)
+            {
+                throw new PdbWritingException(ex);
+            }
+        }
     }
 }

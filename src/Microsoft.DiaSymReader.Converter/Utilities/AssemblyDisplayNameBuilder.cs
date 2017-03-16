@@ -20,11 +20,6 @@ namespace Roslyn.Utilities
             ImmutableArray<byte> publicKeyOrToken = reader.GetBlobContent(assemblyRef.PublicKeyOrToken);
             bool hasPublicKey = (assemblyRef.Flags & AssemblyFlags.PublicKey) != 0;
 
-            if (publicKeyOrToken.IsEmpty)
-            {
-                publicKeyOrToken = default(ImmutableArray<byte>);
-            }
-
             return BuildDisplayName(
                 name: nameStr,
                 version: assemblyRef.Version,

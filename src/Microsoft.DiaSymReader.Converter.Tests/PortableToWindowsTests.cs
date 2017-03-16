@@ -429,17 +429,22 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
     <file id=""1"" name=""C:\Iterator.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
   </files>
   <methods>
-    <method containingType=""C"" name=""M"">
+    <method containingType=""C`1+D`1"" name=""M"">
       <customDebugInfo>
         <forwardIterator name=""&lt;M&gt;d__0"" />
         <encLocalSlotMap>
-          <slot kind=""0"" offset=""15"" />
-          <slot kind=""0"" offset=""66"" />
-          <slot kind=""0"" offset=""144"" />
+          <slot kind=""0"" offset=""19"" />
+          <slot kind=""0"" offset=""78"" />
+          <slot kind=""0"" offset=""168"" />
         </encLocalSlotMap>
       </customDebugInfo>
     </method>
-    <method containingType=""C+&lt;M&gt;d__0"" name=""MoveNext"">
+    <method containingType=""C`1+D`1"" name=""M"">
+      <customDebugInfo>
+        <forwardIterator name=""&lt;M&gt;d__1"" />
+      </customDebugInfo>
+    </method>
+    <method containingType=""C`1+D`1+&lt;M&gt;d__0`1"" name=""MoveNext"">
       <customDebugInfo>
         <using>
           <namespace usingCount=""1"" />
@@ -452,24 +457,24 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         <encLocalSlotMap>
           <slot kind=""27"" offset=""0"" />
           <slot kind=""temp"" />
-          <slot kind=""1"" offset=""57"" />
+          <slot kind=""1"" offset=""69"" />
         </encLocalSlotMap>
       </customDebugInfo>
       <sequencePoints>
         <entry offset=""0x0"" hidden=""true"" document=""1"" />
-        <entry offset=""0x1f"" startLine=""8"" startColumn=""5"" endLine=""8"" endColumn=""6"" document=""1"" />
-        <entry offset=""0x20"" startLine=""9"" startColumn=""9"" endLine=""9"" endColumn=""19"" document=""1"" />
-        <entry offset=""0x27"" startLine=""11"" startColumn=""14"" endLine=""11"" endColumn=""23"" document=""1"" />
+        <entry offset=""0x1f"" startLine=""10"" startColumn=""9"" endLine=""10"" endColumn=""10"" document=""1"" />
+        <entry offset=""0x20"" startLine=""11"" startColumn=""13"" endLine=""11"" endColumn=""23"" document=""1"" />
+        <entry offset=""0x27"" startLine=""13"" startColumn=""18"" endLine=""13"" endColumn=""27"" document=""1"" />
         <entry offset=""0x2e"" hidden=""true"" document=""1"" />
-        <entry offset=""0x30"" startLine=""12"" startColumn=""9"" endLine=""12"" endColumn=""10"" document=""1"" />
-        <entry offset=""0x31"" startLine=""14"" startColumn=""13"" endLine=""14"" endColumn=""23"" document=""1"" />
-        <entry offset=""0x38"" startLine=""15"" startColumn=""13"" endLine=""15"" endColumn=""44"" document=""1"" />
+        <entry offset=""0x30"" startLine=""14"" startColumn=""13"" endLine=""14"" endColumn=""14"" document=""1"" />
+        <entry offset=""0x31"" startLine=""16"" startColumn=""17"" endLine=""16"" endColumn=""27"" document=""1"" />
+        <entry offset=""0x38"" startLine=""17"" startColumn=""17"" endLine=""17"" endColumn=""48"" document=""1"" />
         <entry offset=""0x5d"" hidden=""true"" document=""1"" />
-        <entry offset=""0x64"" startLine=""16"" startColumn=""9"" endLine=""16"" endColumn=""10"" document=""1"" />
-        <entry offset=""0x65"" startLine=""11"" startColumn=""33"" endLine=""11"" endColumn=""36"" document=""1"" />
-        <entry offset=""0x75"" startLine=""11"" startColumn=""25"" endLine=""11"" endColumn=""31"" document=""1"" />
+        <entry offset=""0x64"" startLine=""18"" startColumn=""13"" endLine=""18"" endColumn=""14"" document=""1"" />
+        <entry offset=""0x65"" startLine=""13"" startColumn=""37"" endLine=""13"" endColumn=""40"" document=""1"" />
+        <entry offset=""0x75"" startLine=""13"" startColumn=""29"" endLine=""13"" endColumn=""35"" document=""1"" />
         <entry offset=""0x80"" hidden=""true"" document=""1"" />
-        <entry offset=""0x83"" startLine=""17"" startColumn=""5"" endLine=""17"" endColumn=""6"" document=""1"" />
+        <entry offset=""0x83"" startLine=""19"" startColumn=""9"" endLine=""19"" endColumn=""10"" document=""1"" />
       </sequencePoints>
       <scope startOffset=""0x0"" endOffset=""0x85"">
         <namespace name=""System.Collections.Generic"" />
@@ -480,6 +485,21 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
           </scope>
         </scope>
       </scope>
+    </method>
+    <method containingType=""C`1+D`1+&lt;M&gt;d__1`2"" name=""MoveNext"">
+      <customDebugInfo>
+        <forward declaringType=""C`1+D`1+&lt;M&gt;d__0`1"" methodName=""MoveNext"" />
+        <encLocalSlotMap>
+          <slot kind=""27"" offset=""0"" />
+        </encLocalSlotMap>
+      </customDebugInfo>
+      <sequencePoints>
+        <entry offset=""0x0"" hidden=""true"" document=""1"" />
+        <entry offset=""0x1f"" startLine=""22"" startColumn=""9"" endLine=""22"" endColumn=""10"" document=""1"" />
+        <entry offset=""0x20"" startLine=""23"" startColumn=""13"" endLine=""23"" endColumn=""28"" document=""1"" />
+        <entry offset=""0x30"" hidden=""true"" document=""1"" />
+        <entry offset=""0x37"" startLine=""24"" startColumn=""9"" endLine=""24"" endColumn=""10"" document=""1"" />
+      </sequencePoints>
     </method>
   </methods>
 </symbols>
@@ -498,18 +518,36 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
     <file id=""1"" name=""C:\Imports.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
   </files>
   <methods>
-    <method containingType=""X.A"" name=""M"">
+    <method containingType=""C`1"" name=""G"">
       <customDebugInfo>
         <using>
           <namespace usingCount=""0"" />
-          <namespace usingCount=""13"" />
         </using>
       </customDebugInfo>
       <sequencePoints>
-        <entry offset=""0x0"" startLine=""23"" startColumn=""18"" endLine=""23"" endColumn=""19"" document=""1"" />
-        <entry offset=""0x1"" startLine=""23"" startColumn=""20"" endLine=""23"" endColumn=""21"" document=""1"" />
+        <entry offset=""0x0"" startLine=""39"" startColumn=""14"" endLine=""39"" endColumn=""15"" document=""1"" />
+        <entry offset=""0x1"" startLine=""39"" startColumn=""16"" endLine=""39"" endColumn=""17"" document=""1"" />
       </sequencePoints>
       <scope startOffset=""0x0"" endOffset=""0x2"">
+        <externinfo alias=""ExternAlias1"" assembly=""System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" />
+      </scope>
+    </method>
+    <method containingType=""Y.X.A"" name=""F"">
+      <customDebugInfo>
+        <using>
+          <namespace usingCount=""2"" />
+          <namespace usingCount=""13"" />
+          <namespace usingCount=""0"" />
+        </using>
+        <forwardToModule declaringType=""C`1"" methodName=""G"" />
+      </customDebugInfo>
+      <sequencePoints>
+        <entry offset=""0x0"" startLine=""28"" startColumn=""22"" endLine=""28"" endColumn=""23"" document=""1"" />
+        <entry offset=""0x1"" startLine=""28"" startColumn=""24"" endLine=""28"" endColumn=""25"" document=""1"" />
+      </sequencePoints>
+      <scope startOffset=""0x0"" endOffset=""0x2"">
+        <alias name=""AliasedType7"" target=""C`1+D`1[Y.X.A[][,],Y.X.A[,,][]]"" kind=""type"" />
+        <alias name=""AliasedType8"" target=""System.Collections.Generic.Dictionary`2+KeyCollection[Y.X.A,Y.X.A+B], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" kind=""type"" />
         <extern alias=""ExternAlias1"" />
         <namespace name=""System"" />
         <namespace name=""System.Linq"" />
@@ -519,11 +557,10 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         <alias name=""AliasedNamespace2"" target=""System.IO"" kind=""namespace"" />
         <alias name=""AliasedType1"" target=""System.Char, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" kind=""type"" />
         <alias name=""AliasedType2"" target=""System.Linq.ParallelEnumerable, System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" kind=""type"" />
-        <alias name=""AliasedType3"" target=""X.A+B"" kind=""type"" />
-        <alias name=""AliasedType4"" target=""System.Action`2[[System.Action`9[X.A+B**[,,][],[System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Byte, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.SByte, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Int16, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.UInt16, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Char, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.UInt32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Action`8[[System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.UIntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Int64, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.UInt64, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Double, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" kind=""type"" />
+        <alias name=""AliasedType3"" target=""Y.X.A+B"" kind=""type"" />
+        <alias name=""AliasedType4"" target=""System.Action`2[[System.Action`9[Y.X.A+B**[,,][],[System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Byte, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.SByte, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Int16, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.UInt16, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Char, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.UInt32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Action`8[[System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.UIntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Int64, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.UInt64, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Double, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" kind=""type"" />
         <alias name=""AliasedType5"" target=""System.TypedReference, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" kind=""type"" />
         <alias name=""AliasedType6"" target=""System.Action`1[[System.Int32[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" kind=""type"" />
-        <externinfo alias=""ExternAlias1"" assembly=""System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" />
       </scope>
     </method>
   </methods>

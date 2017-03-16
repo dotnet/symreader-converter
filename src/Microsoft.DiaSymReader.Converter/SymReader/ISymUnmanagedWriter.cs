@@ -26,7 +26,7 @@ namespace Microsoft.DiaSymReader
         #region ISymUnmanagedWriter
 
         ISymUnmanagedDocumentWriter DefineDocument(string url, ref Guid language, ref Guid languageVendor, ref Guid documentType);
-        void SetUserEntryPoint(uint entryMethodToken);
+        void SetUserEntryPoint(int entryMethodToken);
         void OpenMethod(uint methodToken);
         void CloseMethod();
         uint OpenScope(uint startOffset);

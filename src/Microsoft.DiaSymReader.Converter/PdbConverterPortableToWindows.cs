@@ -49,7 +49,7 @@ namespace Microsoft.DiaSymReader.Tools
             var symSequencePointBuilder = new SequencePointsBuilder(capacity: 64);
             var declaredExternAliases = new HashSet<string>();
             var importStringsBuilder = new List<string>();
-            var importCountsPerScope = new List<int>();
+            var importGroups = new List<int>();
             var cdiBuilder = new BlobBuilder();
             var dynamicLocals = new List<(string LocalName, byte[] Flags, int Count, int SlotIndex)>();
             var openScopeEndOffsets = new Stack<int>();
@@ -60,7 +60,6 @@ namespace Microsoft.DiaSymReader.Tools
             var importStringsMap = new Dictionary<ImmutableArray<string>, MethodDefinitionHandle>();
 
             var aliasedAssemblyRefs = GetAliasedAssemblyRefs(pdbReader);
-            // var kickOffMethodToMoveNextMethodMap = GetStateMachineMethodMap(pdbReader);
 
             string vbDefaultNamespace = MetadataUtilities.GetVisualBasicDefaultNamespace(pdbReader);
             bool vbSemantics = vbDefaultNamespace != null;
@@ -112,7 +111,7 @@ namespace Microsoft.DiaSymReader.Tools
                     continue;
                 }
 
-                bool isKickOffMethod = metadataModel.TryGetStateMachineMoveNextMethod(methodDefHandle, out var moveNextHandle);
+                bool isKickOffMethod = metadataModel.TryGetStateMachineMoveNextMethod(methodDefHandle, vbSemantics, out var moveNextHandle);
 
                 // methods without debug info:
                 if (!isKickOffMethod && methodDebugInfo.Document.IsNil && methodDebugInfo.SequencePointsBlob.IsNil)
@@ -167,9 +166,9 @@ namespace Microsoft.DiaSymReader.Tools
                             {
                                 Debug.Assert(importStringsBuilder.Count == 0);
                                 Debug.Assert(declaredExternAliases.Count == 0);
-                                Debug.Assert(importCountsPerScope.Count == 0);
+                                Debug.Assert(importGroups.Count == 0);
 
-                                AddImportStrings(importStringsBuilder, importCountsPerScope, declaredExternAliases, pdbReader, metadataModel, localScope.ImportScope, aliasedAssemblyRefs, vbDefaultNamespaceImportString);
+                                AddImportStrings(importStringsBuilder, importGroups, declaredExternAliases, pdbReader, metadataModel, localScope.ImportScope, aliasedAssemblyRefs, vbDefaultNamespaceImportString);
                                 var importStrings = importStringsBuilder.ToImmutableArray();
                                 importStringsBuilder.Clear();
 
@@ -298,7 +297,7 @@ namespace Microsoft.DiaSymReader.Tools
                         if (forwardImportScopesToMethodDef.IsNil)
                         {
                             // record the number of import strings in each scope:
-                            cdiEncoder.AddUsingGroups(importCountsPerScope);
+                            cdiEncoder.AddUsingGroups(importGroups);
 
                             if (!methodDefHandleWithAssemblyRefAliases.IsNil)
                             {
@@ -326,6 +325,8 @@ namespace Microsoft.DiaSymReader.Tools
                     }
                 }
 
+                importGroups.Clear();
+
                 // the following blobs map 1:1
                 CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, PortableCustomDebugInfoKinds.TupleElementNames, CustomDebugInfoKind.TupleElementNames);
                 CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, PortableCustomDebugInfoKinds.EncLocalSlotMap, CustomDebugInfoKind.EditAndContinueLocalSlotMap);
@@ -338,13 +339,18 @@ namespace Microsoft.DiaSymReader.Tools
 
                 cdiBuilder.Clear();
 
-                if (!isKickOffMethod && methodDefHandleWithAssemblyRefAliases.IsNil)
+                if (aliasedAssemblyRefs.Length > 0 && !isKickOffMethod && methodDefHandleWithAssemblyRefAliases.IsNil)
                 {
                     methodDefHandleWithAssemblyRefAliases = methodDefHandle;
                 }
 
                 Debug.WriteLine($"Close Method {methodToken:X8}");
                 pdbWriter.CloseMethod();
+            }
+
+            if (!pdbReader.DebugMetadataHeader.EntryPoint.IsNil)
+            {
+                pdbWriter.SetEntryPoint(MetadataTokens.GetToken(pdbReader.DebugMetadataHeader.EntryPoint));
             }
         }
 
@@ -405,19 +411,11 @@ namespace Microsoft.DiaSymReader.Tools
             // TODO: errors
             var moveNextDef = metadataReader.GetMethodDefinition(moveNextHandle);
             var iteratorType = moveNextDef.GetDeclaringType();
-            return metadataReader.GetString(metadataReader.GetTypeDefinition(iteratorType).Name);
-        }
+            var name = metadataReader.GetString(metadataReader.GetTypeDefinition(iteratorType).Name);
 
-        private static IReadOnlyDictionary<MethodDefinitionHandle, MethodDefinitionHandle> GetStateMachineMethodMap(MetadataReader pdbReader)
-        {
-            // TODO: SRM doesn't have better APIs.
-
-            return 
-               (from methodHandle in pdbReader.MethodDebugInformation
-                let method = pdbReader.GetMethodDebugInformation(methodHandle)
-                let kickOffHandle = method.GetStateMachineKickoffMethod()
-                where !kickOffHandle.IsNil
-                select (key: kickOffHandle, value: methodHandle.ToDefinitionHandle())).ToDictionary(pair => pair.key, pair => pair.value);
+            // trim generic arity from the name:
+            int backtick = name.LastIndexOf('`');
+            return (backtick > 0) ? name.Substring(0, backtick) : name;
         }
 
         private static void WriteImports(PdbWriter<TDocumentWriter> pdbWriter, ImmutableArray<string> importStrings)
@@ -430,7 +428,7 @@ namespace Microsoft.DiaSymReader.Tools
 
         private static void AddImportStrings(
             List<string> importStrings,
-            List<int> importCountsPerScope,
+            List<int> importGroups,
             HashSet<string> declaredExternAliases,
             MetadataReader pdbReader,
             MetadataModel metadataModel,
@@ -477,7 +475,7 @@ namespace Microsoft.DiaSymReader.Tools
                 // Currently regular (non-scripting) C# doesn't support project-level namespace imports.
                 if (vbSemantics || !isProjectLevel || importStringCount > 0)
                 {
-                    importCountsPerScope.Add(importStringCount);
+                    importGroups.Add(importStringCount);
                 }
 
                 importScopeHandle = importScope.Parent;

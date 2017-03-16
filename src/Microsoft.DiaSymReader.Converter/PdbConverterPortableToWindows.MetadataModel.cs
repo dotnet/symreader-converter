@@ -255,7 +255,7 @@ namespace Microsoft.DiaSymReader.Tools
             private static void BuildName(StringBuilder builder, MetadataReader reader, StringHandle nameHandle)
             {
                 const string needsEscaping = "\\[]*.+,& ";
-                foreach (var c in reader.GetString(nameHandle))
+                foreach (char c in reader.GetString(nameHandle))
                 {
                     if (needsEscaping.IndexOf(c) >= 0)
                     {
@@ -356,7 +356,7 @@ namespace Microsoft.DiaSymReader.Tools
                             sb.Append(',');
                         }
 
-                        var serializedArgName = typeArgument.PooledBuilder.ToStringAndFree();
+                        string serializedArgName = typeArgument.PooledBuilder.ToStringAndFree();
                         if (!typeArgument.AssemblyReferenceOpt.IsNil)
                         {
                             sb.Append('[');
@@ -423,7 +423,7 @@ namespace Microsoft.DiaSymReader.Tools
                 }
             }
 
-            public bool TryGetStateMachineMoveNextMethod(MethodDefinitionHandle handle, out MethodDefinitionHandle moveNextHandle)
+            public bool TryGetStateMachineMoveNextMethod(MethodDefinitionHandle handle, bool vbSemantics, out MethodDefinitionHandle moveNextHandle)
             {
                 var methodDef = Reader.GetMethodDefinition(handle);
                 foreach (var caHandle in methodDef.GetCustomAttributes())
@@ -470,12 +470,41 @@ namespace Microsoft.DiaSymReader.Tools
                     }
                 }
 
+                // Attributes are applied only when available in the target framework or in source.
+                // Fallback to well-known generated names.
+                var stateMachineTypeHandle = FindNestedStateMachineTypeByNamePattern(methodDef, vbSemantics);
+                if (!stateMachineTypeHandle.IsNil)
+                {
+                    moveNextHandle = FindMethodByName(Reader.GetTypeDefinition(stateMachineTypeHandle), "MoveNext");
+                    return !moveNextHandle.IsNil;
+                }
+
                 moveNextHandle = default(MethodDefinitionHandle);
                 return false;
             }
 
+            private TypeDefinitionHandle FindNestedStateMachineTypeByNamePattern(MethodDefinition kickoffMethodDef, bool vbSemantics)
+            {
+                var declaringTypeDef = Reader.GetTypeDefinition(kickoffMethodDef.GetDeclaringType());
+                string escapedMethodName = Reader.GetString(kickoffMethodDef.Name).Replace(".", "-");
+
+                if (vbSemantics)
+                {
+                    // VB state machine type name pattern:
+                    // "VB$StateMachine_*_{method name with . replaced by _}" 
+                    return FindSingleNestedTypeByNamePrefixAndSuffix(declaringTypeDef, prefix: "VB$StateMachine_", suffix: "_" + escapedMethodName);
+                }
+                else
+                {
+                    // C# state machine type name pattern:
+                    // <{method name with . replaced by _}>d*
+                    return FindSingleNestedTypeByNamePrefixAndSuffix(declaringTypeDef, prefix: "<" + escapedMethodName + ">d");
+                }
+            }
+
             private TypeDefinitionHandle FindNestedTypeByName(TypeDefinition typeDef, string name)
             {
+                // note: the reader caches the nested type map
                 foreach (var nestedTypeHandle in typeDef.GetNestedTypes())
                 {
                     var nestedTypeDef = Reader.GetTypeDefinition(nestedTypeHandle);
@@ -500,6 +529,30 @@ namespace Microsoft.DiaSymReader.Tools
                 }
 
                 return default(MethodDefinitionHandle);
+            }
+
+            private TypeDefinitionHandle FindSingleNestedTypeByNamePrefixAndSuffix(TypeDefinition typeDef, string prefix, string suffix = null)
+            {
+                var candidate = default(TypeDefinitionHandle);
+                foreach (var typeHandle in typeDef.GetNestedTypes())
+                {
+                    var nestedTypeDef = Reader.GetTypeDefinition(typeHandle);
+                    if (Reader.StringComparer.StartsWith(nestedTypeDef.Name, prefix) && 
+                        (suffix == null || Reader.GetString(nestedTypeDef.Name).EndsWith(suffix)))
+                    {
+                        if (candidate.IsNil)
+                        {
+                            candidate = typeHandle;
+                        }
+                        else
+                        {
+                            // multiple candidates
+                            return default(TypeDefinitionHandle);
+                        }
+                    }
+                }
+
+                return candidate;
             }
 
             private bool TryGetDeclaringTypeQualifiedName(EntityHandle attributeConstructorHandle, out StringHandle namespaceHandle, out StringHandle nameHandle)

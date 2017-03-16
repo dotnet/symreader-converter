@@ -18,5 +18,6 @@ namespace Microsoft.DiaSymReader
         public abstract void UsingNamespace(string importString);
         public abstract void SetAsyncInfo(int moveNextMethodToken, int kickoffMethodToken, int catchHandlerOffset, int[] yieldOffsets, int[] resumeOffsets);
         public abstract void DefineCustomMetadata(byte[] metadata);
+        public abstract void SetEntryPoint(int entryMethodToken);
     }
 }
