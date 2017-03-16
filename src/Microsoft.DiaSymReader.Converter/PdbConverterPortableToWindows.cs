@@ -244,8 +244,13 @@ namespace Microsoft.DiaSymReader.Tools
 
                             // TODO: translate dummy VB hosited state machine locals to hosted scopes
 
-                            int localSignatureToken = methodBody.LocalSignature.IsNil ? 0 : MetadataTokens.GetToken(methodBody.LocalSignature);
-                            pdbWriter.DefineLocalVariable(variable.Index, name, variable.Attributes, localSignatureToken);
+                            if (methodBody.LocalSignature.IsNil)
+                            {
+                                // TODO: report warning
+                                continue;
+                            }
+
+                            pdbWriter.DefineLocalVariable(variable.Index, name, variable.Attributes, MetadataTokens.GetToken(methodBody.LocalSignature));
 
                             var dynamicFlags = MetadataUtilities.ReadDynamicCustomDebugInformation(pdbReader, localVariableHandle);
                             if (TryGetDynamicLocal(name, variable.Index, dynamicFlags, out var dynamicLocal))

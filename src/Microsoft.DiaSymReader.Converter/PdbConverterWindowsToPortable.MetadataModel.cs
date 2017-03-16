@@ -55,7 +55,7 @@ namespace Microsoft.DiaSymReader.Tools
                 {
                     var displayName = AssemblyDisplayNameBuilder.GetAssemblyDisplayName(Reader, Reader.GetAssemblyReference(handle));
 
-                    assemblyNames[MetadataTokens.GetRowNumber(handle)] = displayName;
+                    assemblyNames[MetadataTokens.GetRowNumber(handle) - 1] = displayName;
                     assemblyRefsByName.Add(displayName, handle);
                 }
 
@@ -69,7 +69,7 @@ namespace Microsoft.DiaSymReader.Tools
                 GetAssemblyDisplayName(_lazyAssemblyRefMap.Value.Item2, handle);
 
             private static string GetAssemblyDisplayName(string[] displayNames, AssemblyReferenceHandle? handle) =>
-                handle.HasValue ? displayNames[MetadataTokens.GetRowNumber(handle.Value)] : CoreLibPlaceholder;
+                handle.HasValue && !handle.Value.IsNil ? displayNames[MetadataTokens.GetRowNumber(handle.Value) - 1] : CoreLibPlaceholder;
 
             private Dictionary<byte[], TypeSpecificationHandle> BuildTypeSpecificationMap()
             {
@@ -129,7 +129,7 @@ namespace Microsoft.DiaSymReader.Tools
                         //   Finally, the TypeDef table has a special ordering constraint: 
                         //   the definition of an enclosing class shall precede the definition of all classes it encloses.
                         // 
-                        // Hence we alrady have calculated the name of the declaring type.
+                        // Hence we already have calculated the name of the declaring type.
                         qualifiedName = MakeNestedTypeName(handleToName[declaringType].TypeName, name);
                     }
                     else
@@ -272,6 +272,7 @@ namespace Microsoft.DiaSymReader.Tools
                         case PrimitiveTypeCode.Single: return "System.Single";
                         case PrimitiveTypeCode.Double: return "System.Double";
                         case PrimitiveTypeCode.String: return "System.String";
+                        case PrimitiveTypeCode.Object: return "System.Object";
                         case PrimitiveTypeCode.TypedReference: return "System.TypedReference";
                         case PrimitiveTypeCode.IntPtr: return "System.IntPtr";
                         case PrimitiveTypeCode.UIntPtr: return "System.UIntPtr";
