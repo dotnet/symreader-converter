@@ -761,5 +761,73 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 </symbols>
 ");
         }
+
+        [Fact]
+        public void Convert_LanguageOnlyTypes()
+        {
+            VerifyWindowsPdb(
+               TestResources.LanguageOnlyTypes.DllAndPdb(portable: true),
+               TestResources.LanguageOnlyTypes.DllAndPdb(portable: false),
+@"<?xml version=""1.0"" encoding=""utf-16""?>
+<symbols>
+  <files>
+    <file id=""1"" name=""C:\LanguageOnlyTypes.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
+  </files>
+  <methods>
+    <method containingType=""C"" name=""F"">
+      <customDebugInfo>
+        <using>
+          <namespace usingCount=""1"" />
+        </using>
+        <dynamicLocals>
+          <bucket flagCount=""8"" flags=""01000000"" slotId=""0"" localName=""c1"" />
+          <bucket flagCount=""8"" flags=""00110000"" slotId=""0"" localName=""c2"" />
+          <bucket flagCount=""16"" flags=""0100101110000000"" slotId=""2"" localName=""v1"" />
+          <bucket flagCount=""16"" flags=""0100101110000000"" slotId=""3"" localName=""v2"" />
+          <bucket flagCount=""8"" flags=""01010000"" slotId=""0"" localName=""c1"" />
+          <bucket flagCount=""8"" flags=""01010000"" slotId=""0"" localName=""c2"" />
+        </dynamicLocals>
+        <tupleElementNames>
+          <local elementNames=""|a0|a1|a2|a3|a4|a5|n0|n1|n2|n3|n4|n5|n6|n7|n8|n9||||n0|n1|n2|n3|n4|n5|n6|n7|n8|n9||||n0|n1|n2|n3|n4|n5|n6|n7|n8|n9||||n0|n1|n2|n3|n4|n5|n6|n7|n8|n9||||n0|n1|n2|n3|n4|n5|n6|n7|n8|n9||||n0|n1|n2|n3|n4|n5|n6|n7|n8|n9|||"" slotIndex=""1"" localName=""v2"" scopeStart=""0x0"" scopeEnd=""0x0"" />
+          <local elementNames=""|a1|a7|a8||||a4|"" slotIndex=""3"" localName=""v2"" scopeStart=""0x0"" scopeEnd=""0x0"" />
+        </tupleElementNames>
+        <encLocalSlotMap>
+          <slot kind=""0"" offset=""839"" />
+          <slot kind=""0"" offset=""869"" />
+          <slot kind=""0"" offset=""1961"" />
+          <slot kind=""0"" offset=""2055"" />
+        </encLocalSlotMap>
+      </customDebugInfo>
+      <sequencePoints>
+        <entry offset=""0x0"" startLine=""9"" startColumn=""5"" endLine=""9"" endColumn=""6"" document=""1"" />
+        <entry offset=""0x1"" startLine=""10"" startColumn=""9"" endLine=""10"" endColumn=""10"" document=""1"" />
+        <entry offset=""0x2"" startLine=""11"" startColumn=""13"" endLine=""18"" endColumn=""125"" document=""1"" />
+        <entry offset=""0x4"" startLine=""20"" startColumn=""13"" endLine=""26"" endColumn=""144"" document=""1"" />
+        <entry offset=""0xc"" startLine=""30"" startColumn=""9"" endLine=""30"" endColumn=""10"" document=""1"" />
+        <entry offset=""0xd"" startLine=""32"" startColumn=""9"" endLine=""32"" endColumn=""10"" document=""1"" />
+        <entry offset=""0xe"" startLine=""33"" startColumn=""13"" endLine=""33"" endColumn=""99"" document=""1"" />
+        <entry offset=""0x10"" startLine=""38"" startColumn=""9"" endLine=""38"" endColumn=""10"" document=""1"" />
+        <entry offset=""0x11"" startLine=""39"" startColumn=""5"" endLine=""39"" endColumn=""6"" document=""1"" />
+      </sequencePoints>
+      <scope startOffset=""0x0"" endOffset=""0x12"">
+        <namespace name=""System"" />
+        <scope startOffset=""0x1"" endOffset=""0xd"">
+          <local name=""v1"" il_index=""0"" il_start=""0x1"" il_end=""0xd"" attributes=""0"" />
+          <local name=""v2"" il_index=""1"" il_start=""0x1"" il_end=""0xd"" attributes=""0"" />
+          <constant name=""c1"" value=""null"" unknown-signature="""" />
+          <constant name=""c2"" value=""null"" unknown-signature="""" />
+        </scope>
+        <scope startOffset=""0xd"" endOffset=""0x11"">
+          <local name=""v1"" il_index=""2"" il_start=""0xd"" il_end=""0x11"" attributes=""0"" />
+          <local name=""v2"" il_index=""3"" il_start=""0xd"" il_end=""0x11"" attributes=""0"" />
+          <constant name=""c1"" value=""null"" unknown-signature="""" />
+          <constant name=""c2"" value=""null"" unknown-signature="""" />
+        </scope>
+      </scope>
+    </method>
+  </methods>
+</symbols>
+");
+        }
     }
 }
