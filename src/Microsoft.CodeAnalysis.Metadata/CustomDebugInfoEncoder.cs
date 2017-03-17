@@ -149,14 +149,48 @@ namespace Microsoft.CodeAnalysis.Debugging
 
                     foreach (var (name, flags, count, slotIndex) in dynamicLocals)
                     {
-                        Debug.Assert(flags.Length == DynamicAttributeSize);
+                        Debug.Assert(flags.Length <= DynamicAttributeSize);
                         Debug.Assert(name.Length <= IdentifierSize);
 
                         builder.WriteBytes(flags);
+                        builder.WriteBytes(0, sizeof(byte) * (DynamicAttributeSize - flags.Length));
                         builder.WriteInt32(count);
                         builder.WriteInt32(slotIndex);
                         builder.WriteUTF16(name);
                         builder.WriteBytes(0, sizeof(char) * (IdentifierSize - name.Length));
+                    }
+                });
+        }
+
+        public void AddTupleElementNames<TNames>(
+           IReadOnlyCollection<(string LocalName, int SlotIndex, int ScopeStart, int ScopeEnd, int NameCount, TNames Names)> tupleLocals,
+           Func<TNames, int, string> nameProvider)
+        {
+            Debug.Assert(tupleLocals != null);
+            Debug.Assert(nameProvider != null);
+
+            AddRecord(
+                CustomDebugInfoKind.TupleElementNames,
+                tupleLocals,
+                (infos, builder) =>
+                {
+                    builder.WriteInt32(infos.Count);
+                    foreach (var info in infos)
+                    {
+                        Debug.Assert((info.SlotIndex == 0) ^ (info.ScopeStart == 0 && info.ScopeEnd == 0));
+
+                        builder.WriteInt32(info.NameCount);
+                        for (int i = 0; i < info.NameCount; i++)
+                        {
+                            builder.WriteUTF8(nameProvider(info.Names, i));
+                            builder.WriteByte(0);
+                        }
+
+                        builder.WriteInt32(info.SlotIndex);
+                        builder.WriteInt32(info.ScopeStart);
+                        builder.WriteInt32(info.ScopeEnd);
+                        builder.WriteUTF8(info.LocalName);
+                        builder.WriteByte(0);
                     }
                 });
         }

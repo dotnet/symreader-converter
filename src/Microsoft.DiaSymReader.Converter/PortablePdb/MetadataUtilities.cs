@@ -132,6 +132,36 @@ namespace Microsoft.DiaSymReader.PortablePdb
             return builder.MoveToImmutable();
         }
 
+        // Copied from Roslyn EE. Share Portable PDB blob decoders.
+       
+        /// <exception cref="BadImageFormatException">Invalid data format.</exception>
+        public static ImmutableArray<string> ReadTupleCustomDebugInformation(MetadataReader reader, EntityHandle variableOrConstantHandle)
+        {
+            var blobHandle = GetCustomDebugInformation(reader, variableOrConstantHandle, PortableCustomDebugInfoKinds.TupleElementNames);
+            if (blobHandle.IsNil)
+            {
+                return default(ImmutableArray<string>);
+            }
+
+            return DecodeTupleElementNames(reader.GetBlobReader(blobHandle));
+        }
+
+        /// <exception cref="BadImageFormatException">Invalid data format.</exception>
+        private static ImmutableArray<string> DecodeTupleElementNames(BlobReader reader)
+        {
+            var builder = ArrayBuilder<string>.GetInstance();
+            while (reader.RemainingBytes > 0)
+            {
+                int byteCount = reader.IndexOf(0);
+                string value = reader.ReadUTF8(byteCount);
+                byte terminator = reader.ReadByte();
+                Debug.Assert(terminator == 0);
+                builder.Add(value.Length == 0 ? null : value);
+            }
+
+            return builder.ToImmutableAndFree();
+        }
+
         // TODO: Copied from PortablePdb. Share.
 
         public static AsyncMethodData ReadAsyncMethodData(MetadataReader metadataReader, MethodDebugInformationHandle debugHandle)

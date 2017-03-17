@@ -42,6 +42,26 @@ namespace TestResources
         public static TestResource DllAndPdb(bool portable) => portable ? PortableDllAndPdb : WindowsDllAndPdb;
     }
 
+    public static class LanguageOnlyTypes
+    {
+        private static byte[] s_portableDll;
+        public static byte[] PortableDll => ResourceLoader.GetOrCreateResource(ref s_portableDll, nameof(LanguageOnlyTypes) + ".dllx");
+
+        private static byte[] s_portablePdb;
+        public static byte[] PortablePdb => ResourceLoader.GetOrCreateResource(ref s_portablePdb, nameof(LanguageOnlyTypes) + ".pdbx");
+
+        private static byte[] s_windowsDll;
+        public static byte[] WindowsDll => ResourceLoader.GetOrCreateResource(ref s_windowsDll, nameof(LanguageOnlyTypes) + ".dll");
+
+        private static byte[] s_windowsPdb;
+        public static byte[] WindowsPdb => ResourceLoader.GetOrCreateResource(ref s_windowsPdb, nameof(LanguageOnlyTypes) + ".pdb");
+
+        public static TestResource PortableDllAndPdb => new TestResource(PortableDll, PortablePdb);
+        public static TestResource WindowsDllAndPdb => new TestResource(WindowsDll, WindowsPdb);
+        public static TestResource DllAndPdb(bool portable) => portable ? PortableDllAndPdb : WindowsDllAndPdb;
+    }
+
+
     public static class Async
     {
         private static byte[] s_portableDll;

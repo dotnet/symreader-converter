@@ -53,6 +53,7 @@ namespace Microsoft.DiaSymReader.Tools
             var importGroups = new List<int>();
             var cdiBuilder = new BlobBuilder();
             var dynamicLocals = new List<(string LocalName, byte[] Flags, int Count, int SlotIndex)>();
+            var tupleLocals = new List<(string LocalName, int SlotIndex, int ScopeStart, int ScopeEnd, int NameCount, ImmutableArray<string> Names)>();
             var openScopeEndOffsets = new Stack<int>();
 
             // state for calculating import string forwarding:
@@ -129,6 +130,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                 var forwardImportScopesToMethodDef = default(MethodDefinitionHandle);
                 Debug.Assert(dynamicLocals.Count == 0);
+                Debug.Assert(tupleLocals.Count == 0);
                 Debug.Assert(openScopeEndOffsets.Count == 0);
 
                 void CloseOpenScopes(int currentScopeStartOffset)
@@ -205,33 +207,6 @@ namespace Microsoft.DiaSymReader.Tools
                             }
                         }
 
-                        foreach (var localConstantHandle in localScope.GetLocalConstants())
-                        {
-                            var constant = pdbReader.GetLocalConstant(localConstantHandle);
-                            string name = pdbReader.GetString(constant.Name);
-
-                            if (name.Length > MaxEntityNameLength)
-                            {
-                                // TODO: report warning
-                                continue;
-                            }
-
-                            var (value, signature) = PortableConstantSignature.GetConstantValueAndSignature(pdbReader, localConstantHandle, metadataReader.GetQualifiedTypeName);
-                            if (!metadataModel.TryGetStandaloneSignatureHandle(signature, out var constantSignatureHandle))
-                            {
-                                // Signature will be unspecified. At least we store the name and the value.
-                                constantSignatureHandle = default(StandaloneSignatureHandle);
-                            }
-
-                            pdbWriter.DefineLocalConstant(name, value, MetadataTokens.GetToken(constantSignatureHandle));
-
-                            var dynamicFlags = MetadataUtilities.ReadDynamicCustomDebugInformation(pdbReader, localConstantHandle);
-                            if (TryGetDynamicLocal(name, 0, dynamicFlags, out var dynamicLocal))
-                            {
-                                dynamicLocals.Add(dynamicLocal);
-                            }
-                        }
-
                         foreach (var localVariableHandle in localScope.GetLocalVariables())
                         {
                             var variable = pdbReader.GetLocalVariable(localVariableHandle);
@@ -257,6 +232,45 @@ namespace Microsoft.DiaSymReader.Tools
                             if (TryGetDynamicLocal(name, variable.Index, dynamicFlags, out var dynamicLocal))
                             {
                                 dynamicLocals.Add(dynamicLocal);
+                            }
+
+                            var tupleElementNames = MetadataUtilities.ReadTupleCustomDebugInformation(pdbReader, localVariableHandle);
+                            if (!tupleElementNames.IsDefaultOrEmpty)
+                            {
+                                tupleLocals.Add((name, SlotIndex: variable.Index, ScopeStart: 0, ScopeEnd: 0, tupleElementNames.Length, tupleElementNames));
+                            }
+                        }
+
+                        foreach (var localConstantHandle in localScope.GetLocalConstants())
+                        {
+                            var constant = pdbReader.GetLocalConstant(localConstantHandle);
+                            string name = pdbReader.GetString(constant.Name);
+
+                            if (name.Length > MaxEntityNameLength)
+                            {
+                                // TODO: report warning
+                                continue;
+                            }
+
+                            var (value, signature) = PortableConstantSignature.GetConstantValueAndSignature(pdbReader, localConstantHandle, metadataReader.GetQualifiedTypeName);
+                            if (!metadataModel.TryGetStandaloneSignatureHandle(signature, out var constantSignatureHandle))
+                            {
+                                // Signature will be unspecified. At least we store the name and the value.
+                                constantSignatureHandle = default(StandaloneSignatureHandle);
+                            }
+
+                            pdbWriter.DefineLocalConstant(name, value, MetadataTokens.GetToken(constantSignatureHandle));
+
+                            var dynamicFlags = MetadataUtilities.ReadDynamicCustomDebugInformation(pdbReader, localConstantHandle);
+                            if (TryGetDynamicLocal(name, 0, dynamicFlags, out var dynamicLocal))
+                            {
+                                dynamicLocals.Add(dynamicLocal);
+                            }
+
+                            var tupleElementNames = MetadataUtilities.ReadTupleCustomDebugInformation(pdbReader, localConstantHandle);
+                            if (!tupleElementNames.IsDefaultOrEmpty)
+                            {
+                                tupleLocals.Add((name, SlotIndex: -1, ScopeStart: localScope.StartOffset, ScopeEnd: localScope.EndOffset, tupleElementNames.Length, tupleElementNames));
                             }
                         }
                     }
@@ -325,12 +339,17 @@ namespace Microsoft.DiaSymReader.Tools
                         cdiEncoder.AddDynamicLocals(dynamicLocals);
                         dynamicLocals.Clear();
                     }
+
+                    if (tupleLocals.Count > 0)
+                    {
+                        cdiEncoder.AddTupleElementNames(tupleLocals, (names, i) => names[i] ?? string.Empty);
+                        tupleLocals.Clear();
+                    }
                 }
 
                 importGroups.Clear();
 
                 // the following blobs map 1:1
-                CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, PortableCustomDebugInfoKinds.TupleElementNames, CustomDebugInfoKind.TupleElementNames);
                 CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, PortableCustomDebugInfoKinds.EncLocalSlotMap, CustomDebugInfoKind.EditAndContinueLocalSlotMap);
                 CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, PortableCustomDebugInfoKinds.EncLambdaAndClosureMap, CustomDebugInfoKind.EditAndContinueLambdaMap);
 
@@ -356,18 +375,23 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        private static bool TryGetDynamicLocal(string name, int slotIndex, ImmutableArray<bool> flagsOpt, out (string LocalName, byte[] Flags, int Count, int SlotIndex) result)
+        private static bool TryGetDynamicLocal(
+            string name,
+            int slotIndex,
+            ImmutableArray<bool> flagsOpt,
+            out (string LocalName, byte[] Flags, int Count, int SlotIndex) result)
         {
-            if (flagsOpt.IsDefaultOrEmpty ||
-                flagsOpt.Length > CustomDebugInfoEncoder.DynamicAttributeSize &&
+            // C# compiler skips variables with too many flags or too long name:
+            if (flagsOpt.IsDefaultOrEmpty || 
+                flagsOpt.Length > CustomDebugInfoEncoder.DynamicAttributeSize ||
                 name.Length >= CustomDebugInfoEncoder.IdentifierSize)
             {
                 result = default((string, byte[], int, int));
                 return false;
             }
 
-            var bytes = new byte[CustomDebugInfoEncoder.DynamicAttributeSize];
-            for (int k = 0; k < flagsOpt.Length; k++)
+            var bytes = new byte[Math.Min(flagsOpt.Length, CustomDebugInfoEncoder.DynamicAttributeSize)];
+            for (int k = 0; k < bytes.Length; k++)
             {
                 if (flagsOpt[k])
                 {
