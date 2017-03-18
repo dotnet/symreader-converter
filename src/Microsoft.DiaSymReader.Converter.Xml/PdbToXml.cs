@@ -1028,12 +1028,7 @@ namespace Microsoft.DiaSymReader.Tools
                 _writer.WriteStartElement("constant");
                 _writer.WriteAttributeString("name", name);
 
-                if (value is int && (int)value == 0 &&
-                    (signature.Length == 0 ||
-                     signature[0] == (byte)ConstantTypeCode.NullReference ||
-                     signature[0] == (int)SignatureTypeCode.Object ||
-                     signature[0] == (int)SignatureTypeCode.String ||
-                     (signature.Length > 2 && signature[0] == (int)SignatureTypeCode.GenericTypeInstance && signature[1] == (byte)ConstantTypeCode.NullReference)))
+                if (value is 0 && IsPossiblyNullConstantType(signature))
                 {
                     _writer.WriteAttributeString("value", "null");
 
@@ -1119,6 +1114,50 @@ namespace Microsoft.DiaSymReader.Tools
                 }
 
                 _writer.WriteEndElement();
+            }
+        }
+
+        private static bool IsPossiblyNullConstantType(byte[] signature)
+        {
+            if (signature.Length == 0)
+            {
+                return true;
+            }   
+
+            switch ((SignatureTypeCode)signature[0])
+            {
+                case SignatureTypeCode.Boolean:
+                case SignatureTypeCode.SByte:
+                case SignatureTypeCode.Byte:
+                case SignatureTypeCode.Char:
+                case SignatureTypeCode.Int16:
+                case SignatureTypeCode.UInt16:
+                case SignatureTypeCode.Int32:
+                case SignatureTypeCode.UInt32:
+                case SignatureTypeCode.Int64:
+                case SignatureTypeCode.UInt64:
+                case SignatureTypeCode.IntPtr:
+                case SignatureTypeCode.UIntPtr:
+                case SignatureTypeCode.Single:
+                case SignatureTypeCode.Double:
+                    return false;
+
+                case SignatureTypeCode.GenericTypeInstance:
+                    if (signature.Length == 1)
+                    {
+                        // bad signature
+                        return true;
+                    }
+
+                    // don't care about projections changing value type to class type here
+                    return (SignatureTypeKind)signature[1] != SignatureTypeKind.ValueType;
+
+                case (SignatureTypeCode)SignatureTypeKind.ValueType: 
+                    // don't care about projections changing value type to class type here
+                    return false;
+
+                default:
+                    return true;
             }
         }
 
