@@ -53,7 +53,7 @@ namespace Microsoft.DiaSymReader.Tools
             var importGroups = new List<int>();
             var cdiBuilder = new BlobBuilder();
             var dynamicLocals = new List<(string LocalName, byte[] Flags, int Count, int SlotIndex)>();
-            var tupleLocals = new List<(string LocalName, int SlotIndex, int ScopeStart, int ScopeEnd, int NameCount, ImmutableArray<string> Names)>();
+            var tupleLocals = new List<(string LocalName, int SlotIndex, int ScopeStart, int ScopeEnd, ImmutableArray<string> Names)>();
             var openScopeEndOffsets = new Stack<int>();
 
             // state for calculating import string forwarding:
@@ -237,7 +237,7 @@ namespace Microsoft.DiaSymReader.Tools
                             var tupleElementNames = MetadataUtilities.ReadTupleCustomDebugInformation(pdbReader, localVariableHandle);
                             if (!tupleElementNames.IsDefaultOrEmpty)
                             {
-                                tupleLocals.Add((name, SlotIndex: variable.Index, ScopeStart: 0, ScopeEnd: 0, tupleElementNames.Length, tupleElementNames));
+                                tupleLocals.Add((name, SlotIndex: variable.Index, ScopeStart: 0, ScopeEnd: 0, Names: tupleElementNames));
                             }
                         }
 
@@ -270,7 +270,7 @@ namespace Microsoft.DiaSymReader.Tools
                             var tupleElementNames = MetadataUtilities.ReadTupleCustomDebugInformation(pdbReader, localConstantHandle);
                             if (!tupleElementNames.IsDefaultOrEmpty)
                             {
-                                tupleLocals.Add((name, SlotIndex: -1, ScopeStart: localScope.StartOffset, ScopeEnd: localScope.EndOffset, tupleElementNames.Length, tupleElementNames));
+                                tupleLocals.Add((name, SlotIndex: -1, ScopeStart: localScope.StartOffset, ScopeEnd: localScope.EndOffset, Names: tupleElementNames));
                             }
                         }
                     }
@@ -342,7 +342,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                     if (tupleLocals.Count > 0)
                     {
-                        cdiEncoder.AddTupleElementNames(tupleLocals, (names, i) => names[i] ?? string.Empty);
+                        cdiEncoder.AddTupleElementNames(tupleLocals);
                         tupleLocals.Clear();
                     }
                 }
