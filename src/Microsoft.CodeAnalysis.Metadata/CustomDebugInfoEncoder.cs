@@ -143,46 +143,51 @@ namespace Microsoft.CodeAnalysis.Debugging
             AddRecord(
                 CustomDebugInfoKind.DynamicLocals,
                 dynamicLocals,
-                (info, builder) =>
+                (infos, builder) =>
                 {
-                    builder.WriteInt32(dynamicLocals.Count);
+                    builder.WriteInt32(infos.Count);
 
-                    foreach (var (name, flags, count, slotIndex) in dynamicLocals)
+                    foreach (var info in infos)
                     {
-                        Debug.Assert(flags.Length <= DynamicAttributeSize);
-                        Debug.Assert(name.Length <= IdentifierSize);
+                        Debug.Assert(info.Flags.Length <= DynamicAttributeSize);
+                        Debug.Assert(info.LocalName.Length <= IdentifierSize);
 
-                        builder.WriteBytes(flags);
-                        builder.WriteBytes(0, sizeof(byte) * (DynamicAttributeSize - flags.Length));
-                        builder.WriteInt32(count);
-                        builder.WriteInt32(slotIndex);
-                        builder.WriteUTF16(name);
-                        builder.WriteBytes(0, sizeof(char) * (IdentifierSize - name.Length));
+                        builder.WriteBytes(info.Flags);
+                        builder.WriteBytes(0, sizeof(byte) * (DynamicAttributeSize - info.Flags.Length));
+                        builder.WriteInt32(info.Count);
+                        builder.WriteInt32(info.SlotIndex);
+                        builder.WriteUTF16(info.LocalName);
+                        builder.WriteBytes(0, sizeof(char) * (IdentifierSize - info.LocalName.Length));
                     }
                 });
         }
 
-        public void AddTupleElementNames<TNames>(
-           IReadOnlyCollection<(string LocalName, int SlotIndex, int ScopeStart, int ScopeEnd, int NameCount, TNames Names)> tupleLocals,
-           Func<TNames, int, string> nameProvider)
+        public void AddTupleElementNames(IReadOnlyCollection<(string LocalName, int SlotIndex, int ScopeStart, int ScopeEnd, ImmutableArray<string> Names)> tupleLocals)
         {
             Debug.Assert(tupleLocals != null);
-            Debug.Assert(nameProvider != null);
 
             AddRecord(
                 CustomDebugInfoKind.TupleElementNames,
                 tupleLocals,
                 (infos, builder) =>
                 {
+                    Debug.Assert(infos.Count > 0);
+
                     builder.WriteInt32(infos.Count);
                     foreach (var info in infos)
                     {
-                        Debug.Assert((info.SlotIndex == 0) ^ (info.ScopeStart == 0 && info.ScopeEnd == 0));
+                        // Constants have slot index -1 and scope specified,
+                        // variables have a slot index specified and no scope.
+                        Debug.Assert((info.SlotIndex == -1) ^ (info.ScopeStart == 0 && info.ScopeEnd == 0));
 
-                        builder.WriteInt32(info.NameCount);
-                        for (int i = 0; i < info.NameCount; i++)
+                        builder.WriteInt32(info.Names.Length);
+                        foreach (var name in info.Names)
                         {
-                            builder.WriteUTF8(nameProvider(info.Names, i));
+                            if (name != null)
+                            {
+                                builder.WriteUTF8(name);
+                            }
+
                             builder.WriteByte(0);
                         }
 
