@@ -98,6 +98,18 @@
     <EmbeddedResource Include="Resources\LanguageOnlyTypes.pdbx">
       <LogicalName>LanguageOnlyTypes.pdbx</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\VB.dll">
+      <LogicalName>VB.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\VB.pdb">
+      <LogicalName>VB.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\VB.dllx">
+      <LogicalName>VB.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\VB.pdbx">
+      <LogicalName>VB.pdbx</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\MethodBoundaries.dll">
       <LogicalName>MethodBoundaries.dll</LogicalName>
     </EmbeddedResource>

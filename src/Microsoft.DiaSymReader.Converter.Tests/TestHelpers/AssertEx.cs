@@ -453,7 +453,7 @@ namespace Roslyn.Test.Utilities
             return message.ToString();
         }
 
-        public static void AssertLinesEqual(string expected, string actual)
+        public static void AssertLinesEqual(string expected, string actual, string message)
         {
             IEnumerable<string> GetLines(string str) => 
                 str.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
@@ -461,6 +461,7 @@ namespace Roslyn.Test.Utilities
             Equal(
                 GetLines(expected), 
                 GetLines(actual),
+                message: message,
                 comparer: (left, right) => left.Trim() == right.Trim(),
                 itemInspector: line => line.Replace("\"", "\"\""),
                 itemSeparator: Environment.NewLine);
