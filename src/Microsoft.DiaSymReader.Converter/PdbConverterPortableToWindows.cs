@@ -62,6 +62,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             // state for calculating import string forwarding:
             var lastImportScopeHandle = default(ImportScopeHandle);
+            var vbLastImportScopeNamespace = default(string);
             var lastImportScopeMethodDefHandle = default(MethodDefinitionHandle);
             var importStringsMap = new Dictionary<ImmutableArray<string>, MethodDefinitionHandle>(SequenceComparer<string>.Instance);
 
@@ -97,42 +98,32 @@ namespace Microsoft.DiaSymReader.Tools
                 var methodDefHandle = methodDebugInfoHandle.ToDefinitionHandle();
                 int methodToken = MetadataTokens.GetToken(methodDefHandle);
                 var methodDef = metadataReader.GetMethodDefinition(methodDefHandle);
-
-                void SkipLocalScopes()
-                {
-                    while (currentLocalScope.HasValue && currentLocalScope.Value.Method == methodDefHandle)
-                    {
-                        currentLocalScope = NextLocalScope();
-                    }
-                }
-
-                // methods without method body don't currently have any debug information:
-                if (methodDef.RelativeVirtualAddress == 0)
-                {
-                    SkipLocalScopes();
-                    continue;
-                }
-
-                bool isKickOffMethod = metadataModel.TryGetStateMachineMoveNextMethod(methodDefHandle, vbSemantics, out var moveNextHandle);
-
-                // methods without debug info:
-                if (!isKickOffMethod && methodDebugInfo.Document.IsNil && methodDebugInfo.SequencePointsBlob.IsNil)
-                {
-                    SkipLocalScopes();
-                    continue;
-                }
-
-                Debug.WriteLine($"Open Method '{metadataReader.GetString(methodDef.Name)}' {methodToken:X8}");
-                pdbWriter.OpenMethod(methodToken);
-
-                var methodBody = peReader.GetMethodBody(methodDef.RelativeVirtualAddress);
-                int methodBodyLength = methodBody.GetILReader().Length;
+#if DEBUG
+                var declaringTypeDef = metadataReader.GetTypeDefinition(methodDef.GetDeclaringType());
+                var typeName = metadataReader.GetString(declaringTypeDef.Name);
+                var methodName = metadataReader.GetString(methodDef.Name);
+#endif
+                bool methodOpened = false;
+                var methodBodyOpt = (methodDef.RelativeVirtualAddress != 0) ? peReader.GetMethodBody(methodDef.RelativeVirtualAddress) : null;
                 var vbCurrentMethodNamespace = vbSemantics ? GetMethodNamespace(metadataReader, methodDef) : null;
+                bool isKickOffMethod = metadataModel.TryGetStateMachineMoveNextMethod(methodDefHandle, vbSemantics, out var moveNextHandle);
 
                 var forwardImportScopesToMethodDef = default(MethodDefinitionHandle);
                 Debug.Assert(dynamicLocals.Count == 0);
                 Debug.Assert(tupleLocals.Count == 0);
                 Debug.Assert(openScopeEndOffsets.Count == 0);
+
+                void LazyOpenMethod()
+                {
+                    if (!methodOpened)
+                    {
+#if DEBUG
+                        Debug.WriteLine($"Open Method '{typeName}::{methodName}' {methodToken:X8}");
+#endif
+                        pdbWriter.OpenMethod(methodToken);
+                        methodOpened = true;
+                    }
+                }
 
                 void CloseOpenScopes(int currentScopeStartOffset)
                 {
@@ -150,6 +141,13 @@ namespace Microsoft.DiaSymReader.Tools
                 bool isFirstMethodScope = true;
                 while (currentLocalScope.HasValue && currentLocalScope.Value.Method == methodDefHandle)
                 {
+                    if (methodBodyOpt == null)
+                    {
+                        continue;
+                    }
+
+                    LazyOpenMethod();
+                    
                     var localScope = currentLocalScope.Value;
 
                     // kickoff methods don't have any scopes emitted to Windows PDBs
@@ -163,7 +161,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                         if (isFirstMethodScope)
                         {
-                            if (lastImportScopeHandle == localScope.ImportScope)
+                            if (lastImportScopeHandle == localScope.ImportScope && vbLastImportScopeNamespace == vbCurrentMethodNamespace)
                             {
                                 // forward to a method that has the same imports:
                                 forwardImportScopesToMethodDef = lastImportScopeMethodDefHandle;
@@ -192,6 +190,7 @@ namespace Microsoft.DiaSymReader.Tools
                                 }
 
                                 lastImportScopeHandle = localScope.ImportScope;
+                                vbLastImportScopeNamespace = vbCurrentMethodNamespace;
                             }
 
                             if (vbSemantics && !forwardImportScopesToMethodDef.IsNil)
@@ -221,15 +220,15 @@ namespace Microsoft.DiaSymReader.Tools
                                 continue;
                             }
 
-                            // TODO: translate dummy VB hosited state machine locals to hosted scopes
-
-                            if (methodBody.LocalSignature.IsNil)
+                            if (methodBodyOpt.LocalSignature.IsNil)
                             {
                                 // TODO: report warning
                                 continue;
                             }
 
-                            pdbWriter.DefineLocalVariable(variable.Index, name, variable.Attributes, MetadataTokens.GetToken(methodBody.LocalSignature));
+                            // TODO: translate hoisted variable scopes to dummy VB hoisted state machine locals (https://github.com/dotnet/roslyn/issues/8473)
+
+                            pdbWriter.DefineLocalVariable(variable.Index, name, variable.Attributes, MetadataTokens.GetToken(methodBodyOpt.LocalSignature));
 
                             var dynamicFlags = MetadataUtilities.ReadDynamicCustomDebugInformation(pdbReader, localVariableHandle);
                             if (TryGetDynamicLocal(name, variable.Index, dynamicFlags, out var dynamicLocal))
@@ -283,19 +282,26 @@ namespace Microsoft.DiaSymReader.Tools
                     isFirstMethodScope = false;
                 }
 
-                CloseOpenScopes(methodBodyLength);
+                bool hasAnyScopes = !isFirstMethodScope;
+
+                CloseOpenScopes(int.MaxValue);
                 if (openScopeEndOffsets.Count > 0)
                 {
                     // TODO: report warning: scope range exceeds size of the method body
                     openScopeEndOffsets.Clear();
                 }
 
-                WriteSequencePoints(pdbWriter, documentWriters, symSequencePointBuilder, methodDebugInfo.GetSequencePoints());
+                if (!methodDebugInfo.SequencePointsBlob.IsNil)
+                {
+                    LazyOpenMethod();
+                    WriteSequencePoints(pdbWriter, documentWriters, symSequencePointBuilder, methodDebugInfo.GetSequencePoints());
+                }
 
                 // async method data:
                 var asyncData = MetadataUtilities.ReadAsyncMethodData(pdbReader, methodDebugInfoHandle);
                 if (!asyncData.IsNone)
                 {
+                    LazyOpenMethod();
                     pdbWriter.SetAsyncInfo(
                         moveNextMethodToken: methodToken,
                         kickoffMethodToken: MetadataTokens.GetToken(asyncData.KickoffMethod),
@@ -312,7 +318,7 @@ namespace Microsoft.DiaSymReader.Tools
                 }
                 else
                 {
-                    if (!vbSemantics)
+                    if (!vbSemantics && hasAnyScopes)
                     {
                         if (forwardImportScopesToMethodDef.IsNil)
                         {
@@ -359,18 +365,22 @@ namespace Microsoft.DiaSymReader.Tools
 
                 if (cdiEncoder.RecordCount > 0)
                 {
+                    LazyOpenMethod();
                     pdbWriter.DefineCustomMetadata(cdiEncoder.ToArray());
                 }
 
                 cdiBuilder.Clear();
 
-                if (aliasedAssemblyRefs.Length > 0 && !isKickOffMethod && methodDefHandleWithAssemblyRefAliases.IsNil)
+                if (methodOpened && aliasedAssemblyRefs.Length > 0 && !isKickOffMethod && methodDefHandleWithAssemblyRefAliases.IsNil)
                 {
                     methodDefHandleWithAssemblyRefAliases = methodDefHandle;
                 }
 
-                Debug.WriteLine($"Close Method {methodToken:X8}");
-                pdbWriter.CloseMethod();
+                if (methodOpened)
+                {
+                    Debug.WriteLine($"Close Method {methodToken:X8}");
+                    pdbWriter.CloseMethod();
+                }
             }
 
             if (!pdbReader.DebugMetadataHeader.EntryPoint.IsNil)
@@ -382,7 +392,20 @@ namespace Microsoft.DiaSymReader.Tools
         private static string GetMethodNamespace(MetadataReader metadataReader, MethodDefinition methodDef)
         {
             var typeDefHandle = methodDef.GetDeclaringType();
-            return typeDefHandle.IsNil ? null : metadataReader.GetString(metadataReader.GetTypeDefinition(typeDefHandle).Namespace);
+            if (typeDefHandle.IsNil)
+            {
+                return null;
+            }
+
+            while (true)
+            {
+                var typeDef = metadataReader.GetTypeDefinition(typeDefHandle);
+                typeDefHandle = typeDef.GetDeclaringType();
+                if (typeDefHandle.IsNil)
+                {
+                    return metadataReader.GetString(typeDef.Namespace);
+                }
+            }
         }
 
         private static int AdjustEndScopeOffset(int exclusiveOffset, bool isEndInclusive) =>

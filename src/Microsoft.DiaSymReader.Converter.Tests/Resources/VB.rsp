@@ -1,0 +1,5 @@
+/imports:<xmlns:prjlevel1='http://NewNamespace'>
+/imports:A1=System.Collections.Generic
+/imports:A2=System.Int64
+/imports:System.Threading
+/define:_MYTYPE="Empty"
