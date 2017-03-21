@@ -43,8 +43,12 @@ namespace Microsoft.DiaSymReader.Tools
 
         internal static void Convert(PEReader peReader, MetadataReader pdbReader, PdbWriter<TDocumentWriter> pdbWriter)
         {
+            string vbDefaultNamespace = MetadataUtilities.GetVisualBasicDefaultNamespace(pdbReader);
+            bool vbSemantics = vbDefaultNamespace != null;
+            string vbDefaultNamespaceImportString = string.IsNullOrEmpty(vbDefaultNamespace) ? null : "*" + vbDefaultNamespace;
+
             var metadataReader = peReader.GetMetadataReader();
-            var metadataModel = new MetadataModel(metadataReader);
+            var metadataModel = new MetadataModel(metadataReader, vbSemantics);
 
             var documentWriters = new ArrayBuilder<TDocumentWriter>(pdbReader.Documents.Count);
             var symSequencePointBuilder = new SequencePointsBuilder(capacity: 64);
@@ -62,10 +66,6 @@ namespace Microsoft.DiaSymReader.Tools
             var importStringsMap = new Dictionary<ImmutableArray<string>, MethodDefinitionHandle>(SequenceComparer<string>.Instance);
 
             var aliasedAssemblyRefs = GetAliasedAssemblyRefs(pdbReader);
-
-            string vbDefaultNamespace = MetadataUtilities.GetVisualBasicDefaultNamespace(pdbReader);
-            bool vbSemantics = vbDefaultNamespace != null;
-            string vbDefaultNamespaceImportString = vbSemantics ? "*" + vbDefaultNamespace : null;
 
             foreach (var documentHandle in pdbReader.Documents)
             {
@@ -127,6 +127,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                 var methodBody = peReader.GetMethodBody(methodDef.RelativeVirtualAddress);
                 int methodBodyLength = methodBody.GetILReader().Length;
+                var vbCurrentMethodNamespace = vbSemantics ? GetMethodNamespace(metadataReader, methodDef) : null;
 
                 var forwardImportScopesToMethodDef = default(MethodDefinitionHandle);
                 Debug.Assert(dynamicLocals.Count == 0);
@@ -140,7 +141,9 @@ namespace Microsoft.DiaSymReader.Tools
                     {
                         int scopeEnd = openScopeEndOffsets.Pop();
                         Debug.WriteLine($"Close Scope [.., {scopeEnd})");
-                        pdbWriter.CloseScope(scopeEnd - (vbSemantics ? 1 : 0));
+
+                        // Note that the root scope end is not end-inclusive in VB:
+                        pdbWriter.CloseScope(AdjustEndScopeOffset(scopeEnd, isEndInclusive: vbSemantics && openScopeEndOffsets.Count > 0));
                     }
                 }
 
@@ -171,7 +174,7 @@ namespace Microsoft.DiaSymReader.Tools
                                 Debug.Assert(declaredExternAliases.Count == 0);
                                 Debug.Assert(importGroups.Count == 0);
 
-                                AddImportStrings(importStringsBuilder, importGroups, declaredExternAliases, pdbReader, metadataModel, localScope.ImportScope, aliasedAssemblyRefs, vbDefaultNamespaceImportString);
+                                AddImportStrings(importStringsBuilder, importGroups, declaredExternAliases, pdbReader, metadataModel, localScope.ImportScope, aliasedAssemblyRefs, vbDefaultNamespaceImportString, vbCurrentMethodNamespace, vbSemantics);
                                 var importStrings = importStringsBuilder.ToImmutableArray();
                                 importStringsBuilder.Clear();
 
@@ -270,6 +273,7 @@ namespace Microsoft.DiaSymReader.Tools
                             var tupleElementNames = MetadataUtilities.ReadTupleCustomDebugInformation(pdbReader, localConstantHandle);
                             if (!tupleElementNames.IsDefaultOrEmpty)
                             {
+                                // Note that the end offset of tuple locals is always end-exclusive, regardless of whether the PDB uses VB semantics or not.
                                 tupleLocals.Add((name, SlotIndex: -1, ScopeStart: localScope.StartOffset, ScopeEnd: localScope.EndOffset, Names: tupleElementNames));
                             }
                         }
@@ -375,6 +379,15 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
+        private static string GetMethodNamespace(MetadataReader metadataReader, MethodDefinition methodDef)
+        {
+            var typeDefHandle = methodDef.GetDeclaringType();
+            return typeDefHandle.IsNil ? null : metadataReader.GetString(metadataReader.GetTypeDefinition(typeDefHandle).Namespace);
+        }
+
+        private static int AdjustEndScopeOffset(int exclusiveOffset, bool isEndInclusive) =>
+            isEndInclusive ? exclusiveOffset - 1 : exclusiveOffset;
+
         private static bool TryGetDynamicLocal(
             string name,
             int slotIndex,
@@ -460,12 +473,12 @@ namespace Microsoft.DiaSymReader.Tools
             MetadataModel metadataModel,
             ImportScopeHandle importScopeHandle,
             ImmutableArray<(AssemblyReferenceHandle, string)> aliasedAssemblyRefs,
-            string vbDefaultNamespaceImportStringOpt)
+            string vbDefaultNamespaceImportStringOpt,
+            string vbCurrentMethodNamespaceOpt,
+            bool vbSemantics)
         {
             Debug.Assert(declaredExternAliases.Count == 0);
             AddExternAliases(declaredExternAliases, pdbReader, importScopeHandle);
-
-            bool vbSemantics = vbDefaultNamespaceImportStringOpt != null;
 
             while (!importScopeHandle.IsNil)
             {
@@ -474,6 +487,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                 if (isProjectLevel && vbDefaultNamespaceImportStringOpt != null)
                 {
+                    Debug.Assert(vbSemantics);
                     importStrings.Add(vbDefaultNamespaceImportStringOpt);
                 }
 
@@ -495,6 +509,12 @@ namespace Microsoft.DiaSymReader.Tools
 
                     importStrings.Add(importString);
                     importStringCount++;
+                }
+
+                if (isProjectLevel && vbCurrentMethodNamespaceOpt != null)
+                {
+                    Debug.Assert(vbSemantics);
+                    importStrings.Add(vbCurrentMethodNamespaceOpt);
                 }
 
                 // Skip C# project-level scope if it doesn't include namespaces.
@@ -557,16 +577,16 @@ namespace Microsoft.DiaSymReader.Tools
                 case ImportDefinitionKind.ImportType:
                     // C#, VB
 
-                    // VB doesn't support generics in imports:
-                    if (vbSemantics && import.TargetType.Kind == HandleKind.TypeSpecification)
-                    {
-                        return null;
-                    }
-
-                    typeName = metadataModel.GetSerializedTypeName(import.TargetType);
-
                     if (vbSemantics)
                     {
+                        // VB doesn't support generics in imports:
+                        if (import.TargetType.Kind == HandleKind.TypeSpecification)
+                        {
+                            return null;
+                        }
+
+                        typeName = metadataModel.GetSerializedTypeName(import.TargetType);
+
                         if (import.Kind == ImportDefinitionKind.AliasType)
                         {
                             return (isProjectLevel ? "@PA:" : "@FA:") + pdbReader.GetStringUTF8(import.Alias) + "=" + typeName;
@@ -578,6 +598,8 @@ namespace Microsoft.DiaSymReader.Tools
                     }
                     else
                     {
+                        typeName = metadataModel.GetSerializedTypeName(import.TargetType);
+
                         if (import.Kind == ImportDefinitionKind.AliasType)
                         {
                             return "A" + pdbReader.GetStringUTF8(import.Alias) + " T" + typeName;
@@ -593,7 +615,7 @@ namespace Microsoft.DiaSymReader.Tools
                     namespaceName = pdbReader.GetStringUTF8(import.TargetNamespace);
                     if (vbSemantics)
                     {
-                        return (isProjectLevel ? "@P:" : "@F:") + namespaceName;
+                        return (isProjectLevel ? "@PA:" : "@FA:") + pdbReader.GetStringUTF8(import.Alias) + "=" + namespaceName;
                     }
                     else
                     {
@@ -605,7 +627,7 @@ namespace Microsoft.DiaSymReader.Tools
                     namespaceName = pdbReader.GetStringUTF8(import.TargetNamespace);
                     if (vbSemantics)
                     {
-                        return (isProjectLevel ? "@PA:" : "@FA:") + pdbReader.GetStringUTF8(import.Alias) + "=" + namespaceName;
+                        return (isProjectLevel ? "@P:" : "@F:") + namespaceName;
                     }
                     else
                     {
