@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
@@ -29,13 +30,13 @@ namespace Microsoft.DiaSymReader.Tools
             private readonly SerializedTypeNameSignatureDecoder _serializedTypeNameDecoder;
             private Lazy<AssemblyReferenceHandle> _lazyCorlibAssemblyRef;
 
-            public MetadataModel(MetadataReader reader)
+            public MetadataModel(MetadataReader reader, bool vbSemantics)
             {
                 Reader = reader;
                 _lazyCorlibAssemblyRef = new Lazy<AssemblyReferenceHandle>(FindCorlibAssemblyRef);
                 _lazyStandaloneSignatureMap = new Lazy<Dictionary<byte[], StandaloneSignatureHandle>>(BuildStandaloneSignatureMap);
                 _lazyAssemblyRefDisplayNames = new Lazy<ImmutableArray<string>>(BuildAssemblyRefDisplayNames);
-                _serializedTypeNameDecoder = new SerializedTypeNameSignatureDecoder(this);
+                _serializedTypeNameDecoder = new SerializedTypeNameSignatureDecoder(this, useAssemblyQualification: !vbSemantics, nestedNameSeparator: vbSemantics ? '.' : '+');
             }
 
             private static readonly (string, string)[] s_corTypes = new(string, string)[]
@@ -137,39 +138,10 @@ namespace Microsoft.DiaSymReader.Tools
             public bool TryGetStandaloneSignatureHandle(byte[] signature, out StandaloneSignatureHandle handle) =>
                 _lazyStandaloneSignatureMap.Value.TryGetValue(signature, out handle);
 
-            public string GetSerializedTypeName(EntityHandle typeHandle)
-            {
-                AssemblyReferenceHandle assemblyQualifierOpt;
-                PooledStringBuilder pooled;
-                switch (typeHandle.Kind)
-                {
-                    case HandleKind.TypeDefinition:
-                        pooled = PooledStringBuilder.GetInstance();
-                        BuildQualifiedName(pooled.Builder, Reader, (TypeDefinitionHandle)typeHandle);
-                        assemblyQualifierOpt = default(AssemblyReferenceHandle);
-                        break;
+            public string GetSerializedTypeName(EntityHandle typeHandle) =>
+                _serializedTypeNameDecoder.GetSerializedTypeName(typeHandle);
 
-                    case HandleKind.TypeReference:
-                        pooled = PooledStringBuilder.GetInstance();
-                        BuildQualifiedName(pooled.Builder, Reader, (TypeReferenceHandle)typeHandle, out assemblyQualifierOpt);
-                        break;
-
-                    case HandleKind.TypeSpecification:
-                        var typeSpec = Reader.GetTypeSpecification((TypeSpecificationHandle)typeHandle);
-                        var name = typeSpec.DecodeSignature(_serializedTypeNameDecoder, genericContext: null);
-                        pooled = name.PooledBuilder;
-                        assemblyQualifierOpt = name.AssemblyReferenceOpt;
-                        break;
-
-                    default:
-                        throw new BadImageFormatException();
-                }
-
-                string result = pooled.ToStringAndFree();
-                return assemblyQualifierOpt.IsNil ? result : result + ", " + GetDisplayName(assemblyQualifierOpt);
-            }
-
-            internal static void BuildQualifiedName(StringBuilder builder, MetadataReader reader, TypeDefinitionHandle typeHandle)
+            internal static void BuildQualifiedName(StringBuilder builder, MetadataReader reader, TypeDefinitionHandle typeHandle, char nestedNameSeparator)
             {
                 const TypeAttributes IsNestedMask = (TypeAttributes)0x00000006;
 
@@ -190,7 +162,7 @@ namespace Microsoft.DiaSymReader.Tools
                         typeDef = reader.GetTypeDefinition(declaringTypeHandle);
                     }
 
-                    BuildQualifiedName(builder, reader, typeDef.Namespace, typeDef.Name, names);
+                    BuildQualifiedName(builder, reader, typeDef.Namespace, typeDef.Name, names, nestedNameSeparator);
                     names.Free();
                 }
                 else
@@ -199,7 +171,7 @@ namespace Microsoft.DiaSymReader.Tools
                 }
             }
 
-            internal static void BuildQualifiedName(StringBuilder builder, MetadataReader reader, TypeReferenceHandle typeHandle, out AssemblyReferenceHandle assemblyRefHandle)
+            internal static void BuildQualifiedName(StringBuilder builder, MetadataReader reader, TypeReferenceHandle typeHandle, char nestedNameSeparator, out AssemblyReferenceHandle assemblyRefHandle)
             {
                 var typeRef = reader.GetTypeReference(typeHandle);
                 switch (typeRef.ResolutionScope.Kind)
@@ -218,7 +190,7 @@ namespace Microsoft.DiaSymReader.Tools
                             typeRef = reader.GetTypeReference((TypeReferenceHandle)typeRef.ResolutionScope);
                         }
 
-                        BuildQualifiedName(builder, reader, typeRef.Namespace, typeRef.Name, names);
+                        BuildQualifiedName(builder, reader, typeRef.Namespace, typeRef.Name, names, nestedNameSeparator);
                         names.Free();
                         break;
 
@@ -230,13 +202,13 @@ namespace Microsoft.DiaSymReader.Tools
                     (AssemblyReferenceHandle)typeRef.ResolutionScope : default(AssemblyReferenceHandle);
             }
 
-            private static void BuildQualifiedName(StringBuilder builder, MetadataReader reader, StringHandle namespaceHandle, StringHandle nameHandle, IReadOnlyList<StringHandle> nestedNames)
+            private static void BuildQualifiedName(StringBuilder builder, MetadataReader reader, StringHandle namespaceHandle, StringHandle nameHandle, IReadOnlyList<StringHandle> nestedNames, char nestedNameSeparator)
             {
                 BuildQualifiedName(builder, reader, namespaceHandle, nameHandle);
 
                 for (int i = nestedNames.Count - 1; i >= 0; i--)
                 {
-                    builder.Append('+');
+                    builder.Append(nestedNameSeparator);
                     BuildName(builder, reader, nestedNames[i]);
                 }
             }
@@ -283,31 +255,73 @@ namespace Microsoft.DiaSymReader.Tools
             private sealed class SerializedTypeNameSignatureDecoder : ISignatureTypeProvider<Name, object>
             {
                 private readonly MetadataModel _model;
+                private readonly bool _useAssemblyQualification;
+                private readonly char _nestedNameSeparator;
 
-                public SerializedTypeNameSignatureDecoder(MetadataModel model)
+                public SerializedTypeNameSignatureDecoder(MetadataModel model, bool useAssemblyQualification, char nestedNameSeparator)
                 {
                     _model = model;
+                    _useAssemblyQualification = useAssemblyQualification;
+                    _nestedNameSeparator = nestedNameSeparator;
+                }
+
+                public string GetSerializedTypeName(EntityHandle typeHandle)
+                {
+                    AssemblyReferenceHandle assemblyQualifierOpt;
+                    PooledStringBuilder pooled;
+                    switch (typeHandle.Kind)
+                    {
+                        case HandleKind.TypeDefinition:
+                            pooled = PooledStringBuilder.GetInstance();
+                            BuildQualifiedName(pooled.Builder, _model.Reader, (TypeDefinitionHandle)typeHandle, _nestedNameSeparator);
+                            assemblyQualifierOpt = default(AssemblyReferenceHandle);
+                            break;
+
+                        case HandleKind.TypeReference:
+                            pooled = PooledStringBuilder.GetInstance();
+                            BuildQualifiedName(pooled.Builder, _model.Reader, (TypeReferenceHandle)typeHandle, _nestedNameSeparator, out assemblyQualifierOpt);
+
+                            if (!_useAssemblyQualification)
+                            {
+                                assemblyQualifierOpt = default(AssemblyReferenceHandle);
+                            }
+
+                            break;
+
+                        case HandleKind.TypeSpecification:
+                            var typeSpec = _model.Reader.GetTypeSpecification((TypeSpecificationHandle)typeHandle);
+                            var name = typeSpec.DecodeSignature(this, genericContext: null);
+                            pooled = name.PooledBuilder;
+                            assemblyQualifierOpt = name.AssemblyReferenceOpt;
+                            break;
+
+                        default:
+                            throw new BadImageFormatException();
+                    }
+
+                    string result = pooled.ToStringAndFree();
+                    return assemblyQualifierOpt.IsNil ? result : result + ", " + _model.GetDisplayName(assemblyQualifierOpt);
                 }
 
                 public Name GetPrimitiveType(PrimitiveTypeCode typeCode)
                 {
                     var pooled = PooledStringBuilder.GetInstance();
                     pooled.Builder.Append(GetPrimitiveTypeQualifiedName(typeCode));
-                    return new Name(pooled, _model._lazyCorlibAssemblyRef.Value);
+                    return new Name(pooled, _useAssemblyQualification ? _model._lazyCorlibAssemblyRef.Value : default(AssemblyReferenceHandle));
                 }
 
                 public Name GetTypeFromDefinition(MetadataReader reader, TypeDefinitionHandle handle, byte rawTypeKind)
                 {
                     var pooled = PooledStringBuilder.GetInstance();
-                    BuildQualifiedName(pooled, reader, handle);
+                    BuildQualifiedName(pooled, reader, handle, _nestedNameSeparator);
                     return new Name(pooled, default(AssemblyReferenceHandle));
                 }
 
                 public Name GetTypeFromReference(MetadataReader reader, TypeReferenceHandle handle, byte rawTypeKind)
                 {
                     var pooled = PooledStringBuilder.GetInstance();
-                    BuildQualifiedName(pooled.Builder, reader, handle, out var assemblyReferenceHandle);
-                    return new Name(pooled, assemblyReferenceHandle);
+                    BuildQualifiedName(pooled.Builder, reader, handle, _nestedNameSeparator, out var assemblyReferenceHandle);
+                    return new Name(pooled, _useAssemblyQualification ? assemblyReferenceHandle : default(AssemblyReferenceHandle));
                 }
 
                 public Name GetSZArrayType(Name elementType)
