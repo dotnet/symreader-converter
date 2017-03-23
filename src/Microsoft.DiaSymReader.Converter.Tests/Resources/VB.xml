@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<symbols>
+  <files>
+    <file id="1" name="C:\VB.vb" language="3a12d0b8-c26c-11d0-b442-00a0244a1dd2" languageVendor="994b45c4-e6e9-11d2-903f-00c04fa302a1" documentType="5a869d0b-6611-11d3-bd2a-0000f80849bd" />
+  </files>
+  <methods>
+    <method containingType="N1.C" name="Foo">
+      <customDebugInfo>
+        <forwardIterator name="VB$StateMachine_1_Foo" />
+        <encLocalSlotMap>
+          <slot kind="0" offset="4" />
+          <slot kind="6" offset="62" />
+          <slot kind="8" offset="62" />
+          <slot kind="0" offset="62" />
+          <slot kind="6" offset="163" />
+          <slot kind="8" offset="163" />
+          <slot kind="0" offset="163" />
+        </encLocalSlotMap>
+      </customDebugInfo>
+    </method>
+    <method containingType="F" name="Tuples">
+      <customDebugInfo>
+        <tupleElementNames>
+          <local elementNames="|x||z" slotIndex="3" localName="a" scopeStart="0x0" scopeEnd="0x0" />
+          <local elementNames="|u|" slotIndex="8" localName="a" scopeStart="0x0" scopeEnd="0x0" />
+        </tupleElementNames>
+        <encLocalSlotMap>
+          <slot kind="6" offset="0" />
+          <slot kind="8" offset="0" />
+          <slot kind="0" offset="0" />
+          <slot kind="0" offset="41" />
+          <slot kind="1" offset="0" />
+          <slot kind="6" offset="118" />
+          <slot kind="8" offset="118" />
+          <slot kind="0" offset="118" />
+          <slot kind="0" offset="159" />
+          <slot kind="1" offset="118" />
+        </encLocalSlotMap>
+      </customDebugInfo>
+      <sequencePoints>
+        <entry offset="0x0" startLine="42" startColumn="5" endLine="42" endColumn="17" document="1" />
+        <entry offset="0x1" startLine="43" startColumn="9" endLine="43" endColumn="32" document="1" />
+        <entry offset="0x15" hidden="true" document="1" />
+        <entry offset="0x1b" startLine="44" startColumn="17" endLine="44" endColumn="68" document="1" />
+        <entry offset="0x23" startLine="45" startColumn="9" endLine="45" endColumn="13" document="1" />
+        <entry offset="0x24" hidden="true" document="1" />
+        <entry offset="0x28" hidden="true" document="1" />
+        <entry offset="0x30" hidden="true" document="1" />
+        <entry offset="0x34" startLine="47" startColumn="9" endLine="47" endColumn="32" document="1" />
+        <entry offset="0x4a" hidden="true" document="1" />
+        <entry offset="0x53" startLine="48" startColumn="17" endLine="48" endColumn="54" document="1" />
+        <entry offset="0x5b" startLine="49" startColumn="9" endLine="49" endColumn="13" document="1" />
+        <entry offset="0x5c" hidden="true" document="1" />
+        <entry offset="0x62" hidden="true" document="1" />
+        <entry offset="0x6c" hidden="true" document="1" />
+        <entry offset="0x70" startLine="50" startColumn="5" endLine="50" endColumn="12" document="1" />
+      </sequencePoints>
+      <scope startOffset="0x0" endOffset="0x71">
+        <xmlnamespace prefix="file1" name="http://stuff/fromFile" importlevel="file" />
+        <xmlnamespace prefix="" name="http://stuff/fromFile1" importlevel="file" />
+        <alias name="AliasE" target="N2.D.E" kind="namespace" importlevel="file" />
+        <namespace name="System" importlevel="file" />
+        <namespace name="System.Collections.Generic" importlevel="file" />
+        <xmlnamespace prefix="prjlevel1" name="http://NewNamespace" importlevel="project" />
+        <alias name="A1" target="System.Collections.Generic" kind="namespace" importlevel="project" />
+        <alias name="A2" target="System.Int64" kind="namespace" importlevel="project" />
+        <namespace name="System" importlevel="project" />
+        <namespace name="Microsoft.VisualBasic" importlevel="project" />
+        <namespace name="System.Linq" importlevel="project" />
+        <namespace name="System.Xml.Linq" importlevel="project" />
+        <namespace name="System.Threading" importlevel="project" />
+        <currentnamespace name="" />
+        <scope startOffset="0x17" endOffset="0x27">
+          <local name="x" il_index="2" il_start="0x17" il_end="0x27" attributes="0" />
+          <scope startOffset="0x1b" endOffset="0x22">
+            <local name="a" il_index="3" il_start="0x1b" il_end="0x22" attributes="0" />
+          </scope>
+        </scope>
+        <scope startOffset="0x4c" endOffset="0x61">
+          <local name="x" il_index="7" il_start="0x4c" il_end="0x61" attributes="0" />
+          <scope startOffset="0x53" endOffset="0x5a">
+            <local name="a" il_index="8" il_start="0x53" il_end="0x5a" attributes="0" />
+          </scope>
+        </scope>
+      </scope>
+    </method>
+    <method containingType="NoSequencePoints" name="M">
+      <scope startOffset="0x0" endOffset="0x8">
+        <importsforward declaringType="F" methodName="Tuples" />
+      </scope>
+    </method>
+    <method containingType="N1.C+VB$StateMachine_1_Foo" name="MoveNext">
+      <customDebugInfo>
+        <encLocalSlotMap>
+          <slot kind="20" offset="-1" />
+          <slot kind="27" offset="-1" />
+          <slot kind="1" offset="62" />
+          <slot kind="1" offset="163" />
+        </encLocalSlotMap>
+      </customDebugInfo>
+      <sequencePoints>
+        <entry offset="0x0" hidden="true" document="1" />
+        <entry offset="0x41" startLine="11" startColumn="9" endLine="11" endColumn="59" document="1" />
+        <entry offset="0x42" startLine="12" startColumn="17" endLine="12" endColumn="23" document="1" />
+        <entry offset="0x4e" startLine="13" startColumn="13" endLine="13" endColumn="24" document="1" />
+        <entry offset="0x58" startLine="15" startColumn="13" endLine="15" endColumn="30" document="1" />
+        <entry offset="0x6b" hidden="true" document="1" />
+        <entry offset="0x80" startLine="16" startColumn="17" endLine="16" endColumn="24" document="1" />
+        <entry offset="0xa0" startLine="17" startColumn="17" endLine="17" endColumn="24" document="1" />
+        <entry offset="0xc0" startLine="18" startColumn="13" endLine="18" endColumn="17" document="1" />
+        <entry offset="0xc1" hidden="true" document="1" />
+        <entry offset="0xcf" hidden="true" document="1" />
+        <entry offset="0xe0" hidden="true" document="1" />
+        <entry offset="0xe3" startLine="20" startColumn="13" endLine="20" endColumn="36" document="1" />
+        <entry offset="0x101" hidden="true" document="1" />
+        <entry offset="0x116" startLine="21" startColumn="17" endLine="21" endColumn="24" document="1" />
+        <entry offset="0x136" startLine="22" startColumn="17" endLine="22" endColumn="24" document="1" />
+        <entry offset="0x156" startLine="23" startColumn="13" endLine="23" endColumn="17" document="1" />
+        <entry offset="0x157" hidden="true" document="1" />
+        <entry offset="0x165" hidden="true" document="1" />
+        <entry offset="0x176" hidden="true" document="1" />
+        <entry offset="0x179" startLine="25" startColumn="9" endLine="25" endColumn="21" document="1" />
+      </sequencePoints>
+      <scope startOffset="0x0" endOffset="0x17b">
+        <xmlnamespace prefix="file1" name="http://stuff/fromFile" importlevel="file" />
+        <xmlnamespace prefix="" name="http://stuff/fromFile1" importlevel="file" />
+        <alias name="AliasE" target="N2.D.E" kind="namespace" importlevel="file" />
+        <namespace name="System" importlevel="file" />
+        <namespace name="System.Collections.Generic" importlevel="file" />
+        <xmlnamespace prefix="prjlevel1" name="http://NewNamespace" importlevel="project" />
+        <alias name="A1" target="System.Collections.Generic" kind="namespace" importlevel="project" />
+        <alias name="A2" target="System.Int64" kind="namespace" importlevel="project" />
+        <namespace name="System" importlevel="project" />
+        <namespace name="Microsoft.VisualBasic" importlevel="project" />
+        <namespace name="System.Linq" importlevel="project" />
+        <namespace name="System.Xml.Linq" importlevel="project" />
+        <namespace name="System.Threading" importlevel="project" />
+        <currentnamespace name="N1" />
+        <scope startOffset="0x41" endOffset="0x17a">
+          <local name="$VB$ResumableLocal_arr$0" il_index="0" il_start="0x41" il_end="0x17a" attributes="0" />
+          <scope startOffset="0x6d" endOffset="0xce">
+            <local name="$VB$ResumableLocal_x$3" il_index="3" il_start="0x6d" il_end="0xce" attributes="0" />
+          </scope>
+          <scope startOffset="0x103" endOffset="0x164">
+            <local name="$VB$ResumableLocal_x$6" il_index="6" il_start="0x103" il_end="0x164" attributes="0" />
+          </scope>
+        </scope>
+      </scope>
+    </method>
+    <method containingType="N2.D+E" name="M">
+      <sequencePoints>
+        <entry offset="0x0" startLine="32" startColumn="13" endLine="32" endColumn="20" document="1" />
+        <entry offset="0x1" startLine="36" startColumn="13" endLine="36" endColumn="20" document="1" />
+      </sequencePoints>
+      <scope startOffset="0x0" endOffset="0x2">
+        <xmlnamespace prefix="file1" name="http://stuff/fromFile" importlevel="file" />
+        <xmlnamespace prefix="" name="http://stuff/fromFile1" importlevel="file" />
+        <alias name="AliasE" target="N2.D.E" kind="namespace" importlevel="file" />
+        <namespace name="System" importlevel="file" />
+        <namespace name="System.Collections.Generic" importlevel="file" />
+        <xmlnamespace prefix="prjlevel1" name="http://NewNamespace" importlevel="project" />
+        <alias name="A1" target="System.Collections.Generic" kind="namespace" importlevel="project" />
+        <alias name="A2" target="System.Int64" kind="namespace" importlevel="project" />
+        <namespace name="System" importlevel="project" />
+        <namespace name="Microsoft.VisualBasic" importlevel="project" />
+        <namespace name="System.Linq" importlevel="project" />
+        <namespace name="System.Xml.Linq" importlevel="project" />
+        <namespace name="System.Threading" importlevel="project" />
+        <currentnamespace name="N2" />
+        <constant name="D1" value="0" type="Decimal" />
+        <constant name="D2" value="1.23" type="Decimal" />
+        <constant name="DT" value="01/01/2015 00:00:00" type="DateTime" />
+      </scope>
+    </method>
+  </methods>
+</symbols>

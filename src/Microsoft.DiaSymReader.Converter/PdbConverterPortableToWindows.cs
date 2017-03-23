@@ -106,7 +106,8 @@ namespace Microsoft.DiaSymReader.Tools
                 bool methodOpened = false;
                 var methodBodyOpt = (methodDef.RelativeVirtualAddress != 0) ? peReader.GetMethodBody(methodDef.RelativeVirtualAddress) : null;
                 var vbCurrentMethodNamespace = vbSemantics ? GetMethodNamespace(metadataReader, methodDef) : null;
-                bool isKickOffMethod = metadataModel.TryGetStateMachineMoveNextMethod(methodDefHandle, vbSemantics, out var moveNextHandle);
+                var moveNextHandle = metadataModel.FindStateMachineMoveNextMethod(methodDefHandle, vbSemantics);
+                bool isKickOffMethod = !moveNextHandle.IsNil;
 
                 var forwardImportScopesToMethodDef = default(MethodDefinitionHandle);
                 Debug.Assert(dynamicLocals.Count == 0);

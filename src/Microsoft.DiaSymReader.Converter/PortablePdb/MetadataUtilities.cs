@@ -219,5 +219,55 @@ namespace Microsoft.DiaSymReader.PortablePdb
                 resultOffsets.ToImmutable(),
                 resumeMethods.ToImmutable());
         }
+
+        // Copied from Roslyn: MetadataWriter.SerializeBitVector
+        internal static void SerializeBitVector(BlobBuilder builder, ImmutableArray<bool> flags)
+        {
+            int c = flags.Length - 1;
+            while (!flags[c])
+            {
+                c--;
+            }
+
+            int b = 0;
+            int shift = 0;
+            for (int i = 0; i <= c; i++)
+            {
+                if (flags[i])
+                {
+                    b |= 1 << shift;
+                }
+
+                if (shift == 7)
+                {
+                    builder.WriteByte((byte)b);
+                    b = 0;
+                    shift = 0;
+                }
+                else
+                {
+                    shift++;
+                }
+            }
+
+            if (b != 0)
+            {
+                builder.WriteByte((byte)b);
+            }
+        }
+
+        // Copied from Roslyn: MetadataWriter.SerializeTupleElementNames
+        internal static void SerializeTupleElementNames(BlobBuilder builder, ImmutableArray<string> names)
+        {
+            foreach (var name in names)
+            {
+                if (name != null)
+                {
+                    builder.WriteUTF8(name);
+                }
+
+                builder.WriteByte(0);
+            }
+        }
     }
 }

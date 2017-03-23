@@ -483,18 +483,16 @@ namespace Microsoft.DiaSymReader.Tools
 
             foreach (DynamicLocalInfo dynamicLocal in dynamicLocals)
             {
-                ulong flags = dynamicLocal.Flags;
-                int flagCount = dynamicLocal.FlagCount;
+                var flags = dynamicLocal.Flags;
 
-                PooledStringBuilder pooled = PooledStringBuilder.GetInstance();
-                StringBuilder flagsBuilder = pooled.Builder;
-                for (int f = 0; f < flagCount; f++)
+                var pooled = PooledStringBuilder.GetInstance();
+                var flagsBuilder = pooled.Builder;
+                foreach (bool flag in flags)
                 {
-                    flagsBuilder.Append((flags >> f) & 1UL);
+                    flagsBuilder.Append(flag ?  '1' : '0');
                 }
 
                 _writer.WriteStartElement("bucket");
-                _writer.WriteAttributeString("flagCount", CultureInvariantToString(flagCount));
                 _writer.WriteAttributeString("flags", pooled.ToStringAndFree());
                 _writer.WriteAttributeString("slotId", CultureInvariantToString(dynamicLocal.SlotId));
                 _writer.WriteAttributeString("localName", dynamicLocal.LocalName);

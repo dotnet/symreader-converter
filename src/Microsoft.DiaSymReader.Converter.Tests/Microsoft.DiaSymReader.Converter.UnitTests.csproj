@@ -26,6 +26,9 @@
     <Content Include="Resources\**\*.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Microsoft.DiaSymReader.Converter.Xml\Utilities\StringUtilities.cs" Link="MetadataVisualizer\StringUtilities.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Resources\Async.dll">
       <LogicalName>Async.dll</LogicalName>
     </EmbeddedResource>

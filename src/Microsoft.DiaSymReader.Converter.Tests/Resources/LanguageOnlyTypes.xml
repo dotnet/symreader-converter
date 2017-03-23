@@ -10,12 +10,12 @@
           <namespace usingCount="1" />
         </using>
         <dynamicLocals>
-          <bucket flagCount="9" flags="010010111" slotId="2" localName="v1" />
-          <bucket flagCount="9" flags="010010111" slotId="3" localName="v2" />
-          <bucket flagCount="2" flags="01" slotId="0" localName="c1" />
-          <bucket flagCount="2" flags="01" slotId="0" localName="c2" />
-          <bucket flagCount="4" flags="0101" slotId="0" localName="c1" />
-          <bucket flagCount="4" flags="0101" slotId="0" localName="c2" />
+          <bucket flags="010010111" slotId="2" localName="v1" />
+          <bucket flags="010010111" slotId="3" localName="v2" />
+          <bucket flags="01" slotId="0" localName="c1" />
+          <bucket flags="01" slotId="0" localName="c2" />
+          <bucket flags="0101" slotId="0" localName="c1" />
+          <bucket flags="0101" slotId="0" localName="c2" />
         </dynamicLocals>
         <tupleElementNames>
           <local elementNames="|a0|a1|a2|a3|a4|a5|n0|n1|n2|n3|n4|n5|n6|n7|n8|n9||||n0|n1|n2|n3|n4|n5|n6|n7|n8|n9||||n0|n1|n2|n3|n4|n5|n6|n7|n8|n9||||n0|n1|n2|n3|n4|n5|n6|n7|n8|n9||||n0|n1|n2|n3|n4|n5|n6|n7|n8|n9||||n0|n1|n2|n3|n4|n5|n6|n7|n8|n9|||" slotIndex="1" localName="v2" scopeStart="0x0" scopeEnd="0x0" />
