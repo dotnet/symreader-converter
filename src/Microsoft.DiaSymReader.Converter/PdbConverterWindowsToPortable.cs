@@ -12,6 +12,7 @@ using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Debugging;
+using Microsoft.DiaSymReader.PortablePdb;
 using Roslyn.Utilities;
 
 namespace Microsoft.DiaSymReader.Tools
@@ -33,27 +34,23 @@ namespace Microsoft.DiaSymReader.Tools
 
                     var symReader = SymReaderFactory.CreateWindowsPdbReader(sourcePdbStream, peReader);
 
+                    var documents = symReader.GetDocuments();
+                    bool vbSemantics = documents.Any(d => d.GetLanguage() == SymReaderHelpers.VisualBasicLanguageGuid);
+
                     var metadataReader = peReader.GetMetadataReader();
-                    var metadataModel = new MetadataModel(metadataReader);
+                    var metadataModel = new MetadataModel(metadataReader, vbSemantics);
 
                     typeSystemRowCounts = metadataModel.GetRowCounts();
                     debugEntryPointToken = ReadEntryPointHandle(symReader);
 
                     // documents:
                     var documentIndex = new Dictionary<string, DocumentHandle>(StringComparer.Ordinal);
-                    var documents = symReader.GetDocuments();
                     metadataBuilder.SetCapacity(TableIndex.Document, documents.Length);
-
-                    bool vbSemantics = false;
 
                     foreach (var document in documents)
                     {
                         string name = document.GetName();
                         Guid language = document.GetLanguage();
-
-                        // TODO:
-                        // won't work for IL-merged assmemblies
-                        vbSemantics |= language == SymReaderHelpers.VisualBasicLanguageGuid;
 
                         var rid = metadataBuilder.AddDocument(
                             name: metadataBuilder.GetOrAddDocumentName(name),
@@ -68,10 +65,12 @@ namespace Microsoft.DiaSymReader.Tools
                     var lastLocalConstantHandle = default(LocalConstantHandle);
 
                     var importStringsByMethod = new Dictionary<int, ImmutableArray<string>>();
-                    var importScopesByMethod = new Dictionary<int, ImportScopeHandle>();
+                    var importScopesByMethod = new List<ImportScopeHandle>();
 
                     // Maps import scope content to import scope handles
                     var importScopeIndex = new Dictionary<ImportScopeInfo, ImportScopeHandle>();
+                    
+                    // import scopes to be emitted to the Portable PDB:
                     var importScopes = new List<ImportScopeInfo>();
 
                     // reserve slot for module import scope:
@@ -98,31 +97,41 @@ namespace Microsoft.DiaSymReader.Tools
 
                             if (importStrings.IsEmpty)
                             {
-                                // no debug info
-                                continue;
+                                importGroups = default(ImmutableArray<ImmutableArray<ImportInfo>>);
                             }
-
-                            var vbFileLevelImports = ArrayBuilder<ImportInfo>.GetInstance();
-                            foreach (var importString in importStrings)
+                            else
                             {
-                                if (TryParseImportString(importString, out var import, vbSemantics: true))
+                                bool projectLevelImportsDefined = vbProjectLevelImports.Count > 0;
+                                var vbFileLevelImports = ArrayBuilder<ImportInfo>.GetInstance();
+                                foreach (var importString in importStrings)
                                 {
-                                    if (import.Kind == ImportTargetKind.DefaultNamespace)
+                                    if (TryParseImportString(importString, out var import, vbSemantics: true))
                                     {
-                                        vbDefaultNamespace = import.Target;
-                                    }
-                                    else if (import.Scope == VBImportScopeKind.Project)
-                                    {
-                                        vbProjectLevelImports.Add(import);
-                                    }
-                                    else
-                                    {
-                                        vbFileLevelImports.Add(import);
+                                        // already processed by GetVisualBasicImportStrings
+                                        Debug.Assert(import.Kind != ImportTargetKind.MethodToken);
+
+                                        if (import.Kind == ImportTargetKind.DefaultNamespace)
+                                        {
+                                            vbDefaultNamespace = import.Target;
+                                        }
+                                        else if (import.Scope == VBImportScopeKind.Project)
+                                        {
+                                            // All methods that define project level imports should be defining the same imports.
+                                            // Use the first set and ignore the rest.
+                                            if (!projectLevelImportsDefined)
+                                            {
+                                                vbProjectLevelImports.Add(import);
+                                            }
+                                        }
+                                        else if (import.Kind != ImportTargetKind.Defunct && import.Kind != ImportTargetKind.CurrentNamespace)
+                                        {
+                                            vbFileLevelImports.Add(import);
+                                        }
                                     }
                                 }
-                            }
 
-                            importGroups = ImmutableArray.Create(vbFileLevelImports.ToImmutableAndFree());
+                                importGroups = ImmutableArray.Create(vbFileLevelImports.ToImmutableAndFree());
+                            }
                         }
                         else
                         {
@@ -132,12 +141,6 @@ namespace Microsoft.DiaSymReader.Tools
                                 getMethodCustomDebugInfo: (token, sr) => sr.GetCustomDebugInfo(token, methodVersion: 1),
                                 getMethodImportStrings: (token, sr) => GetImportStrings(token, importStringsByMethod, sr),
                                 externAliasStrings: out var localExternAliasStrings);
-
-                            if (importStringGroups.IsDefault)
-                            {
-                                // no debug info
-                                continue;
-                            }
 
                             if (!localExternAliasStrings.IsDefault)
                             {
@@ -151,11 +154,30 @@ namespace Microsoft.DiaSymReader.Tools
                                 }
                             }
 
-                            importGroups = ImmutableArray.CreateRange(importStringGroups.Select(g => ParseImportStrings(g, vbSemantics: false)));
+                            if (importStringGroups.IsDefault)
+                            {
+                                importGroups = default(ImmutableArray<ImmutableArray<ImportInfo>>);
+                            }
+                            else
+                            {
+                                importGroups = ImmutableArray.CreateRange(importStringGroups.Select(g => ParseImportStrings(g, vbSemantics: false)));
+                            }
                         }
 
-                        var importScopeHandle = DefineImportScope(importGroups, importScopeIndex, importScopes);
-                        importScopesByMethod.Add(methodToken, importScopeHandle);
+                        if (importGroups.IsDefault)
+                        {
+                            importScopesByMethod.Add(default(ImportScopeHandle));
+                        }
+                        else
+                        {
+                            importScopesByMethod.Add(DefineImportScope(importGroups, importScopeIndex, importScopes));
+                        }
+                    }
+
+                    // always emit VB default namespace, even if it is not specified in the Windows PDB
+                    if (vbSemantics && vbDefaultNamespace == null)
+                    {
+                        vbDefaultNamespace = string.Empty;
                     }
 
                     // import scopes:
@@ -170,8 +192,11 @@ namespace Microsoft.DiaSymReader.Tools
                             imports: SerializeImportsBlob(metadataBuilder, importScopes[i].Imports, metadataModel));
                     }
 
-                    var dynamicNames = new Dictionary<string, DynamicLocalInfo>();
-                    var dynamicSlots = new Dictionary<int, DynamicLocalInfo>();
+                    var dynamicVariables = new Dictionary<int, DynamicLocalInfo>();
+                    var dynamicConstants = new Dictionary<string, List<DynamicLocalInfo>>();
+                    var tupleVariables = new Dictionary<int, TupleElementNamesInfo>();
+                    var tupleConstants = new Dictionary<(string name, int scopeStart, int scopeEnd), TupleElementNamesInfo>();
+                    var scopes = new List<(int Start, int End, ISymUnmanagedVariable[] Variables, ISymUnmanagedConstant[] Constants)>();
 
                     // methods:
                     metadataBuilder.SetCapacity(TableIndex.MethodDebugInformation, metadataReader.MethodDefinitions.Count);
@@ -179,6 +204,7 @@ namespace Microsoft.DiaSymReader.Tools
                     {
                         var methodDef = metadataReader.GetMethodDefinition(methodHandle);
                         int methodToken = MetadataTokens.GetToken(methodHandle);
+                        int methodRowId = MetadataTokens.GetRowNumber(methodHandle);
 
                         var symMethod = symReader.GetMethod(methodToken);
                         if (symMethod == null)
@@ -188,21 +214,22 @@ namespace Microsoft.DiaSymReader.Tools
                         }
 
                         // method debug info:
+                        MethodBodyBlock methodBodyOpt;
                         int localSignatureRowId;
                         if (methodDef.RelativeVirtualAddress != 0)
                         {
-                            var methodBody = peReader.GetMethodBody(methodDef.RelativeVirtualAddress);
-                            localSignatureRowId = methodBody.LocalSignature.IsNil ? 0 : MetadataTokens.GetRowNumber(methodBody.LocalSignature);
+                            methodBodyOpt = peReader.GetMethodBody(methodDef.RelativeVirtualAddress);
+                            localSignatureRowId = methodBodyOpt.LocalSignature.IsNil ? 0 : MetadataTokens.GetRowNumber(methodBodyOpt.LocalSignature);
                         }
                         else
                         {
+                            methodBodyOpt = null;
                             localSignatureRowId = 0;
                         }
 
                         var symSequencePoints = symMethod.GetSequencePoints().ToImmutableArray();
 
-                        DocumentHandle singleDocumentHandle;
-                        BlobHandle sequencePointsBlob = SerializeSequencePoints(metadataBuilder, localSignatureRowId, symSequencePoints, documentIndex, out singleDocumentHandle);
+                        BlobHandle sequencePointsBlob = SerializeSequencePoints(metadataBuilder, localSignatureRowId, symSequencePoints, documentIndex, out var singleDocumentHandle);
 
                         metadataBuilder.AddMethodDebugInformation(
                             document: singleDocumentHandle,
@@ -224,7 +251,9 @@ namespace Microsoft.DiaSymReader.Tools
                         }
 
                         // custom debug information:
+                        var importScope = importScopesByMethod[methodRowId - 1];
                         var dynamicLocals = ImmutableArray<DynamicLocalInfo>.Empty;
+                        var tupleLocals = ImmutableArray<TupleElementNamesInfo>.Empty;
 
                         byte[] customDebugInfoBytes = symReader.GetCustomDebugInfo(methodToken, methodVersion: 1);
                         if (customDebugInfoBytes != null)
@@ -237,10 +266,57 @@ namespace Microsoft.DiaSymReader.Tools
                                         dynamicLocals = CustomDebugInfoReader.DecodeDynamicLocalsRecord(record.Data);
                                         break;
 
+                                    case CustomDebugInfoKind.TupleElementNames:
+                                        tupleLocals = CustomDebugInfoReader.DecodeTupleElementNamesRecord(record.Data);
+                                        break;
+
+                                    case CustomDebugInfoKind.ForwardMethodInfo:
+                                        if (importScope.IsNil)
+                                        {
+                                            int forwardToMethodRowId = MetadataUtilities.GetRowId(CustomDebugInfoReader.DecodeForwardRecord(record.Data));
+                                            if (forwardToMethodRowId >= 1 && forwardToMethodRowId <= importScopesByMethod.Count)
+                                            {
+                                                importScope = importScopesByMethod[forwardToMethodRowId - 1];
+                                            }
+                                            else
+                                            {
+                                                // TODO: error: invalid CDI data
+                                            }
+
+                                            // TODO: if (importScope.IsNil) warning: forwarded to method that doesn't have debug info
+                                        }
+                                        else
+                                        {
+                                            // TODO: warning: import debug info forwarded as well as specified
+                                        }
+
+                                        break;
+
+                                    case CustomDebugInfoKind.StateMachineTypeName:
+                                        if (importScope.IsNil)
+                                        {
+                                            string nonGenericName = CustomDebugInfoReader.DecodeForwardIteratorRecord(record.Data);
+                                            var moveNextHandle = metadataModel.FindStateMachineMoveNextMethod(methodDef, nonGenericName, isGenericSuffixIncluded: false);
+                                            if (!moveNextHandle.IsNil)
+                                            {
+                                                importScope = importScopesByMethod[MetadataTokens.GetRowNumber(moveNextHandle) - 1];
+                                            }
+                                            else
+                                            {
+                                                // TODO: warning: invalid state machine name in CDI
+                                            }
+                                        }
+                                        else
+                                        {
+                                            // TODO: warning: kickoff methods shouldn't have import scopes defined
+                                        }
+
+                                        break;
+
                                     case CustomDebugInfoKind.StateMachineHoistedLocalScopes:
                                         metadataBuilder.AddCustomDebugInformation(
                                             parent: methodHandle,
-                                            kind: metadataBuilder.GetOrAddGuid(PortableCustomDebugInfoKinds.EncLocalSlotMap),
+                                            kind: metadataBuilder.GetOrAddGuid(PortableCustomDebugInfoKinds.StateMachineHoistedLocalScopes),
                                             value: SerializeStateMachineHoistedLocalsBlob(metadataBuilder, CustomDebugInfoReader.DecodeStateMachineHoistedLocalScopesRecord(record.Data)));
                                         break;
 
@@ -262,55 +338,59 @@ namespace Microsoft.DiaSymReader.Tools
                         }
 
                         var rootScope = symMethod.GetRootScope();
-                        if (rootScope.GetNamespaces().Length == 0 || rootScope.GetLocals().Length == 0 || rootScope.GetConstants().Length == 0)
-                        {
-                            dynamicNames.Clear();
-                            dynamicSlots.Clear();
-
-                            foreach (var dynamicLocal in dynamicLocals)
-                            {
-                                if (dynamicLocal.SlotId == 0)
-                                {
-                                    // All dynamic constants have slot id == 0, 
-                                    // but a variable can also have slot id == 0
-                                    if (!dynamicNames.ContainsKey(dynamicLocal.LocalName))
-                                    {
-                                        dynamicNames.Add(dynamicLocal.LocalName, dynamicLocal);
-                                    }
-                                    else
-                                    {
-                                        // TODO: warning
-                                    }
-                                }
-                                else if (!dynamicSlots.ContainsKey(dynamicLocal.SlotId))
-                                {
-                                    dynamicSlots.Add(dynamicLocal.SlotId, dynamicLocal);
-                                }
-                                else
-                                {
-                                    // TODO: warning
-                                }
-                            }
-
-                            foreach (ISymUnmanagedScope scope in rootScope.GetChildren())
-                            {
-                                SerializeScope(
-                                    metadataBuilder,
-                                    metadataModel, 
-                                    methodHandle, 
-                                    importScopesByMethod[methodToken], 
-                                    scope, 
-                                    dynamicSlots, 
-                                    dynamicNames, 
-                                    vbSemantics,
-                                    ref lastLocalVariableHandle, 
-                                    ref lastLocalConstantHandle);
-                            }
-                        }
-                        else
+                        if (rootScope.GetNamespaces().Length != 0 || rootScope.GetLocals().Length != 0 || rootScope.GetConstants().Length == 0)
                         {
                             // TODO: warning: 
                             // "Root scope must be empty (method 0x{0:x8})", MetadataTokens.GetToken(methodHandle))
+                        }
+
+                        var childScopes = rootScope.GetChildren();
+                        if (childScopes.Length > 0)
+                        {
+                            BuildDynamicLocalMaps(dynamicVariables, dynamicConstants, dynamicLocals);
+                            BuildTupleLocalMaps(tupleVariables, tupleConstants, tupleLocals);
+
+                            Debug.Assert(scopes.Count == 0);
+                            foreach (var child in childScopes)
+                            {
+                                AddScopesRecursive(scopes, child, vbSemantics, isTopScope: true);
+                            }
+
+                            foreach (var scope in scopes)
+                            {
+                                SerializeScope(
+                                    metadataBuilder,
+                                    metadataModel,
+                                    methodHandle,
+                                    importScope,
+                                    scope.Start,
+                                    scope.End,
+                                    scope.Variables,
+                                    scope.Constants,
+                                    tupleVariables,
+                                    tupleConstants,
+                                    dynamicVariables,
+                                    dynamicConstants,
+                                    vbSemantics,
+                                    lastLocalVariableHandle: ref lastLocalVariableHandle,
+                                    lastLocalConstantHandle: ref lastLocalConstantHandle);
+                            }
+
+                            dynamicConstants.Clear();
+                            dynamicVariables.Clear();
+                            tupleConstants.Clear();
+                            tupleVariables.Clear();
+                            scopes.Clear();
+                        }
+                        else if (methodBodyOpt != null)
+                        {
+                            metadataBuilder.AddLocalScope(
+                                method: methodHandle,
+                                importScope: importScope,
+                                variableList: NextHandle(lastLocalVariableHandle),
+                                constantList: NextHandle(lastLocalConstantHandle),
+                                startOffset: 0,
+                                length: methodBodyOpt.GetILReader().Length);
                         }
                     }
                 }
@@ -325,6 +405,60 @@ namespace Microsoft.DiaSymReader.Tools
             BlobBuilder blobBuilder = new BlobBuilder();
             serializer.Serialize(blobBuilder);
             blobBuilder.WriteContentTo(targetPdbStream);
+        }
+
+        private static void BuildDynamicLocalMaps(
+            Dictionary<int, DynamicLocalInfo> variables, 
+            Dictionary<string, List<DynamicLocalInfo>> constants, 
+            ImmutableArray<DynamicLocalInfo> infos)
+        {
+            Debug.Assert(variables.Count == 0);
+            Debug.Assert(constants.Count == 0);
+
+            foreach (var info in infos)
+            {
+                if (info.SlotId == 0)
+                {
+                    // All dynamic constants have slot id == 0, but a variable can also have slot id == 0.
+                    // Put the info into the constants list and we'll fetch it from there for variables as well.
+                    if (constants.TryGetValue(info.LocalName, out var existingInfos))
+                    {
+                        existingInfos.Add(info);
+                    }
+                    else
+                    {
+                        constants.Add(info.LocalName, new List<DynamicLocalInfo> { info });
+                    }
+                }
+                else if (!variables.ContainsKey(info.SlotId))
+                {
+                    variables.Add(info.SlotId, info);
+                }
+                else
+                {
+                    // TODO: warning
+                }
+            }
+        }
+
+        private static void BuildTupleLocalMaps(
+            Dictionary<int, TupleElementNamesInfo> variables,
+            Dictionary<(string name, int scopeStart, int scopeEnd), TupleElementNamesInfo> constants,
+            ImmutableArray<TupleElementNamesInfo> infos)
+        {
+            Debug.Assert(variables.Count == 0);
+            Debug.Assert(constants.Count == 0);
+            foreach (var info in infos)
+            {
+                if (info.SlotIndex >= 0)
+                {
+                    variables.Add(info.SlotIndex, info);
+                }
+                else
+                {
+                    constants.Add((info.LocalName, info.ScopeStart, info.ScopeEnd), info);
+                }
+            }
         }
 
         private static BlobHandle SerializeStateMachineHoistedLocalsBlob(MetadataBuilder metadataBuilder, ImmutableArray<StateMachineHoistedLocalScope> scopes)
@@ -455,15 +589,14 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 var info = new ImportScopeInfo(importGroups[i], parentHandle);
 
-                ImportScopeHandle existingScopeHandle;
-                if (importScopeIndex.TryGetValue(info, out existingScopeHandle))
+                if (importScopeIndex.TryGetValue(info, out var existingScopeHandle))
                 {
                     parentHandle = existingScopeHandle;
                 }
                 else
                 {
                     importScopes.Add(info);
-                    parentHandle = MetadataTokens.ImportScopeHandle(importScopes.Count);
+                    importScopeIndex.Add(info, parentHandle = MetadataTokens.ImportScopeHandle(importScopes.Count));
                 }
             }
 
@@ -626,73 +759,27 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        private static void SerializeScope(
-            MetadataBuilder metadataBuilder,
-            MetadataModel metadataModel,
-            MethodDefinitionHandle methodHandle,
-            ImportScopeHandle importScopeHandle,
-            ISymUnmanagedScope symScope,
-            Dictionary<int, DynamicLocalInfo> dynamicSlots,
-            Dictionary<string, DynamicLocalInfo> dynamicNames,
+        private static void AddScopesRecursive(
+            List<(int, int, ISymUnmanagedVariable[], ISymUnmanagedConstant[])> builder,
+            ISymUnmanagedScope symScope, 
             bool vbSemantics,
-            ref LocalVariableHandle lastLocalVariableHandle,
-            ref LocalConstantHandle lastLocalConstantHandle)
+            bool isTopScope)
         {
             // VB Windows PDB encode the range as end-inclusive, 
             // all Portable PDBs use end-exclusive encoding.
             int start = symScope.GetStartOffset();
-            int end = symScope.GetEndOffset() + (vbSemantics ? 1 : 0);
+            int end = symScope.GetEndOffset() + (vbSemantics && !isTopScope ? 1 : 0);
 
-            metadataBuilder.AddLocalScope(
-                method: methodHandle,
-                importScope: importScopeHandle,
-                variableList: NextHandle(lastLocalVariableHandle),
-                constantList: NextHandle(lastLocalConstantHandle),
-                startOffset: start,
-                length: end - start);
+            // TODO: Once https://github.com/dotnet/roslyn/issues/8473 is implemented, convert to State Machine Hoisted Variable Scopes CDI
+            var symLocals = symScope.GetLocals().Where(l => !l.GetName().StartsWith("$VB$ResumableLocal_")).ToArray();
+            var symConstants = symScope.GetConstants();
+            var symChildScopes = symScope.GetChildren();
 
-            foreach (var symLocal in symScope.GetLocals())
-            {
-                int slot = symLocal.GetSlot();
-                string name = symLocal.GetName();
+            builder.Add((start, end, symLocals, symConstants));
 
-                lastLocalVariableHandle = metadataBuilder.AddLocalVariable(
-                    attributes: (LocalVariableAttributes)symLocal.GetAttributes(),
-                    index: slot,
-                    name: metadataBuilder.GetOrAddString(name));
-
-                DynamicLocalInfo dynamicInfo;
-                if (slot > 0 && dynamicSlots.TryGetValue(slot, out dynamicInfo) ||
-                    slot == 0 && dynamicNames.TryGetValue(name, out dynamicInfo))
-                {
-                    metadataBuilder.AddCustomDebugInformation(
-                        parent: lastLocalVariableHandle,
-                        kind: metadataBuilder.GetOrAddGuid(PortableCustomDebugInfoKinds.DynamicLocalVariables),
-                        value: SerializeDynamicLocalBlob(metadataBuilder, dynamicInfo));
-                }
-            }
-
-            foreach (var symConstant in symScope.GetConstants())
-            {
-                string name = symConstant.GetName();
-                object value = symConstant.GetValue();
-
-                lastLocalConstantHandle = metadataBuilder.AddLocalConstant(
-                    name: metadataBuilder.GetOrAddString(name),
-                    signature: SerializeConstantSignature(metadataBuilder, metadataModel, symConstant.GetSignature(), value));
-
-                DynamicLocalInfo dynamicInfo;
-                if (dynamicNames.TryGetValue(name, out dynamicInfo))
-                {
-                    metadataBuilder.AddCustomDebugInformation(
-                        parent: lastLocalConstantHandle,
-                        kind: metadataBuilder.GetOrAddGuid(PortableCustomDebugInfoKinds.DynamicLocalVariables),
-                        value: SerializeDynamicLocalBlob(metadataBuilder, dynamicInfo));
-                }
-            }
-
+            int scopeCountBeforeChildren = builder.Count;
             int previousChildScopeEnd = start;
-            foreach (ISymUnmanagedScope child in symScope.GetChildren())
+            foreach (ISymUnmanagedScope child in symChildScopes)
             {
                 int childScopeStart = child.GetStartOffset();
                 int childScopeEnd = child.GetEndOffset();
@@ -701,12 +788,112 @@ namespace Microsoft.DiaSymReader.Tools
                 if (childScopeStart < previousChildScopeEnd || childScopeEnd > end)
                 {
                     // TODO: loc/warning
-                    throw new BadImageFormatException($"Invalid scope IL offset range: [{childScopeStart}, {childScopeEnd}), method 0x{MetadataTokens.GetToken(methodHandle):x}.");
+                    // throw new BadImageFormatException($"Invalid scope IL offset range: [{childScopeStart}, {childScopeEnd}).");
+                    break;
                 }
 
                 previousChildScopeEnd = childScopeEnd;
 
-                SerializeScope(metadataBuilder, metadataModel, methodHandle, importScopeHandle, child, dynamicSlots, dynamicNames, vbSemantics, ref lastLocalVariableHandle, ref lastLocalConstantHandle);
+                AddScopesRecursive(builder, child, vbSemantics, isTopScope: false);
+            }
+
+            if (!isTopScope && symLocals.Length == 0 && symConstants.Length == 0 && builder.Count == scopeCountBeforeChildren)
+            {
+                // remove the current scope, it's empty:
+                builder.RemoveAt(builder.Count - 1);
+            }
+        }
+
+        private static void SerializeScope(
+            MetadataBuilder metadataBuilder,
+            MetadataModel metadataModel,
+            MethodDefinitionHandle methodHandle,
+            ImportScopeHandle importScopeHandle,
+            int start,
+            int end,
+            ISymUnmanagedVariable[] symVariables,
+            ISymUnmanagedConstant[] symConstants,
+            Dictionary<int, TupleElementNamesInfo> tupleVariables,
+            Dictionary<(string, int, int), TupleElementNamesInfo> tupleConstants,
+            Dictionary<int, DynamicLocalInfo> dynamicVariables,
+            Dictionary<string, List<DynamicLocalInfo>> dynamicConstants,
+            bool vbSemantics,
+            ref LocalVariableHandle lastLocalVariableHandle,
+            ref LocalConstantHandle lastLocalConstantHandle)
+        {
+            metadataBuilder.AddLocalScope(
+                method: methodHandle,
+                importScope: importScopeHandle,
+                variableList: NextHandle(lastLocalVariableHandle),
+                constantList: NextHandle(lastLocalConstantHandle),
+                startOffset: start,
+                length: end - start);
+
+            bool TryPopConstantInfo(string name, out DynamicLocalInfo info)
+            {
+                if (dynamicConstants.TryGetValue(name, out var dynamicInfos) && dynamicInfos.Count > 0)
+                {
+                    info = dynamicInfos[0];
+                    dynamicInfos.RemoveAt(0);
+                    return true;
+                }
+
+                info = default(DynamicLocalInfo);
+                return false;
+            }
+
+            foreach (var symVariable in symVariables)
+            {
+                int slot = symVariable.GetSlot();
+                string name = symVariable.GetName();
+
+                lastLocalVariableHandle = metadataBuilder.AddLocalVariable(
+                    attributes: (LocalVariableAttributes)symVariable.GetAttributes(),
+                    index: slot,
+                    name: metadataBuilder.GetOrAddString(name));
+
+                if (tupleVariables.TryGetValue(slot, out var tupleInfo))
+                {
+                    metadataBuilder.AddCustomDebugInformation(
+                        parent: lastLocalVariableHandle,
+                        kind: metadataBuilder.GetOrAddGuid(PortableCustomDebugInfoKinds.TupleElementNames),
+                        value: SerializeTupleInfo(metadataBuilder, tupleInfo));
+                }
+
+                if (slot > 0 && dynamicVariables.TryGetValue(slot, out var dynamicInfo) ||
+                    slot == 0 && TryPopConstantInfo(name, out dynamicInfo))
+                {
+                    metadataBuilder.AddCustomDebugInformation(
+                        parent: lastLocalVariableHandle,
+                        kind: metadataBuilder.GetOrAddGuid(PortableCustomDebugInfoKinds.DynamicLocalVariables),
+                        value: SerializeDynamicInfo(metadataBuilder, dynamicInfo));
+                }
+            }
+
+            foreach (var symConstant in symConstants)
+            {
+                string name = symConstant.GetName();
+                object value = symConstant.GetValue();
+
+                lastLocalConstantHandle = metadataBuilder.AddLocalConstant(
+                    name: metadataBuilder.GetOrAddString(name),
+                    signature: SerializeConstantSignature(metadataBuilder, metadataModel, symConstant.GetSignature(), value));
+
+                if (tupleConstants.TryGetValue((name, start, end), out var tupleInfo))
+                {
+                    metadataBuilder.AddCustomDebugInformation(
+                        parent: lastLocalConstantHandle,
+                        kind: metadataBuilder.GetOrAddGuid(PortableCustomDebugInfoKinds.TupleElementNames),
+                        value: SerializeTupleInfo(metadataBuilder, tupleInfo));
+                }
+
+                if (TryPopConstantInfo(name, out var dynamicInfo))
+                {
+                    metadataBuilder.AddCustomDebugInformation(
+                        parent: lastLocalConstantHandle,
+                        kind: metadataBuilder.GetOrAddGuid(PortableCustomDebugInfoKinds.DynamicLocalVariables),
+                        value: SerializeDynamicInfo(metadataBuilder, dynamicInfo));
+                }
             }
         }
 
@@ -717,47 +904,17 @@ namespace Microsoft.DiaSymReader.Tools
             return metadataBuilder.GetOrAddBlob(builder);
         }
 
-        private static BlobHandle SerializeDynamicLocalBlob(MetadataBuilder metadataBuilder, DynamicLocalInfo dynamicInfo)
+        private static BlobHandle SerializeDynamicInfo(MetadataBuilder metadataBuilder, DynamicLocalInfo dynamicInfo)
         {
-            Debug.Assert(dynamicInfo.FlagCount > 0);
-            Debug.Assert(dynamicInfo.Flags != 0);
-
             var builder = new BlobBuilder();
-            
-            int c = dynamicInfo.FlagCount - 1;
-            ulong flags = dynamicInfo.Flags;
+            MetadataUtilities.SerializeBitVector(builder, dynamicInfo.Flags);
+            return metadataBuilder.GetOrAddBlob(builder);
+        }
 
-            // trim trailing 0s:
-            while ((flags & (1u << c)) == 0) c--;
-
-            int b = 0;
-            int shift = 0;
-            for (int i = 0; i <= c; i++)
-            {
-                bool bit = (flags & (1u << c)) != 0;
-
-                if (bit)
-                {
-                    b |= 1 << shift;
-                }
-
-                if (shift == 7)
-                {
-                    builder.WriteByte((byte)b);
-                    b = 0;
-                    shift = 0;
-                }
-                else
-                {
-                    shift++;
-                }
-            }
-
-            if (b != 0)
-            {
-                builder.WriteByte((byte)b);
-            }
-
+        private static BlobHandle SerializeTupleInfo(MetadataBuilder metadataBuilder, TupleElementNamesInfo tupleInfo)
+        {
+            var builder = new BlobBuilder();
+            MetadataUtilities.SerializeTupleElementNames(builder, tupleInfo.ElementNames);
             return metadataBuilder.GetOrAddBlob(builder);
         }
 
@@ -802,7 +959,7 @@ namespace Microsoft.DiaSymReader.Tools
                         writer.WriteCompressedInteger(0);
                     }
 
-                    writer.WriteCompressedInteger(MetadataTokens.GetHeapOffset(currentDocument));
+                    writer.WriteCompressedInteger(MetadataTokens.GetRowNumber(currentDocument));
                     previousDocument = currentDocument;
                 }
 

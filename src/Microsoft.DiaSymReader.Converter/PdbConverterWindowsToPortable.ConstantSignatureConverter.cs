@@ -43,14 +43,14 @@ namespace Microsoft.DiaSymReader.Tools
                             builder.WriteCompressedInteger(typeRefDefSpec);
                             builder.WriteDecimal((decimal)value);
                         }
-                        else if (value is DateTime)
+                        else if (value is double d)
                         {
                             // GeneralConstant: VALUETYPE TypeDefOrRefOrSpecEncoded <date-time>
                             builder.WriteByte((byte)SignatureTypeKind.ValueType);
                             builder.WriteCompressedInteger(typeRefDefSpec);
-                            builder.WriteDateTime((DateTime)value);
+                            builder.WriteDateTime(new DateTime(BitConverter.DoubleToInt64Bits(d)));
                         }
-                        else if (value == null)
+                        else if (value is 0 && rawTypeCode == (byte)SignatureTypeKind.Class)
                         {
                             // GeneralConstant: CLASS TypeDefOrRefOrSpecEncoded
                             builder.WriteByte(rawTypeCode);
@@ -71,8 +71,8 @@ namespace Microsoft.DiaSymReader.Tools
                         break;
 
                     case SignatureTypeCode.Object:
-                        // null:
-                        Debug.Assert(value == null);
+                        // null (null values are represented as 0 in Windows PDB):
+                        Debug.Assert(value is 0);
                         builder.WriteByte((byte)SignatureTypeCode.Object);
                         break;
 
@@ -88,16 +88,39 @@ namespace Microsoft.DiaSymReader.Tools
                     case SignatureTypeCode.UInt64:
                     case SignatureTypeCode.Single:
                     case SignatureTypeCode.Double:
-                    case SignatureTypeCode.String:
                         // PrimitiveConstant
                         builder.WriteByte(rawTypeCode);
                         builder.WriteConstant(value);
                         break;
 
+                    case SignatureTypeCode.String:
+                        builder.WriteByte(rawTypeCode);
+                        if (value is 0)
+                        {
+                            // null string
+                            builder.WriteByte(0xff);
+                        }
+                        else if (value == null)
+                        {
+                            // empty string
+                            builder.WriteUTF16(string.Empty);
+                        }
+                        else if (value is string str)
+                        {
+                            builder.WriteUTF16(str);
+                        }
+                        else
+                        {
+                            throw new BadImageFormatException();
+                        }
+
+                        break;
+
                     case SignatureTypeCode.SZArray:
                     case SignatureTypeCode.Array:
                     case SignatureTypeCode.GenericTypeInstance:
-                        Debug.Assert(value == null);
+                        // Note: enums have non-null value and may be generic (null values are represented as 0 in Windows PDB):
+                        Debug.Assert(rawTypeCode == (byte)SignatureTypeCode.GenericTypeInstance || value is 0);
 
                         // Find an existing TypeSpec in metadata.
                         // If there isn't one we can't represent the constant type in the Portable PDB, use Object.
@@ -111,10 +134,20 @@ namespace Microsoft.DiaSymReader.Tools
                         {
                             builder.WriteCompressedInteger(CodedIndex.TypeDefOrRefOrSpec(typeSpec));
                         }
+                        else if (rawTypeCode == (byte)SignatureTypeCode.GenericTypeInstance)
+                        {
+                            // enum constant (an integer):
+                            builder.WriteByte((byte)AssemblyDisplayNameBuilder.GetConstantTypeCode(value));
+                            builder.WriteConstant(value);
+
+                            // TODO: warning - can't translate const type exactly
+                        }
                         else
                         {
-                            // TODO: warning - can't translate const type
+                            // null array:
                             builder.WriteByte((byte)SignatureTypeCode.Object);
+
+                            // TODO: warning - can't translate const type exactly
                         }
 
                         break;
