@@ -1415,12 +1415,22 @@ namespace Microsoft.DiaSymReader.Tools
                 _writer.WriteAttributeString("languageVendor", doc.GetLanguageVendor().ToString());
                 _writer.WriteAttributeString("documentType", doc.GetDocumentType().ToString());
 
-                var checkSum = string.Concat(doc.GetChecksum().Select(b => $"{b,2:X}, "));
-
-                if (!string.IsNullOrEmpty(checkSum))
+                var algorithm = doc.GetHashAlgorithm();
+                if (algorithm != default(Guid))
                 {
-                    _writer.WriteAttributeString("checkSumAlgorithmId", doc.GetHashAlgorithm().ToString());
-                    _writer.WriteAttributeString("checkSum", checkSum);
+                    var checksumBytes = doc.GetChecksum();
+                    if (checksumBytes.Length != 0)
+                    {
+                        _writer.WriteAttributeString("checkSumAlgorithmId", algorithm.ToString());
+                        _writer.WriteAttributeString("checkSum", string.Concat(checksumBytes.Select(b => $"{b,2:X}, ")));
+                    }
+                }
+
+                Marshal.ThrowExceptionForHR(doc.HasEmbeddedSource(out bool hasEmbeddedSource));
+                if (hasEmbeddedSource)
+                {
+                    Marshal.ThrowExceptionForHR(doc.GetSourceLength(out int sourceLength));
+                    _writer.WriteAttributeString("embeddedSourceLength", sourceLength.ToString());
                 }
 
                 _writer.WriteEndElement();
