@@ -45,11 +45,13 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 string name = document.GetName();
                 Guid language = document.GetLanguage();
+                var hashAlgorithm = document.GetHashAlgorithm();
+                var checksumHandle = (hashAlgorithm != default(Guid)) ? metadataBuilder.GetOrAddBlob(document.GetChecksum()) : default(BlobHandle);
 
                 var rid = metadataBuilder.AddDocument(
                     name: metadataBuilder.GetOrAddDocumentName(name),
-                    hashAlgorithm: metadataBuilder.GetOrAddGuid(document.GetHashAlgorithm()),
-                    hash: metadataBuilder.GetOrAddBlob(document.GetChecksum()),
+                    hashAlgorithm: metadataBuilder.GetOrAddGuid(hashAlgorithm),
+                    hash: checksumHandle,
                     language: metadataBuilder.GetOrAddGuid(language));
 
                 documentIndex.Add(name, rid);
@@ -284,6 +286,7 @@ namespace Microsoft.DiaSymReader.Tools
                                     // TODO: warning: import debug info forwarded as well as specified
                                 }
 
+<<<<<<< HEAD
                                 break;
 
                             case CustomDebugInfoKind.StateMachineTypeName:
@@ -332,13 +335,18 @@ namespace Microsoft.DiaSymReader.Tools
                 }
 
                 var rootScope = symMethod.GetRootScope();
-                if (rootScope.GetNamespaces().Length != 0 || rootScope.GetLocals().Length != 0 || rootScope.GetConstants().Length == 0)
+                ISymUnmanagedScope[] childScopes;
+                if (rootScope.GetNamespaces().Length != 0 || rootScope.GetLocals().Length != 0 || rootScope.GetConstants().Length != 0)
                 {
-                    // TODO: warning: 
-                    // "Root scope must be empty (method 0x{0:x8})", MetadataTokens.GetToken(methodHandle))
+                    // C#/VB only produce empty root scopes, but Managed C++ doesn't.
+                    // Pretend the root scope is a single child.
+                    childScopes = new ISymUnmanagedScope[] { rootScope };
+                }
+                else
+                {
+                   childScopes = rootScope.GetChildren(); 
                 }
 
-                var childScopes = rootScope.GetChildren();
                 if (childScopes.Length > 0)
                 {
                     BuildDynamicLocalMaps(dynamicVariables, dynamicConstants, dynamicLocals);
@@ -970,9 +978,12 @@ namespace Microsoft.DiaSymReader.Tools
             DocumentHandle previousDocument = TryGetSingleDocument(sequencePoints, documentIndex);
             singleDocumentHandle = previousDocument;
 
+            int previousOffset = -1;
             for (int i = 0; i < sequencePoints.Length; i++)
             {
-                var currentDocument = documentIndex[sequencePoints[i].Document.GetName()];
+                var sequencePoint = SanitizeSequencePoint(sequencePoints[i], previousOffset);
+
+                var currentDocument = documentIndex[sequencePoint.Document.GetName()];
                 if (previousDocument != currentDocument)
                 {
                     // optional document in header or document record:
@@ -988,40 +999,80 @@ namespace Microsoft.DiaSymReader.Tools
                 // delta IL offset:
                 if (i > 0)
                 {
-                    writer.WriteCompressedInteger((sequencePoints[i].Offset - sequencePoints[i - 1].Offset));
+                    writer.WriteCompressedInteger(sequencePoint.Offset - previousOffset);
                 }
                 else
                 {
-                    writer.WriteCompressedInteger(sequencePoints[i].Offset);
+                    writer.WriteCompressedInteger(sequencePoint.Offset);
                 }
 
-                if (sequencePoints[i].IsHidden)
+                previousOffset = sequencePoint.Offset;
+
+                if (sequencePoint.IsHidden)
                 {
                     writer.WriteInt16(0);
                     continue;
                 }
 
                 // Delta Lines & Columns:
-                SerializeDeltaLinesAndColumns(writer, sequencePoints[i]);
+                SerializeDeltaLinesAndColumns(writer, sequencePoint);
 
                 // delta Start Lines & Columns:
                 if (previousNonHiddenStartLine < 0)
                 {
                     Debug.Assert(previousNonHiddenStartColumn < 0);
-                    writer.WriteCompressedInteger(sequencePoints[i].StartLine);
-                    writer.WriteCompressedInteger(sequencePoints[i].StartColumn);
+                    writer.WriteCompressedInteger(sequencePoint.StartLine);
+                    writer.WriteCompressedInteger(sequencePoint.StartColumn);
                 }
                 else
                 {
-                    writer.WriteCompressedSignedInteger(sequencePoints[i].StartLine - previousNonHiddenStartLine);
-                    writer.WriteCompressedSignedInteger(sequencePoints[i].StartColumn - previousNonHiddenStartColumn);
+                    writer.WriteCompressedSignedInteger(sequencePoint.StartLine - previousNonHiddenStartLine);
+                    writer.WriteCompressedSignedInteger(sequencePoint.StartColumn - previousNonHiddenStartColumn);
                 }
 
-                previousNonHiddenStartLine = sequencePoints[i].StartLine;
-                previousNonHiddenStartColumn = sequencePoints[i].StartColumn;
+                previousNonHiddenStartLine = sequencePoint.StartLine;
+                previousNonHiddenStartColumn = sequencePoint.StartColumn;
             }
 
             return metadataBuilder.GetOrAddBlob(writer);
+        }
+
+        private static SymUnmanagedSequencePoint SanitizeSequencePoint(SymUnmanagedSequencePoint sequencePoint, int previousOffset)
+        {
+            // Spec:
+            // The values of non-hidden sequence point must satisfy the following constraints
+            // - IL Offset is within range [0, 0x20000000)
+            // - IL Offset of a sequence point is lesser than IL Offset of the subsequent sequence point.
+            // - Start Line is within range [0, 0x20000000) and not equal to 0xfeefee.
+            // - End Line is within range [0, 0x20000000) and not equal to 0xfeefee.
+            // - Start Column is within range [0, 0x10000)
+            // - End Column is within range [0, 0x10000)
+            // - End Line is greater or equal to Start Line.
+            // - If Start Line is equal to End Line then End Column is greater than Start Column.
+
+            const int maxColumn = ushort.MaxValue;
+            const int maxLine = MetadataUtilities.MaxCompressedIntegerValue;
+            int offset = Math.Max(sequencePoint.Offset, previousOffset + 1);
+
+            if (sequencePoint.IsHidden)
+            {
+                return new SymUnmanagedSequencePoint(offset, sequencePoint.Document, sequencePoint.StartLine, sequencePoint.StartColumn, sequencePoint.EndLine, sequencePoint.EndColumn);
+            }
+
+            int startLine = Math.Max(0, Math.Min(sequencePoint.StartLine, maxLine));
+            int endLine = Math.Max(startLine, Math.Min(sequencePoint.EndLine, maxLine));
+            int startColumn = Math.Max(0, Math.Min(sequencePoint.StartColumn, maxColumn));
+            int endColumn = Math.Max(0, Math.Min(sequencePoint.EndColumn, maxColumn));
+
+            if (startLine == endLine && startColumn >= endColumn)
+            {
+                // Managed C++ emits sequence points: (line, 0, line, 0), meaning the entire line:
+                endColumn = (startColumn == 0 && endColumn == 0) ? maxColumn : startColumn + 1;
+            }
+
+            // TODO: report warning if SP has been adjusted
+
+            return new SymUnmanagedSequencePoint(offset, sequencePoint.Document, startLine, startColumn, endLine, endColumn);
         }
 
         private static DocumentHandle TryGetSingleDocument(ImmutableArray<SymUnmanagedSequencePoint> sequencePoints, Dictionary<string, DocumentHandle> documentIndex)

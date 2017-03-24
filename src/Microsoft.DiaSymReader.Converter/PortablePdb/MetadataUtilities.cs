@@ -14,6 +14,7 @@ namespace Microsoft.DiaSymReader.PortablePdb
 {
     internal static class MetadataUtilities
     {
+        public const int MaxCompressedIntegerValue = 0x1fffffff;
         public const SignatureTypeCode SignatureTypeCode_ValueType = (SignatureTypeCode)0x11;
         public const SignatureTypeCode SignatureTypeCode_Class = (SignatureTypeCode)0x12;
         public static int MethodDefToken(int rowId) => 0x06000000 | rowId;
