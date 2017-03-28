@@ -5,9 +5,6 @@ using System.IO;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
-using Microsoft.DiaSymReader.Tools;
-
-//[assembly: DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.ApplicationDirectory | DllImportSearchPath.UserDirectories)]
 
 namespace Microsoft.DiaSymReader
 {
@@ -15,30 +12,24 @@ namespace Microsoft.DiaSymReader
     {
         private const string SymWriterClsid = "0AE2DEB0-F901-478b-BB9F-881EE8066788";
 
-        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.ApplicationDirectory | DllImportSearchPath.UserDirectories)]
         [DllImport("Microsoft.DiaSymReader.Native.x86.dll", EntryPoint = "CreateSymReader")]
         private extern static void CreateSymReader32(ref Guid id, [MarshalAs(UnmanagedType.IUnknown)]out object symReader);
 
-        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.ApplicationDirectory | DllImportSearchPath.UserDirectories)]
         [DllImport("Microsoft.DiaSymReader.Native.amd64.dll", EntryPoint = "CreateSymReader")]
         private extern static void CreateSymReader64(ref Guid id, [MarshalAs(UnmanagedType.IUnknown)]out object symReader);
 
-        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.ApplicationDirectory | DllImportSearchPath.UserDirectories)]
         [DllImport("Microsoft.DiaSymReader.Native.x86.dll", EntryPoint = "CreateSymWriter")]
         private extern static void CreateSymWriter32(ref Guid id, [MarshalAs(UnmanagedType.IUnknown)]out object symWriter);
 
-        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory | DllImportSearchPath.ApplicationDirectory | DllImportSearchPath.UserDirectories)]
         [DllImport("Microsoft.DiaSymReader.Native.amd64.dll", EntryPoint = "CreateSymWriter")]
         private extern static void CreateSymWriter64(ref Guid id, [MarshalAs(UnmanagedType.IUnknown)]out object symWriter);
 
-        /// <exception cref="ArgumentException"/>
-        /// <exception cref="ArgumentNullException"/>
-        /// <exception cref="IOException"/>
-        /// <exception cref="ObjectDisposedException"/>
-        public static bool IsPortable(Stream pdbStream)
+        internal static bool IsPortable(Stream pdbStream)
         {
-            StreamUtilities.ValidateStream(pdbStream, nameof(pdbStream), readRequired: true, seekRequired: true);
-
             pdbStream.Position = 0;
 
             bool isPortable;
