@@ -62,11 +62,47 @@ namespace Microsoft.DiaSymReader.Tools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid PDB format: {0}.
+        /// </summary>
+        internal static string InvalidPdbFormat {
+            get {
+                return ResourceManager.GetString("InvalidPdbFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid user entry point in the source PDB.
+        /// </summary>
+        internal static string InvalidUserEntryPointInSourcePdb {
+            get {
+                return ResourceManager.GetString("InvalidUserEntryPointInSourcePdb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Metadata not available.
         /// </summary>
         internal static string MetadataNotAvailable {
             get {
                 return ResourceManager.GetString("MetadataNotAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified PE was built with Portable PDB.
+        /// </summary>
+        internal static string SpecifiedPEBuiltWithPortablePdb {
+            get {
+                return ResourceManager.GetString("SpecifiedPEBuiltWithPortablePdb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified PE file doesn&apos;t have any PDB associated with it.
+        /// </summary>
+        internal static string SpecifiedPEFileHasNoAssociatedPdb {
+            get {
+                return ResourceManager.GetString("SpecifiedPEFileHasNoAssociatedPdb", resourceCulture);
             }
         }
         

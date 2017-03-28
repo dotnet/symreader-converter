@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.DiaSymReader.Tools
 {
@@ -13,7 +14,11 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="ArgumentNullException"/>
         /// <exception cref="IOException"/>
         /// <exception cref="ObjectDisposedException"/>
-        public static bool IsPortable(Stream pdbStream) => SymReaderFactory.IsPortable(pdbStream);
+        public static bool IsPortable(Stream pdbStream)
+        {
+            StreamUtilities.ValidateStream(pdbStream, nameof(pdbStream), readRequired: true, seekRequired: true);
+            return SymReaderFactory.IsPortable(pdbStream);
+        }
 
         /// <summary>
         /// Converts Windows PDB stream to Portable PDB and vice versa.
@@ -31,9 +36,7 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
         public static void Convert(Stream peStream, Stream sourcePdbStream, Stream targetPdbStream)
         {
-            StreamUtilities.ValidateStream(peStream, nameof(peStream), readRequired: true, seekRequired: true);
             StreamUtilities.ValidateStream(sourcePdbStream, nameof(sourcePdbStream), readRequired: true, seekRequired: true);
-            StreamUtilities.ValidateStream(targetPdbStream, nameof(targetPdbStream), writeRequired: true);
 
             if (SymReaderFactory.IsPortable(sourcePdbStream))
             {
@@ -41,7 +44,7 @@ namespace Microsoft.DiaSymReader.Tools
             }
             else
             {
-                PdbConverterWindowsToPortable.Convert(peStream, sourcePdbStream, targetPdbStream);
+                ConvertWindowsToPortable(peStream, sourcePdbStream, targetPdbStream); 
             }
         }
 
@@ -64,7 +67,17 @@ namespace Microsoft.DiaSymReader.Tools
             StreamUtilities.ValidateStream(sourcePdbStream, nameof(sourcePdbStream), readRequired: true);
             StreamUtilities.ValidateStream(targetPdbStream, nameof(targetPdbStream), writeRequired: true);
 
-            PdbConverterWindowsToPortable.Convert(peStream, sourcePdbStream, targetPdbStream);
+            using (var peReader = new PEReader(peStream, PEStreamOptions.LeaveOpen))
+            {
+                try
+                {
+                    PdbConverterWindowsToPortable.Convert(peReader, sourcePdbStream, targetPdbStream);
+                }
+                catch (COMException e)
+                {
+                    throw new BadImageFormatException(string.Format(ConverterResources.InvalidPdbFormat, e.Message), e);
+                }
+            }
         }
 
         /// <summary>

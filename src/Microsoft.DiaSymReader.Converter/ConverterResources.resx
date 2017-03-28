@@ -117,8 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="InvalidPdbFormat" xml:space="preserve">
+    <value>Invalid PDB format: {0}</value>
+  </data>
+  <data name="InvalidUserEntryPointInSourcePdb" xml:space="preserve">
+    <value>Invalid user entry point in the source PDB</value>
+  </data>
   <data name="MetadataNotAvailable" xml:space="preserve">
     <value>Metadata not available</value>
+  </data>
+  <data name="SpecifiedPEBuiltWithPortablePdb" xml:space="preserve">
+    <value>Specified PE was built with Portable PDB</value>
+  </data>
+  <data name="SpecifiedPEFileHasNoAssociatedPdb" xml:space="preserve">
+    <value>Specified PE file doesn't have any PDB associated with it</value>
   </data>
   <data name="StreamMustBeReadable" xml:space="preserve">
     <value>Stream must be readable</value>
