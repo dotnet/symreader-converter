@@ -188,6 +188,7 @@ namespace Microsoft.DiaSymReader.Tools
         public bool TryResolveTypeSpecification(byte[] spec, out TypeSpecificationHandle typeSpec) =>
                 _lazyTypeSpecificationMap.Value.TryGetValue(spec, out typeSpec);
 
+        /// <returns>Null if serialized type name format is not supported for the specified type.</returns>
         public string GetSerializedTypeName(EntityHandle typeHandle) =>
             _serializedTypeNameDecoder.GetSerializedTypeName(typeHandle);
 
@@ -290,16 +291,16 @@ namespace Microsoft.DiaSymReader.Tools
 
         private struct Name
         {
-            public readonly PooledStringBuilder PooledBuilder;
+            public readonly PooledStringBuilder PooledBuilderOpt;
             public readonly AssemblyReferenceHandle AssemblyReferenceOpt;
 
             public Name(PooledStringBuilder pooledBuilder, AssemblyReferenceHandle assemblyReference)
             {
-                PooledBuilder = pooledBuilder;
+                PooledBuilderOpt = pooledBuilder;
                 AssemblyReferenceOpt = assemblyReference;
             }
 
-            public StringBuilder Builder => PooledBuilder.Builder;
+            public StringBuilder BuilderOpt => PooledBuilderOpt?.Builder;
         }
 
         private sealed class SerializedTypeNameSignatureDecoder : ISignatureTypeProvider<Name, object>
@@ -341,7 +342,12 @@ namespace Microsoft.DiaSymReader.Tools
                     case HandleKind.TypeSpecification:
                         var typeSpec = _model.Reader.GetTypeSpecification((TypeSpecificationHandle)typeHandle);
                         var name = typeSpec.DecodeSignature(this, genericContext: null);
-                        pooled = name.PooledBuilder;
+                        pooled = name.PooledBuilderOpt;
+                        if (pooled == null)
+                        {
+                            return null;
+                        }
+
                         assemblyQualifierOpt = name.AssemblyReferenceOpt;
                         break;
 
@@ -376,13 +382,17 @@ namespace Microsoft.DiaSymReader.Tools
 
             public Name GetSZArrayType(Name elementType)
             {
-                elementType.Builder.Append("[]");
+                elementType.BuilderOpt?.Append("[]");
                 return elementType;
             }
 
             public Name GetArrayType(Name elementType, ArrayShape shape)
             {
-                var sb = elementType.Builder;
+                var sb = elementType.BuilderOpt;
+                if (sb == null)
+                {
+                    return default(Name);
+                }
 
                 sb.Append('[');
 
@@ -399,18 +409,29 @@ namespace Microsoft.DiaSymReader.Tools
 
             public Name GetPointerType(Name elementType)
             {
-                elementType.Builder.Append('*');
+                elementType.BuilderOpt?.Append('*');
                 return elementType;
             }
 
             public Name GetGenericInstantiation(Name genericType, ImmutableArray<Name> typeArguments)
             {
-                var sb = genericType.Builder;
+                var sb = genericType.BuilderOpt;
+
+                if (sb == null)
+                {
+                    return default(Name);
+                }
+
                 sb.Append('[');
 
                 bool first = true;
                 foreach (Name typeArgument in typeArguments)
                 {
+                    if (typeArgument.PooledBuilderOpt == null)
+                    {
+                        return default(Name);
+                    }
+
                     if (first)
                     {
                         first = false;
@@ -420,7 +441,8 @@ namespace Microsoft.DiaSymReader.Tools
                         sb.Append(',');
                     }
 
-                    string serializedArgName = typeArgument.PooledBuilder.ToStringAndFree();
+                    string serializedArgName = typeArgument.PooledBuilderOpt.ToStringAndFree();
+                    
                     if (!typeArgument.AssemblyReferenceOpt.IsNil)
                     {
                         sb.Append('[');
@@ -440,25 +462,25 @@ namespace Microsoft.DiaSymReader.Tools
             }
 
             public Name GetByReferenceType(Name elementType) =>
-                throw new BadImageFormatException();
+                default(Name);
 
             public Name GetFunctionPointerType(MethodSignature<Name> signature) =>
-                throw new BadImageFormatException();
+                default(Name);
 
             public Name GetModifiedType(Name modifier, Name unmodifiedType, bool isRequired) =>
-                throw new BadImageFormatException();
+                default(Name);
 
             public Name GetTypeFromSpecification(MetadataReader reader, object genericContext, TypeSpecificationHandle handle, byte rawTypeKind) =>
-                throw new BadImageFormatException();
+                default(Name);
 
             public Name GetPinnedType(Name elementType) =>
-                throw new BadImageFormatException();
+                default(Name);
 
             public Name GetGenericMethodParameter(object genericContext, int index) =>
-                throw new BadImageFormatException();
+                default(Name);
 
             public Name GetGenericTypeParameter(object genericContext, int index) =>
-                throw new BadImageFormatException();
+                default(Name);
         }
 
         private static string GetPrimitiveTypeQualifiedName(PrimitiveTypeCode typeCode)
@@ -504,7 +526,14 @@ namespace Microsoft.DiaSymReader.Tools
             for (int rowId = 1; rowId <= Reader.GetTableRowCount(TableIndex.TypeSpec); rowId++)
             {
                 var handle = MetadataTokens.TypeSpecificationHandle(rowId);
-                map[GetSerializedTypeName(handle)] = handle;
+
+                var name = GetSerializedTypeName(handle);
+                if (name != null)
+                {
+                    // Not all TypeSpecs can appear in import strings where they are encoded as serialized type name.
+                    // E.g. type spec containing generic type and method parameters.
+                    map[name] = handle;
+                }
             }
 
             return map;
