@@ -610,6 +610,11 @@ namespace Microsoft.DiaSymReader.Tools
                         }
 
                         typeName = metadataModel.GetSerializedTypeName(import.TargetType);
+                        if (typeName == null)
+                        {
+                            // TODO: report error: unsupported type
+                            return null;
+                        }
 
                         if (import.Kind == ImportDefinitionKind.AliasType)
                         {
@@ -623,6 +628,11 @@ namespace Microsoft.DiaSymReader.Tools
                     else
                     {
                         typeName = metadataModel.GetSerializedTypeName(import.TargetType);
+                        if (typeName == null)
+                        {
+                            // TODO: report error: unsupported type
+                            return null;
+                        }
 
                         if (import.Kind == ImportDefinitionKind.AliasType)
                         {
