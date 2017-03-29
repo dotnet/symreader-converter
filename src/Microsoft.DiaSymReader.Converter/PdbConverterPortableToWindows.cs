@@ -142,18 +142,16 @@ namespace Microsoft.DiaSymReader.Tools
                 bool isFirstMethodScope = true;
                 while (currentLocalScope.HasValue && currentLocalScope.Value.Method == methodDefHandle)
                 {
+                    // kickoff methods don't have any scopes emitted to Windows PDBs
                     if (methodBodyOpt == null)
                     {
-                        continue;
+                        // TODO: report warning - scope associated with method that has no body
                     }
-
-                    LazyOpenMethod();
-                    
-                    var localScope = currentLocalScope.Value;
-
-                    // kickoff methods don't have any scopes emitted to Windows PDBs
-                    if (!isKickOffMethod)
+                    else if (!isKickOffMethod)
                     {
+                        LazyOpenMethod();
+
+                        var localScope = currentLocalScope.Value;
                         CloseOpenScopes(localScope.StartOffset);
 
                         Debug.WriteLine($"Open Scope [{localScope.StartOffset}, {localScope.EndOffset})");

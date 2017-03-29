@@ -940,5 +940,54 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
   </methods>
 </symbols>");
         }
+
+        [Fact]
+        public void Convert_Misc()
+        {
+            VerifyWindowsPdb(
+                TestResources.Misc.DllAndPdb(portable: true),
+                TestResources.Misc.DllAndPdb(portable: false),
+@"<?xml version=""1.0"" encoding=""utf-16""?>
+<symbols>
+  <files>
+    <file id=""1"" name=""C:\Misc.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
+  </files>
+  <methods>
+    <method containingType=""C`1"" name=""M"" parameterNames=""b"">
+      <customDebugInfo>
+        <using>
+          <namespace usingCount=""3"" />
+        </using>
+        <encLocalSlotMap>
+          <slot kind=""0"" offset=""15"" />
+          <slot kind=""21"" offset=""0"" />
+        </encLocalSlotMap>
+      </customDebugInfo>
+      <sequencePoints>
+        <entry offset=""0x0"" startLine=""13"" startColumn=""5"" endLine=""13"" endColumn=""6"" document=""1"" />
+        <entry offset=""0x1"" startLine=""14"" startColumn=""9"" endLine=""14"" endColumn=""34"" document=""1"" />
+        <entry offset=""0x7"" startLine=""15"" startColumn=""9"" endLine=""15"" endColumn=""28"" document=""1"" />
+        <entry offset=""0x13"" startLine=""16"" startColumn=""9"" endLine=""16"" endColumn=""18"" document=""1"" />
+        <entry offset=""0x1c"" startLine=""17"" startColumn=""5"" endLine=""17"" endColumn=""6"" document=""1"" />
+      </sequencePoints>
+      <scope startOffset=""0x0"" endOffset=""0x1e"">
+        <namespace name=""System"" />
+        <namespace name=""System.Collections.Generic"" />
+        <alias name=""X"" target=""C`1[[System.Int32*[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]"" kind=""type"" />
+        <local name=""c"" il_index=""0"" il_start=""0x0"" il_end=""0x1e"" attributes=""0"" />
+      </scope>
+    </method>
+    <method containingType=""C`1"" name="".ctor"">
+      <customDebugInfo>
+        <forward declaringType=""C`1"" methodName=""M"" parameterNames=""b"" />
+      </customDebugInfo>
+      <sequencePoints>
+        <entry offset=""0x0"" startLine=""9"" startColumn=""5"" endLine=""9"" endColumn=""30"" document=""1"" />
+        <entry offset=""0x7"" startLine=""10"" startColumn=""5"" endLine=""10"" endColumn=""28"" document=""1"" />
+      </sequencePoints>
+    </method>
+  </methods>
+</symbols>");
+        }
     }
 }

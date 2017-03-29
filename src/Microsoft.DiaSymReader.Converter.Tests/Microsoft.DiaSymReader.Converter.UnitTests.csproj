@@ -152,6 +152,18 @@
     <EmbeddedResource Include="Resources\SourceLink.json">
       <LogicalName>SourceLink.json</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Misc.dll">
+      <LogicalName>Misc.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Misc.pdb">
+      <LogicalName>Misc.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Misc.dllx">
+      <LogicalName>Misc.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Misc.pdbx">
+      <LogicalName>Misc.pdbx</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="$(NuGetPackageRoot)\Microsoft.DiaSymReader.Native\$(MicrosoftDiaSymReaderNativeVersion)\runtimes\win\native\Microsoft.DiaSymReader.Native.x86.dll">

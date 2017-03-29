@@ -125,9 +125,10 @@ namespace Microsoft.DiaSymReader.Tools
                         // Find an existing TypeSpec in metadata.
                         // If there isn't one we can't represent the constant type in the Portable PDB, use Object.
 
-                        // +1/-1 for the type code we already read.
-                        var spec = new byte[sigReader.RemainingBytes + 1];
-                        Buffer.BlockCopy(signature, sigReader.Offset - 1, spec, 0, spec.Length);
+                        // -1 for the type code we already read.
+                        sigReader.Offset--;
+
+                        var spec = sigReader.ReadBytes(sigReader.RemainingBytes);
 
                         TypeSpecificationHandle typeSpec;
                         if (metadataModel.TryResolveTypeSpecification(spec, out typeSpec))
@@ -158,6 +159,11 @@ namespace Microsoft.DiaSymReader.Tools
                     case SignatureTypeCode.Pointer:
                         // generic parameters, pointers are not valid types for constants:
                         throw new BadImageFormatException();
+                }
+
+                if (sigReader.RemainingBytes > 0)
+                {
+                    throw new BadImageFormatException();
                 }
             }
         }
