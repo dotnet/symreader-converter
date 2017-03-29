@@ -829,11 +829,24 @@ namespace Microsoft.DiaSymReader.Tools
 
             foreach (var symVariable in symVariables)
             {
-                int slot = symVariable.GetSlot();
-                string name = symVariable.GetName();
+                int slot;
+                string name;
+                LocalVariableAttributes attributes;
+
+                try
+                {
+                    slot = symVariable.GetSlot();
+                    name = symVariable.GetName();
+                    attributes = (LocalVariableAttributes)symVariable.GetAttributes();
+                }
+                catch (Exception)
+                {
+                    // TODO: report warning: bad variable
+                    continue;
+                }
 
                 lastLocalVariableHandle = metadataBuilder.AddLocalVariable(
-                    attributes: (LocalVariableAttributes)symVariable.GetAttributes(),
+                    attributes: attributes,
                     index: slot,
                     name: metadataBuilder.GetOrAddString(name));
 
@@ -857,12 +870,36 @@ namespace Microsoft.DiaSymReader.Tools
 
             foreach (var symConstant in symConstants)
             {
-                string name = symConstant.GetName();
-                object value = symConstant.GetValue();
+                string name;
+                object value;
+                byte[] signature;
+
+                try
+                {
+                    name = symConstant.GetName();
+                    value = symConstant.GetValue();
+                    signature = symConstant.GetSignature();
+                }
+                catch (Exception)
+                {
+                    // TODO: report warning: bad constant
+                    continue;
+                }
+
+                BlobHandle signatureHandle;
+                try
+                {
+                    signatureHandle = SerializeConstantSignature(metadataBuilder, metadataModel, signature, value);
+                }
+                catch (BadImageFormatException)
+                {
+                    // TODO: report warning: bad constant signature
+                    continue;
+                }
 
                 lastLocalConstantHandle = metadataBuilder.AddLocalConstant(
                     name: metadataBuilder.GetOrAddString(name),
-                    signature: SerializeConstantSignature(metadataBuilder, metadataModel, symConstant.GetSignature(), value));
+                    signature: signatureHandle);
 
                 if (tupleConstants.TryGetValue((name, start, end), out var tupleInfo))
                 {

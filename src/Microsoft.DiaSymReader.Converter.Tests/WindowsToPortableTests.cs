@@ -902,5 +902,66 @@ CustomDebugInformation (index: 0x37, size: 36):
 5: 0x06000005 (MethodDef)      EnC Local Slot Map   07-01-09-01-01-01-01-2A-02-01-07-77-09-77-01-77-01-80-A0-02-77  
 6: 0x0600000a (MethodDef)      EnC Local Slot Map   15-00-1C-00-02-3F-02-80-A4");
         }
+
+        [Fact]
+        public void Convert_Misc()
+        {
+            VerifyPortablePdb(
+                TestResources.Misc.DllAndPdb(portable: true),
+                TestResources.Misc.DllAndPdb(portable: false), @"
+Document (index: 0x30, size: 8): 
+========================================================================================================
+   Name          Language  HashAlgorithm  Hash                                                         
+========================================================================================================
+1: 'C:\Misc.cs'  C#        SHA-1          DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE  
+
+MethodDebugInformation (index: 0x31, size: 8): 
+==================================================
+1: 
+{
+  Locals: 0x11000001 (StandAloneSig)
+  Document: #1
+
+  IL_0000: (13, 5) - (13, 6)
+  IL_0001: (14, 9) - (14, 34)
+  IL_0007: (15, 9) - (15, 28)
+  IL_0013: (16, 9) - (16, 18)
+  IL_001C: (17, 5) - (17, 6)
+}
+2: 
+{
+  Document: #1
+
+  IL_0000: (9, 5) - (9, 30)
+  IL_0007: (10, 5) - (10, 28)
+}
+
+LocalScope (index: 0x32, size: 32): 
+===============================================================================================================
+   Method                  ImportScope               Variables              Constants  StartOffset  Length  
+===============================================================================================================
+1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  0x33000001-0x33000001  nil        0000         30      
+2: 0x06000002 (MethodDef)  0x35000002 (ImportScope)  nil                    nil        0000         23      
+
+LocalVariable (index: 0x33, size: 6): 
+============================
+   Name  Index  Attributes  
+============================
+1: 'c'   0      None        
+
+ImportScope (index: 0x35, size: 8): 
+=================================================================================================
+   Parent                    Imports                                                              
+=================================================================================================
+1: nil (ImportScope)         nil                                                                  
+2: 0x35000001 (ImportScope)  'System', 'System.Collections.Generic', 'X' = 0x1b000001 (TypeSpec)  
+
+CustomDebugInformation (index: 0x37, size: 6): 
+============================================================
+   Parent                  Kind                Value        
+============================================================
+1: 0x06000001 (MethodDef)  EnC Local Slot Map  01-10-16-01
+");
+        }
     }
 }

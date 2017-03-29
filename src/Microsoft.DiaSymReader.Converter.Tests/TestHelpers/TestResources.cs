@@ -197,4 +197,23 @@ namespace TestResources
 
         public static TestResource PortableDllAndPdb => new TestResource(PortableDll, PortablePdb);
     }
+
+    public static class Misc
+    {
+        private static byte[] s_portableDll;
+        public static byte[] PortableDll => ResourceLoader.GetOrCreateResource(ref s_portableDll, nameof(Misc) + ".dllx");
+
+        private static byte[] s_portablePdb;
+        public static byte[] PortablePdb => ResourceLoader.GetOrCreateResource(ref s_portablePdb, nameof(Misc) + ".pdbx");
+
+        private static byte[] s_windowsDll;
+        public static byte[] WindowsDll => ResourceLoader.GetOrCreateResource(ref s_windowsDll, nameof(Misc) + ".dll");
+
+        private static byte[] s_windowsPdb;
+        public static byte[] WindowsPdb => ResourceLoader.GetOrCreateResource(ref s_windowsPdb, nameof(Misc) + ".pdb");
+
+        public static TestResource PortableDllAndPdb => new TestResource(PortableDll, PortablePdb);
+        public static TestResource WindowsDllAndPdb => new TestResource(WindowsDll, WindowsPdb);
+        public static TestResource DllAndPdb(bool portable) => portable ? PortableDllAndPdb : WindowsDllAndPdb;
+    }
 }

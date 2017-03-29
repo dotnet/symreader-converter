@@ -310,6 +310,7 @@ namespace Microsoft.DiaSymReader.Tools
                 case PrimitiveTypeCode.Object: return nameof(System) + "." + nameof(Object);
                 case PrimitiveTypeCode.String: return nameof(System) + "." + nameof(String);
                 case PrimitiveTypeCode.TypedReference: return "System.TypedReference";
+                case PrimitiveTypeCode.Void: return "System.Void";
                 default:
                     throw new BadImageFormatException();
             }

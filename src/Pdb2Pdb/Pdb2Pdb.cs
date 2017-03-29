@@ -36,9 +36,16 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 using (var peStream = new FileStream(peFile, FileMode.Open, FileAccess.Read))
                 using (var srcPdbStream = new FileStream(srcPdb, FileMode.Open, FileAccess.Read))
-                using (var dstPdbStream = new FileStream(dstPdb, FileMode.Create, FileAccess.ReadWrite))
                 {
+                    var dstPdbStream = new MemoryStream();
                     PdbConverter.Convert(peStream, srcPdbStream, dstPdbStream);
+
+                    // Create the file once we know we have successfully converted the PDB:
+                    using (var dstFileStream = new FileStream(dstPdb, FileMode.Create, FileAccess.ReadWrite))
+                    {
+                        dstPdbStream.Position = 0;
+                        dstPdbStream.CopyTo(dstFileStream);
+                    }
                 }
             }
             catch (Exception e)
