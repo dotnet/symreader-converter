@@ -72,26 +72,124 @@ namespace Microsoft.DiaSymReader.Tools
 
                     case SignatureTypeCode.Object:
                         // null (null values are represented as 0 in Windows PDB):
-                        Debug.Assert(value is 0);
-                        builder.WriteByte((byte)SignatureTypeCode.Object);
-                        break;
+                        if (value is 0)
+                        {
+                            builder.WriteByte((byte)SignatureTypeCode.Object);
+                            break;
+                        }
+
+                        throw new BadImageFormatException();
 
                     case SignatureTypeCode.Boolean:
-                    case SignatureTypeCode.Char:
+                        if (value is short boolValue)
+                        {
+                            builder.WriteByte(rawTypeCode);
+                            builder.WriteBoolean(boolValue != 0);
+                            break;
+                        }
+
+                        throw new BadImageFormatException();
+
                     case SignatureTypeCode.SByte:
+                        if (value is short sbyteValue && sbyteValue >= sbyte.MinValue && sbyteValue <= sbyte.MaxValue)
+                        {
+                            builder.WriteByte(rawTypeCode);
+                            builder.WriteSByte((sbyte)sbyteValue);
+                            break;
+                        }
+
+                        throw new BadImageFormatException();
+
                     case SignatureTypeCode.Byte:
+                        if (value is short byteValue && byteValue >= byte.MinValue && byteValue <= byte.MaxValue)
+                        {
+                            builder.WriteByte(rawTypeCode);
+                            builder.WriteByte((byte)byteValue);
+                            break;
+                        }
+
+                        throw new BadImageFormatException();
+
                     case SignatureTypeCode.Int16:
+                        if (value is short shortValue)
+                        {
+                            builder.WriteByte(rawTypeCode);
+                            builder.WriteInt16(shortValue);
+                            break;
+                        }
+
+                        throw new BadImageFormatException();
+
+                    case SignatureTypeCode.Char:
                     case SignatureTypeCode.UInt16:
+                        if (value is ushort charValue)
+                        {
+                            builder.WriteByte(rawTypeCode);
+                            builder.WriteUInt16(charValue);
+                            break;
+                        }
+
+                        throw new BadImageFormatException();
+
                     case SignatureTypeCode.Int32:
+                        if (value is int intValue)
+                        {
+                            builder.WriteByte(rawTypeCode);
+                            builder.WriteInt32(intValue);
+                            break;
+                        }
+
+                        throw new BadImageFormatException();
+
                     case SignatureTypeCode.UInt32:
+                        if (value is uint uintValue)
+                        {
+                            builder.WriteByte(rawTypeCode);
+                            builder.WriteUInt32(uintValue);
+                            break;
+                        }
+
+                        throw new BadImageFormatException();
+
                     case SignatureTypeCode.Int64:
+                        if (value is long longValue)
+                        {
+                            builder.WriteByte(rawTypeCode);
+                            builder.WriteInt64(longValue);
+                            break;
+                        }
+
+                        throw new BadImageFormatException();
+
                     case SignatureTypeCode.UInt64:
+                        if (value is ulong ulongValue)
+                        {
+                            builder.WriteByte(rawTypeCode);
+                            builder.WriteUInt64(ulongValue);
+                            break;
+                        }
+
+                        throw new BadImageFormatException();
+
                     case SignatureTypeCode.Single:
+                        if (value is float floatValue)
+                        {
+                            builder.WriteByte(rawTypeCode);
+                            builder.WriteSingle(floatValue);
+                            break;
+                        }
+
+                        throw new BadImageFormatException();
+
                     case SignatureTypeCode.Double:
-                        // PrimitiveConstant
-                        builder.WriteByte(rawTypeCode);
-                        builder.WriteConstant(value);
-                        break;
+                        if (value is double doubleValue)
+                        {
+                            builder.WriteByte(rawTypeCode);
+                            builder.WriteDouble(doubleValue);
+                            break;
+                        }
+
+                        throw new BadImageFormatException();
 
                     case SignatureTypeCode.String:
                         builder.WriteByte(rawTypeCode);
