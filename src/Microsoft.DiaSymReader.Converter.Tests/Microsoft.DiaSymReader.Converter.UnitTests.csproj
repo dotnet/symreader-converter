@@ -12,6 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Metadata.Visualizer" Version="$(MicrosoftMetadataVisualizerVersion)" />
     <PackageReference Include="Microsoft.DiaSymReader.PortablePdb" Version="$(MicrosoftDiaSymReaderPortablePdbVersion)" />
     <ProjectReference Include="..\Microsoft.DiaSymReader.Converter.Xml\Microsoft.DiaSymReader.Converter.Xml.csproj" />
     <ProjectReference Include="..\Microsoft.DiaSymReader.Converter\Microsoft.DiaSymReader.Converter.csproj" />
@@ -24,9 +25,6 @@
     <Content Include="Resources\**\*.cs" />
     <Content Include="Resources\**\*.cmd" />
     <Content Include="Resources\**\*.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\Microsoft.DiaSymReader.Converter.Xml\Utilities\StringUtilities.cs" Link="MetadataVisualizer\StringUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Async.dll">

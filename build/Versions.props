@@ -19,10 +19,11 @@
     <XUnitVersion>2.2.0-beta4-build3444</XUnitVersion>
     <XUnitRunnerVisualStudioVersion>2.2.0-beta4-build1194</XUnitRunnerVisualStudioVersion>
     
-    <!-- symreader -->
+    <!-- libs -->
     <MicrosoftDiaSymReaderVersion>1.1.0</MicrosoftDiaSymReaderVersion>
     <MicrosoftDiaSymReaderNativeVersion>1.5.0</MicrosoftDiaSymReaderNativeVersion>
     <MicrosoftDiaSymReaderPortablePdbVersion>1.2.0</MicrosoftDiaSymReaderPortablePdbVersion>
+    <MicrosoftMetadataVisualizerVersion>1.0.0-beta1-61530-02</MicrosoftMetadataVisualizerVersion>
 
     <!-- CoreFX -->
     <SystemCollectionsImmutableVersion>1.3.1</SystemCollectionsImmutableVersion>
