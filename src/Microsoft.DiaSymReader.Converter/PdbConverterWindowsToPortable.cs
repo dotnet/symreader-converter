@@ -286,7 +286,6 @@ namespace Microsoft.DiaSymReader.Tools
                                     // TODO: warning: import debug info forwarded as well as specified
                                 }
 
-<<<<<<< HEAD
                                 break;
 
                             case CustomDebugInfoKind.StateMachineTypeName:
