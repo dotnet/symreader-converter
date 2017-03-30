@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
@@ -104,7 +105,10 @@ namespace Microsoft.DiaSymReader.Tools
                 var methodName = metadataReader.GetString(methodDef.Name);
 #endif
                 bool methodOpened = false;
-                var methodBodyOpt = (methodDef.RelativeVirtualAddress != 0) ? peReader.GetMethodBody(methodDef.RelativeVirtualAddress) : null;
+
+                var methodBodyOpt = (methodDef.RelativeVirtualAddress != 0 && (methodDef.ImplAttributes & MethodImplAttributes.CodeTypeMask) == MethodImplAttributes.Managed) ? 
+                    peReader.GetMethodBody(methodDef.RelativeVirtualAddress) : null;
+
                 var vbCurrentMethodNamespace = vbSemantics ? GetMethodNamespace(metadataReader, methodDef) : null;
                 var moveNextHandle = metadataModel.FindStateMachineMoveNextMethod(methodDefHandle, vbSemantics);
                 bool isKickOffMethod = !moveNextHandle.IsNil;
