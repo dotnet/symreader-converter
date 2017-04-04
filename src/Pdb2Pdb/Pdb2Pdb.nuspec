@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Pdb2Pdb</id>
+    <version>$version$</version>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>$licenseUrl$</licenseUrl>
+    <projectUrl>$repoUrl$</projectUrl>
+    <copyright>$copyright$</copyright>
+    <repository url="$repoUrl$" />
+    <developmentDependency>true</developmentDependency>
+    <tags>DiaSymReader ISymUnmanagedReader Portable PDB debugging conversion tool</tags> 
+    <serviceable>true</serviceable>
+    <description>Converter between Windows PDB and Portable PDB (standalone or embedded) file formats.</description>
+    <language>en-US</language>
+  </metadata>
+  <files>
+    <file src="net46\*.dll" target="tools" />
+    <file src="net46\*.exe" target="tools" />
+    <file src="net46\*.exe.config" target="tools" />
+  </files>
+</package>

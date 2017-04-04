@@ -5,7 +5,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IsPackable>true</IsPackable>
-    <Description>Converts content of Windows PDB to XML representation.</Description>
+    <Description>Converts content of PDB symbol file to XML representation.</Description>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageTags>DiaSymReader ISymUnmanagedReader Windows PDB debugging XML Pdb2Xml</PackageTags>
   </PropertyGroup>
