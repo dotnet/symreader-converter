@@ -577,6 +577,12 @@ namespace Microsoft.DiaSymReader.Tools
 
         private static ImmutableArray<(AssemblyReferenceHandle, string)> GetAliasedAssemblyRefs( MetadataReader pdbReader)
         {
+            // F# doesn't emit import scopes
+            if (pdbReader.ImportScopes.Count == 0)
+            {
+                return ImmutableArray<(AssemblyReferenceHandle, string)>.Empty;
+            }
+
             // C# serialized aliased assembly refs to the first import scope.
             // In Windows PDBs they are attached as CDIs to any method in the assembly and the other methods 
             // have CDI that forwards to it.
