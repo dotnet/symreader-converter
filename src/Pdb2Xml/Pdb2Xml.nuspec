@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Pdb2Xml</id>
+    <version>$version$</version>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>$licenseUrl$</licenseUrl>
+    <projectUrl>$repoUrl$</projectUrl>
+    <copyright>$copyright$</copyright>
+    <repository url="$repoUrl$" />
+    <developmentDependency>true</developmentDependency>
+    <tags>DiaSymReader ISymUnmanagedReader Windows PDB debugging XML Pdb2Xml tool</tags> 
+    <serviceable>true</serviceable>
+    <description>Converts content of PDB symbol file to XML representation.</description>
+    <language>en-US</language>
+  </metadata>
+  <files>
+    <file src="net46\*.dll" target="tools" />
+    <file src="net46\*.exe" target="tools" />
+    <file src="net46\*.exe.config" target="tools" />
+  </files>
+</package>
