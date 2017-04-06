@@ -39,17 +39,22 @@ namespace Microsoft.DiaSymReader
             return isPortable;
         }
 
-        public static ISymUnmanagedReader3 CreateWindowsPdbReader(Stream pdbStream, PEReader peReader)
+        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream)
+        {
+            return CreateWindowsPdbReader(pdbStream, new SymReaderMetadataImport(null, null));
+        }
+
+        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream, PEReader peReader)
         {
             return CreateWindowsPdbReader(pdbStream, new SymReaderMetadataImport(peReader.GetMetadataReader(), peReader));
         }
 
-        public static ISymUnmanagedReader3 CreateWindowsPdbReader(Stream pdbStream, MetadataReader metadataReader, IDisposable metadataOwner)
+        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream, MetadataReader metadataReader, IDisposable metadataOwner)
         {
             return CreateWindowsPdbReader(pdbStream, new SymReaderMetadataImport(metadataReader, metadataOwner));
         }
 
-        public static ISymUnmanagedReader3 CreateWindowsPdbReader(Stream pdbStream, object metadataImporter)
+        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream, object metadataImporter)
         {
             object symReader = null;
 
@@ -63,12 +68,12 @@ namespace Microsoft.DiaSymReader
                 CreateSymReader64(ref guid, out symReader);
             }
 
-            var reader = (ISymUnmanagedReader3)symReader;
+            var reader = (ISymUnmanagedReader5)symReader;
             reader.Initialize(pdbStream, metadataImporter);
             return reader;
         }
 
-        public static ISymUnmanagedWriter7 CreateWindowsPdbWriter(object pdbStream, object metadataProvider)
+        public static ISymUnmanagedWriter8 CreateWindowsPdbWriter(object pdbStream, object metadataProvider)
         {
             object symWriter = null;
             var guid = new Guid(SymWriterClsid);
@@ -81,7 +86,7 @@ namespace Microsoft.DiaSymReader
                 CreateSymWriter64(ref guid, out symWriter);
             }
 
-            var writer = (ISymUnmanagedWriter7)symWriter;
+            var writer = (ISymUnmanagedWriter8)symWriter;
             writer.InitializeDeterministic(metadataProvider, pdbStream);
             return writer;
         }

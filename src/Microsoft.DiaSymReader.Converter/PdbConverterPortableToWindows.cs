@@ -390,6 +390,9 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 pdbWriter.SetEntryPoint(MetadataTokens.GetToken(pdbReader.DebugMetadataHeader.EntryPoint));
             }
+
+            SymReaderHelpers.GetWindowsPdbSignature(pdbReader.DebugMetadataHeader.Id, out var guid, out var stamp, out var age);
+            pdbWriter.UpdateSignature(guid, stamp, age);
         }
 
         private static string GetMethodNamespace(MetadataReader metadataReader, MethodDefinition methodDef)

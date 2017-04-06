@@ -1,8 +1,12 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 using System.Xml.Linq;
 using Roslyn.Test.Utilities;
 using Xunit;
@@ -37,6 +41,32 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 
             PdbConverter.ConvertPortableToWindows(portablePEStream, portablePdbStream, convertedWindowsPdbStream);
             VerifyPdb(convertedWindowsPdbStream, portablePEStream, expectedXml, "Comparing Windows PDB converted from Portable PDB with expected XML");
+
+            portablePdbStream.Position = 0;
+            convertedWindowsPdbStream.Position = 0;
+            VerifyMatchingSignatures(portablePdbStream, convertedWindowsPdbStream);
+        }
+
+        private static void VerifyMatchingSignatures(Stream portablePdbStream, Stream windowsPdbStream)
+        {
+            Guid guid;
+            uint stamp;
+            int age;
+            using (var provider = MetadataReaderProvider.FromPortablePdbStream(portablePdbStream))
+            {
+                SymReaderHelpers.GetWindowsPdbSignature(provider.GetMetadataReader().DebugMetadataHeader.Id, out guid, out stamp, out age);
+            }
+
+            var symReader = SymReaderFactory.CreateWindowsPdbReader(windowsPdbStream);
+            try
+            {
+                Marshal.ThrowExceptionForHR(symReader.MatchesModule(guid, stamp, age, out bool result));
+                Assert.True(result);
+            }
+            finally
+            {
+                ((ISymUnmanagedDispose)symReader).Destroy();
+            }
         }
 
         private static string AdjustForInherentDifferences(string xml)

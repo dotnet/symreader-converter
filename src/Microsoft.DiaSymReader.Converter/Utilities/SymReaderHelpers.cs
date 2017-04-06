@@ -49,5 +49,16 @@ namespace Microsoft.DiaSymReader.Tools
 
             return ImmutableArray.CreateRange(namespaces.Select(n => n.GetName()));
         }
+
+        public static void GetWindowsPdbSignature(ImmutableArray<byte> bytes, out Guid guid, out uint timestamp, out int age)
+        {
+            var guidBytes = new byte[16];
+            bytes.CopyTo(0, guidBytes, 0, guidBytes.Length);
+            guid = new Guid(guidBytes);
+
+            int n = guidBytes.Length;
+            timestamp = ((uint)bytes[n + 3] << 24) | ((uint)bytes[n + 2] << 16) | ((uint)bytes[n + 1] << 8) | bytes[n];
+            age = 1;
+        }
     }
 }

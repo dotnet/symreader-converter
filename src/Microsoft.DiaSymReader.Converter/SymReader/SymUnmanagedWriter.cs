@@ -18,7 +18,7 @@ namespace Microsoft.DiaSymReader
         private static object s_zeroInt32 = 0;
 
         private SymReaderMetadataImport _metadataImport;
-        private ISymUnmanagedWriter7 _symWriter;
+        private ISymUnmanagedWriter8 _symWriter;
         private ComMemoryStream _pdbStream;
 
         public SymUnmanagedWriter(MetadataReader metadataReader)
@@ -356,6 +356,18 @@ namespace Microsoft.DiaSymReader
             try
             {
                 _symWriter.SetUserEntryPoint(entryMethodToken);
+            }
+            catch (Exception ex)
+            {
+                throw new PdbWritingException(ex);
+            }
+        }
+
+        public override void UpdateSignature(Guid guid, uint stamp, int age)
+        {
+            try
+            {
+                _symWriter.UpdateSignature(guid, stamp, age);
             }
             catch (Exception ex)
             {

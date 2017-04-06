@@ -19,5 +19,6 @@ namespace Microsoft.DiaSymReader
         public abstract void SetAsyncInfo(int moveNextMethodToken, int kickoffMethodToken, int catchHandlerOffset, int[] yieldOffsets, int[] resumeOffsets);
         public abstract void DefineCustomMetadata(byte[] metadata);
         public abstract void SetEntryPoint(int entryMethodToken);
+        public abstract void UpdateSignature(Guid guid, uint stamp, int age);
     }
 }
