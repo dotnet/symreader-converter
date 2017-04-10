@@ -20,5 +20,7 @@ namespace Microsoft.DiaSymReader
         public abstract void DefineCustomMetadata(byte[] metadata);
         public abstract void SetEntryPoint(int entryMethodToken);
         public abstract void UpdateSignature(Guid guid, uint stamp, int age);
+        public abstract void SetSourceServerData(byte[] data);
+        public abstract void SetSourceLinkData(byte[] data);
     }
 }

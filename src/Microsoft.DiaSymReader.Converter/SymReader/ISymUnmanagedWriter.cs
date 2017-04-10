@@ -125,6 +125,8 @@ namespace Microsoft.DiaSymReader
 
         // ISymUnmanagedWriter8
         void UpdateSignature(Guid pdbId, uint stamp, int age);
+        unsafe void SetSourceServerData([In]byte* data, int size);
+        unsafe void SetSourceLinkData([In]byte* data, int size);
     }
 
     [ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("98ECEE1E-752D-11d3-8D56-00C04F680B2B"), SuppressUnmanagedCodeSecurity]

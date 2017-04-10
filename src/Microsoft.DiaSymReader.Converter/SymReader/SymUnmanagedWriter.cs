@@ -374,5 +374,35 @@ namespace Microsoft.DiaSymReader
                 throw new PdbWritingException(ex);
             }
         }
+
+        public unsafe override void SetSourceServerData(byte[] data)
+        {
+            try
+            {
+                fixed (byte* dataPtr = &data[0])
+                {
+                    _symWriter.SetSourceServerData(dataPtr, data.Length);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new PdbWritingException(ex);
+            }
+        }
+
+        public unsafe override void SetSourceLinkData(byte[] data)
+        {
+            try
+            {
+                fixed (byte* dataPtr = &data[0])
+                {
+                    _symWriter.SetSourceLinkData(dataPtr, data.Length);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new PdbWritingException(ex);
+            }
+        }
     }
 }

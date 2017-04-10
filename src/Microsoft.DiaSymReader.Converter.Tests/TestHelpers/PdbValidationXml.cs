@@ -25,7 +25,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         {
             var windowsPEStream = new MemoryStream(windows.PE);
             var windowsPdbStream = new MemoryStream(windows.Pdb);
-            var actualXml = PdbToXmlConverter.ToXml(windowsPdbStream, windowsPEStream);
+            var actualXml = PdbToXmlConverter.ToXml(windowsPdbStream, windowsPEStream, PdbToXmlOptions.IncludeSourceServerInformation | PdbToXmlOptions.ResolveTokens);
 
             var adjustedExpectedXml = AdjustForInherentDifferences(expectedXml);
             var adjustedActualXml = AdjustForInherentDifferences(actualXml);
@@ -143,7 +143,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         {
             pdbStream.Position = 0;
             peStream.Position = 0;
-            var actualXml = PdbToXmlConverter.ToXml(pdbStream, peStream);
+            var actualXml = PdbToXmlConverter.ToXml(pdbStream, peStream, PdbToXmlOptions.IncludeSourceServerInformation | PdbToXmlOptions.ResolveTokens);
 
             AssertEx.AssertLinesEqual(expectedXml, actualXml, message);
         }
