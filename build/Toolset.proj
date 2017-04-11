@@ -12,7 +12,6 @@
     <PackageReference Include="RoslynTools.Microsoft.SignTool" Version="$(RoslynToolsMicrosoftSignToolVersion)" />
     <PackageReference Include="MicroBuild.Core" Version="$(MicroBuildCoreVersion)" />
     <PackageReference Include="MicroBuild.Core.Sentinel" Version="1.0.0" />
-    <PackageReference Include="MicroBuild.Plugins.SwixBuild" Version="$(MicroBuildPluginsSwixBuildVersion)" />
     <PackageReference Include="Microsoft.Net.Compilers" Version="$(MicrosoftNetCompilersVersion)" />
   </ItemGroup>
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />

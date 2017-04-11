@@ -61,7 +61,25 @@ namespace Microsoft.DiaSymReader.Tools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to File not found: {0}.
+        ///   Looks up a localized string similar to Can&apos;t specify both /extract and /pdb options..
+        /// </summary>
+        internal static string CantSpecifyBothExtractAndPdbOptions {
+            get {
+                return ResourceManager.GetString("CantSpecifyBothExtractAndPdbOptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File &apos;{0}&apos; doesn&apos;t contain an embedded PDB..
+        /// </summary>
+        internal static string FileDoesntContainEmbeddedPdb {
+            get {
+                return ResourceManager.GetString("FileDoesntContainEmbeddedPdb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File not found: &apos;{0}&apos;.
         /// </summary>
         internal static string FileNotFound {
             get {
@@ -70,11 +88,54 @@ namespace Microsoft.DiaSymReader.Tools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Usage: Pdb2Pdb &lt;PE file&gt; [/src:&lt;PDB path&gt;] [/dst:&lt;PDB path&gt;].
+        ///   Looks up a localized string similar to Missing dll/exe path..
+        /// </summary>
+        internal static string MissingDllExePath {
+            get {
+                return ResourceManager.GetString("MissingDllExePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing value for option &apos;{0}&apos;.
+        /// </summary>
+        internal static string MissingValueForOption {
+            get {
+                return ResourceManager.GetString("MissingValueForOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only one dll/exe can be specified.
+        /// </summary>
+        internal static string OnlyOneDllExeCanBeSpecified {
+            get {
+                return ResourceManager.GetString("OnlyOneDllExeCanBeSpecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Usage: Pdb2Pdb &lt;dll/exe path&gt; [/pdb:&lt;path&gt;] [/out:&lt;path&gt;] [/extract]
+        ///
+        ////pdb:&lt;path&gt;    Path to the PDB to convert. If not specified explicitly, the PDB referenced by or embedded in the DLL/EXE is used.
+        ////out:&lt;path&gt;    Output PDB path.
+        ////extract       Extract PDB embedded in the DLL/EXE. 
+        ///
+        ////extract and /pdb are mutually exclusive.
+        ///.
         /// </summary>
         internal static string Pdb2PdbUsage {
             get {
                 return ResourceManager.GetString("Pdb2PdbUsage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unrecognized option: &apos;{0}&apos;.
+        /// </summary>
+        internal static string UnrecognizedOption {
+            get {
+                return ResourceManager.GetString("UnrecognizedOption", resourceCulture);
             }
         }
     }

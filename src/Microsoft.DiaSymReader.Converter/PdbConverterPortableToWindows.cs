@@ -22,7 +22,7 @@ using Roslyn.Utilities;
 
 namespace Microsoft.DiaSymReader.Tools
 {
-    internal static partial class PdbConverterPortableToWindows<TDocumentWriter>
+    internal sealed class PdbConverterPortableToWindows<TDocumentWriter>
     {
         private static readonly Guid s_languageVendorMicrosoft = new Guid("{994b45c4-e6e9-11d2-903f-00c04fa302a1}");
         private static readonly Guid s_documentTypeText = new Guid("{5a869d0b-6611-11d3-bd2a-0000f80849bd}");
@@ -30,7 +30,11 @@ namespace Microsoft.DiaSymReader.Tools
         private static readonly Guid s_csharpGuid = new Guid("3f5162f8-07c6-11d3-9053-00c04fa302a1");
         private static readonly Guid s_visualBasicGuid = new Guid("3a12d0b8-c26c-11d0-b442-00a0244a1dd2");
         private static readonly Guid s_fsharpGuid = new Guid("ab4f38c9-b6e6-43ba-be3b-58080b2ccce3");
-        
+
+        public PdbConverterPortableToWindows()
+        {
+        }
+
         /// <summary>
         /// This is the maximum length of a string in the PDB, assuming it is in UTF-8 format 
         /// and not (yet) null-terminated.
@@ -46,7 +50,7 @@ namespace Microsoft.DiaSymReader.Tools
                 s_languageVendorMicrosoft : default(Guid);
         }
 
-        internal static void Convert(PEReader peReader, MetadataReader pdbReader, PdbWriter<TDocumentWriter> pdbWriter, PdbConversionOptions options)
+        internal void Convert(PEReader peReader, MetadataReader pdbReader, PdbWriter<TDocumentWriter> pdbWriter, PdbConversionOptions options)
         {
             string vbDefaultNamespace = MetadataUtilities.GetVisualBasicDefaultNamespace(pdbReader);
             bool vbSemantics = vbDefaultNamespace != null;

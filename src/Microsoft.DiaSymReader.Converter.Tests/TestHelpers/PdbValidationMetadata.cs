@@ -31,7 +31,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             var windowsPdbStream = new MemoryStream(windows.Pdb);
             var convertedPortablePdbStream = new MemoryStream();
 
-            PdbConverter.ConvertWindowsToPortable(windowsPEStream, windowsPdbStream, convertedPortablePdbStream);
+            new PdbConverter().ConvertWindowsToPortable(windowsPEStream, windowsPdbStream, convertedPortablePdbStream);
 
             convertedPortablePdbStream.Position = 0;
             VerifyPortablePdb(

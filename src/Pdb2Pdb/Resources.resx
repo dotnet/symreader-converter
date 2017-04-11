@@ -117,11 +117,35 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CantSpecifyBothExtractAndPdbOptions" xml:space="preserve">
+    <value>Can't specify both /extract and /pdb options.</value>
+  </data>
+  <data name="FileDoesntContainEmbeddedPdb" xml:space="preserve">
+    <value>File '{0}' doesn't contain an embedded PDB.</value>
+  </data>
   <data name="FileNotFound" xml:space="preserve">
-    <value>File not found: {0}</value>
+    <value>File not found: '{0}'</value>
+  </data>
+  <data name="MissingValueForOption" xml:space="preserve">
+    <value>Missing value for option '{0}'</value>
+  </data>
+  <data name="OnlyOneDllExeCanBeSpecified" xml:space="preserve">
+    <value>Only one dll/exe can be specified</value>
+  </data>
+  <data name="UnrecognizedOption" xml:space="preserve">
+    <value>Unrecognized option: '{0}'</value>
+  </data>
+  <data name="MissingDllExePath" xml:space="preserve">
+    <value>Missing dll/exe path.</value>
   </data>
   <data name="Pdb2PdbUsage" xml:space="preserve">
-    <value><![CDATA[Usage: Pdb2Pdb <PE file> [/src:<PDB path>] [/dst:<PDB path>]]]></value>
+    <value>Usage: Pdb2Pdb &lt;dll/exe path&gt; [/pdb:&lt;path&gt;] [/out:&lt;path&gt;] [/extract]
+
+/pdb:&lt;path&gt;    Path to the PDB to convert. If not specified explicitly, the PDB referenced by or embedded in the DLL/EXE is used.
+/out:&lt;path&gt;    Output PDB path.
+/extract       Extract PDB embedded in the DLL/EXE. 
+
+/extract and /pdb are mutually exclusive.
+</value>
   </data>
-  
 </root>

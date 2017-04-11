@@ -17,11 +17,15 @@ using Roslyn.Utilities;
 
 namespace Microsoft.DiaSymReader.Tools
 {
-    internal static partial class PdbConverterWindowsToPortable
+    internal sealed partial class PdbConverterWindowsToPortable
     {
+        public PdbConverterWindowsToPortable()
+        {
+        }
+
         /// <exception cref="COMException"/>
         /// <exception cref="InvalidDataException"/>
-        public static void Convert(PEReader peReader, Stream sourcePdbStream, Stream targetPdbStream)
+        public void Convert(PEReader peReader, Stream sourcePdbStream, Stream targetPdbStream)
         {
             var metadataBuilder = new MetadataBuilder();
             var pdbId = ReadPdbId(peReader);
@@ -276,14 +280,17 @@ namespace Microsoft.DiaSymReader.Tools
                                     }
                                     else
                                     {
-                                        // TODO: error: invalid CDI data
+                                        // TODO: _diagnosticsOpt.Error(ErrorCode.InvalidForwardMethodInfo, methodToken);
                                     }
 
-                                    // TODO: if (importScope.IsNil) warning: forwarded to method that doesn't have debug info
+                                    if (importScope.IsNil)
+                                    {
+                                        // TODO: _diagnosticsOpt.Error(ErrorCode.ForwardedToMethodInfoWithNoScope, methodToken);
+                                    }
                                 }
                                 else
                                 {
-                                    // TODO: warning: import debug info forwarded as well as specified
+                                    // TODO: _diagnosticsOpt.Error(ErrorCode.BothForwardMethodInfoAndImportsSpecified, methodToken);
                                 }
 
                                 break;
@@ -299,12 +306,12 @@ namespace Microsoft.DiaSymReader.Tools
                                     }
                                     else
                                     {
-                                        // TODO: warning: invalid state machine name in CDI
+                                        // TODO: _diagnosticsOpt.Error(ErrorCode.InvalidStateMachineTypeName, methodToken);
                                     }
                                 }
                                 else
                                 {
-                                    // TODO: warning: kickoff methods shouldn't have import scopes defined
+                                    // TODO: _diagnosticsOpt.Error(ErrorCode.KickoffMethodWithImports, methodToken);
                                 }
 
                                 break;
