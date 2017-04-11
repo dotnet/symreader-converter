@@ -6,12 +6,6 @@ using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 
-#if DSRN16
-using ISymUnmanagedReaderN = Microsoft.DiaSymReader.ISymUnmanagedReader5;
-#else
-using ISymUnmanagedReaderN = Microsoft.DiaSymReader.ISymUnmanagedReader3;
-#endif
-
 namespace Microsoft.DiaSymReader
 {
     internal static class SymReaderFactory
@@ -45,22 +39,22 @@ namespace Microsoft.DiaSymReader
             return isPortable;
         }
 
-        public static ISymUnmanagedReaderN CreateWindowsPdbReader(Stream pdbStream)
+        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream)
         {
             return CreateWindowsPdbReader(pdbStream, new SymReaderMetadataImport(null, null));
         }
 
-        public static ISymUnmanagedReaderN CreateWindowsPdbReader(Stream pdbStream, PEReader peReader)
+        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream, PEReader peReader)
         {
             return CreateWindowsPdbReader(pdbStream, new SymReaderMetadataImport(peReader.GetMetadataReader(), peReader));
         }
 
-        public static ISymUnmanagedReaderN CreateWindowsPdbReader(Stream pdbStream, MetadataReader metadataReader, IDisposable metadataOwner)
+        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream, MetadataReader metadataReader, IDisposable metadataOwner)
         {
             return CreateWindowsPdbReader(pdbStream, new SymReaderMetadataImport(metadataReader, metadataOwner));
         }
 
-        public static ISymUnmanagedReaderN CreateWindowsPdbReader(Stream pdbStream, object metadataImporter)
+        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream, object metadataImporter)
         {
             object symReader = null;
 
@@ -74,7 +68,7 @@ namespace Microsoft.DiaSymReader
                 CreateSymReader64(ref guid, out symReader);
             }
 
-            var reader = (ISymUnmanagedReaderN)symReader;
+            var reader = (ISymUnmanagedReader5)symReader;
             reader.Initialize(pdbStream, metadataImporter);
             return reader;
         }

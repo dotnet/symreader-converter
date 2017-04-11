@@ -44,14 +44,11 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             converter.ConvertPortableToWindows(portablePEStream, portablePdbStream, convertedWindowsPdbStream);
             VerifyPdb(convertedWindowsPdbStream, portablePEStream, expectedXml, "Comparing Windows PDB converted from Portable PDB with expected XML");
 
-#if DSRN16 // https://github.com/dotnet/symreader-converter/issues/42
             portablePdbStream.Position = 0;
             convertedWindowsPdbStream.Position = 0;
             VerifyMatchingSignatures(portablePdbStream, convertedWindowsPdbStream);
-#endif
         }
 
-#if DSRN16 // https://github.com/dotnet/symreader-converter/issues/42
         private static void VerifyMatchingSignatures(Stream portablePdbStream, Stream windowsPdbStream)
         {
             Guid guid;
@@ -73,7 +70,6 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
                 ((ISymUnmanagedDispose)symReader).Destroy();
             }
         }
-#endif
 
         private static string AdjustForInherentDifferences(string xml)
         {

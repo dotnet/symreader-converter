@@ -410,7 +410,6 @@ namespace Microsoft.DiaSymReader.Tools
                 pdbWriter.SetEntryPoint(MetadataTokens.GetToken(pdbReader.DebugMetadataHeader.EntryPoint));
             }
 
-#if DSRN16 // https://github.com/dotnet/symreader-converter/issues/42
             var sourceLinkHandle = pdbReader.GetCustomDebugInformation(EntityHandle.ModuleDefinition, PortableCustomDebugInfoKinds.SourceLink);
             if (!sourceLinkHandle.IsNil)
             {
@@ -426,7 +425,6 @@ namespace Microsoft.DiaSymReader.Tools
 
             SymReaderHelpers.GetWindowsPdbSignature(pdbReader.DebugMetadataHeader.Id, out var guid, out var stamp, out var age);
             pdbWriter.UpdateSignature(guid, stamp, age);
-#endif
         }
                
         private static string GetMethodNamespace(MetadataReader metadataReader, MethodDefinition methodDef)
