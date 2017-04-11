@@ -39,7 +39,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             var portablePdbStream = new MemoryStream(portable.Pdb);
             var convertedWindowsPdbStream = new MemoryStream();
 
-            PdbConverter.ConvertPortableToWindows(portablePEStream, portablePdbStream, convertedWindowsPdbStream);
+            new PdbConverter().ConvertPortableToWindows(portablePEStream, portablePdbStream, convertedWindowsPdbStream);
             VerifyPdb(convertedWindowsPdbStream, portablePEStream, expectedXml, "Comparing Windows PDB converted from Portable PDB with expected XML");
 
 #if DSRN16 // https://github.com/dotnet/symreader-converter/issues/42
