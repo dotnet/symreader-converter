@@ -1639,9 +1639,13 @@ namespace Microsoft.DiaSymReader.Tools
             var srcsvrModule = _symReader as ISymUnmanagedSourceServerModule;
             if (srcsvrModule != null)
             {
-                _writer.WriteStartElement("srcsvr");
+                int hr = srcsvrModule.GetSourceServerData(out int length, out byte* data);
+                if (hr != HResult.S_OK)
+                {
+                    return;
+                }
 
-                Marshal.ThrowExceptionForHR(srcsvrModule.GetSourceServerData(out int length, out byte* data));
+                _writer.WriteStartElement("srcsvr");
 
                 try
                 {

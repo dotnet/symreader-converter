@@ -1,7 +1,8 @@
 {
-  "documents": 
-  {
-     "C:\\a*": "http://server1/*",
-     "C:\\A*": "http://server2/*",
+  "documents": {
+    "C:\\a*": "http://server/1/a*",
+    "C:\\A*": "http://server/2/A*",
+    "C:\\*": "http://server/3/*.g",
+    "*": "http://server/4/*"
   }
 }

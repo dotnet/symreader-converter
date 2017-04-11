@@ -101,12 +101,12 @@ namespace Microsoft.DiaSymReader.Tools
             using (var peReader = new PEReader(peStream, PEStreamOptions.LeaveOpen))
             using (var pdbWriter = new SymUnmanagedWriter(peReader.GetMetadataReader()))
             {
-                ConvertPortableToWindows(peReader, sourcePdbStream, pdbWriter);
+                ConvertPortableToWindows(peReader, sourcePdbStream, pdbWriter, PdbConversionOptions.Default);
                 pdbWriter.WriteTo(targetPdbStream);
             }
         }
 
-        public static void ConvertPortableToWindows<TDocumentWriter>(PEReader peReader, Stream sourcePdbStream, PdbWriter<TDocumentWriter> pdbWriter)
+        public static void ConvertPortableToWindows<TDocumentWriter>(PEReader peReader, Stream sourcePdbStream, PdbWriter<TDocumentWriter> pdbWriter, PdbConversionOptions options)
         {
             if (peReader == null)
             {
@@ -122,7 +122,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             using (var pdbReaderProvider = MetadataReaderProvider.FromPortablePdbStream(sourcePdbStream, MetadataStreamOptions.LeaveOpen))
             {
-                PdbConverterPortableToWindows<TDocumentWriter>.Convert(peReader, pdbReaderProvider.GetMetadataReader(), pdbWriter);
+                PdbConverterPortableToWindows<TDocumentWriter>.Convert(peReader, pdbReaderProvider.GetMetadataReader(), pdbWriter, options);
             }
         }
     }

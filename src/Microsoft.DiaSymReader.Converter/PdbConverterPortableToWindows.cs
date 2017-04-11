@@ -10,10 +10,14 @@ using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
+using System.Runtime.CompilerServices;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Collections;
 using Microsoft.CodeAnalysis.Debugging;
 using Microsoft.DiaSymReader.PortablePdb;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Roslyn.Utilities;
 
 namespace Microsoft.DiaSymReader.Tools
@@ -42,7 +46,7 @@ namespace Microsoft.DiaSymReader.Tools
                 s_languageVendorMicrosoft : default(Guid);
         }
 
-        internal static void Convert(PEReader peReader, MetadataReader pdbReader, PdbWriter<TDocumentWriter> pdbWriter)
+        internal static void Convert(PEReader peReader, MetadataReader pdbReader, PdbWriter<TDocumentWriter> pdbWriter, PdbConversionOptions options)
         {
             string vbDefaultNamespace = MetadataUtilities.GetVisualBasicDefaultNamespace(pdbReader);
             bool vbSemantics = vbDefaultNamespace != null;
@@ -52,6 +56,7 @@ namespace Microsoft.DiaSymReader.Tools
             var metadataModel = new MetadataModel(metadataReader, vbSemantics);
 
             var documentWriters = new ArrayBuilder<TDocumentWriter>(pdbReader.Documents.Count);
+            var documentNames = new ArrayBuilder<string>(pdbReader.Documents.Count);
             var symSequencePointBuilder = new SequencePointsBuilder(capacity: 64);
             var declaredExternAliases = new HashSet<string>();
             var importStringsBuilder = new List<string>();
@@ -73,9 +78,11 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 var document = pdbReader.GetDocument(documentHandle);
                 var languageGuid = pdbReader.GetGuid(document.Language);
+                var name = pdbReader.GetString(document.Name);
+                documentNames.Add(name);
 
                 documentWriters.Add(pdbWriter.DefineDocument(
-                    name: pdbReader.GetString(document.Name),
+                    name: name,
                     language: languageGuid,
                     type: s_documentTypeText,
                     vendor: GetLanguageVendorGuid(languageGuid),
@@ -390,6 +397,24 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 pdbWriter.SetEntryPoint(MetadataTokens.GetToken(pdbReader.DebugMetadataHeader.EntryPoint));
             }
+
+#if DSRN16 // https://github.com/dotnet/symreader-converter/issues/42
+            var sourceLinkHandle = pdbReader.GetCustomDebugInformation(EntityHandle.ModuleDefinition, PortableCustomDebugInfoKinds.SourceLink);
+            if (!sourceLinkHandle.IsNil)
+            {
+                if ((options & PdbConversionOptions.SuppressSourceLinkConversion) == 0)
+                {
+                    ConvertSourceServerData(pdbReader.GetStringUTF8(sourceLinkHandle), pdbWriter, documentNames);
+                }
+                else
+                {
+                    pdbWriter.SetSourceLinkData(pdbReader.GetBlobBytes(sourceLinkHandle));
+                }
+            }
+
+            SymReaderHelpers.GetWindowsPdbSignature(pdbReader.DebugMetadataHeader.Id, out var guid, out var stamp, out var age);
+            pdbWriter.UpdateSignature(guid, stamp, age);
+#endif
         }
 
         private static string GetMethodNamespace(MetadataReader metadataReader, MethodDefinition methodDef)
@@ -774,6 +799,85 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 symSequencePointBuilder.WriteSequencePoints(pdbWriter, documentWriters[currentDocumentWriterIndex]);
             }
+        }
+
+        // Avoid loading JSON dependency if not needed.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void ConvertSourceServerData(string sourceLink, PdbWriter<TDocumentWriter> pdbWriter, IReadOnlyCollection<string> documentNames)
+        {
+            var builder = new StringBuilder();
+
+            var map = SourceLinkMap.Parse(sourceLink);
+            var mapping = new List<(string name, string uri)>();
+
+            string commonProtocol = null;
+            foreach (var documentName in documentNames)
+            {
+                string uri = map.GetUri(documentName);
+                if (uri == null)
+                {
+                    // TODO: report error
+                    continue;
+                }
+
+                string protocol;
+                if (uri.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+                {
+                    protocol = "http";
+                }
+                else if (uri.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                {
+                    protocol = "https";
+                }
+                else
+                {
+                    // TODO: report error
+                    continue;
+                }
+
+                if (commonProtocol == null)
+                {
+                    commonProtocol = protocol;
+                }
+                else if (commonProtocol != protocol)
+                {
+                    commonProtocol = "http";
+                }
+
+                mapping.Add((documentName, uri));
+            }
+
+            if (commonProtocol == null)
+            {
+                // no http/https uris found
+                return;
+            }
+
+            string commonPrefix = StringUtilities.GetLongestCommonPrefix(mapping.Select(p => p.uri));
+
+            builder.Append("SRCSRV: ini ------------------------------------------------\r\n");
+            builder.Append("VERSION=2\r\n");
+            builder.Append("SRCSRV: variables ------------------------------------------\r\n");
+            builder.Append("RAWURL=");
+            builder.Append(commonPrefix);
+            builder.Append("%var2%\r\n");
+            builder.Append("SRCSRVVERCTRL=");
+            builder.Append(commonProtocol);
+            builder.Append("\r\n");
+            builder.Append("SRCSRVTRG=%RAWURL%\r\n");
+            builder.Append("SRCSRV: source files ---------------------------------------\r\n");
+
+            foreach (var (name, uri) in mapping)
+            {
+                builder.Append(name);
+                builder.Append('*');
+                builder.Append(uri.Substring(commonPrefix.Length));
+                builder.Append("\r\n");
+            }
+
+            builder.Append("SRCSRV: end ------------------------------------------------");
+
+            pdbWriter.SetSourceServerData(Encoding.UTF8.GetBytes(builder.ToString()));
         }
     }
 }
