@@ -12,9 +12,13 @@
     <NuspecBasePath>$(OutputPath)</NuspecBasePath>
     <NuspecProperties>version=$(Version);licenseUrl=$(PackageLicenseUrl);repoUrl=$(RepositoryUrl);copyright=$(Copyright)</NuspecProperties>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.DiaSymReader.Converter\Microsoft.DiaSymReader.Converter.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Pdb2Pdb.UnitTests" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources.Designer.cs">

@@ -1,0 +1,152 @@
+﻿<!-- Copyright (c)  Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information. -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Resources\**\*.cs" />
+    <Content Include="Resources\**\*.cs" />
+    <Content Include="Resources\**\*.cmd" />
+    <Content Include="Resources\**\*.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Async.dll">
+      <LogicalName>Async.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Async.pdb">
+      <LogicalName>Async.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Async.dllx">
+      <LogicalName>Async.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Async.pdbx">
+      <LogicalName>Async.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Iterator.dll">
+      <LogicalName>Iterator.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Iterator.pdb">
+      <LogicalName>Iterator.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Iterator.dllx">
+      <LogicalName>Iterator.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Iterator.pdbx">
+      <LogicalName>Iterator.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Imports.dll">
+      <LogicalName>Imports.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Imports.pdb">
+      <LogicalName>Imports.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Imports.dllx">
+      <LogicalName>Imports.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Imports.pdbx">
+      <LogicalName>Imports.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Documents.dll">
+      <LogicalName>Documents.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Documents.pdb">
+      <LogicalName>Documents.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Documents.dllx">
+      <LogicalName>Documents.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Documents.pdbx">
+      <LogicalName>Documents.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Scopes.dll">
+      <LogicalName>Scopes.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Scopes.pdb">
+      <LogicalName>Scopes.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Scopes.dllx">
+      <LogicalName>Scopes.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Scopes.pdbx">
+      <LogicalName>Scopes.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LanguageOnlyTypes.dll">
+      <LogicalName>LanguageOnlyTypes.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LanguageOnlyTypes.pdb">
+      <LogicalName>LanguageOnlyTypes.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LanguageOnlyTypes.dllx">
+      <LogicalName>LanguageOnlyTypes.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\LanguageOnlyTypes.pdbx">
+      <LogicalName>LanguageOnlyTypes.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\VB.dll">
+      <LogicalName>VB.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\VB.pdb">
+      <LogicalName>VB.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\VB.dllx">
+      <LogicalName>VB.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\VB.pdbx">
+      <LogicalName>VB.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MethodBoundaries.dll">
+      <LogicalName>MethodBoundaries.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MethodBoundaries.pdb">
+      <LogicalName>MethodBoundaries.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MethodBoundaries.dllx">
+      <LogicalName>MethodBoundaries.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MethodBoundaries.pdbx">
+      <LogicalName>MethodBoundaries.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\EmbeddedSource.cs">
+      <LogicalName>EmbeddedSource.cs</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\EmbeddedSourceSmall.cs">
+      <LogicalName>EmbeddedSourceSmall.cs</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\EmbeddedSource.dll">
+      <LogicalName>EmbeddedSource.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\EmbeddedSource.pdb">
+      <LogicalName>EmbeddedSource.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\EmbeddedSource.dllx">
+      <LogicalName>EmbeddedSource.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\EmbeddedSource.pdbx">
+      <LogicalName>EmbeddedSource.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SourceLink.dll">
+      <LogicalName>SourceLink.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SourceLink.pdb">
+      <LogicalName>SourceLink.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SourceLink.dllx">
+      <LogicalName>SourceLink.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SourceLink.pdbx">
+      <LogicalName>SourceLink.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Misc.dll">
+      <LogicalName>Misc.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Misc.pdb">
+      <LogicalName>Misc.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Misc.dllx">
+      <LogicalName>Misc.dllx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Misc.pdbx">
+      <LogicalName>Misc.pdbx</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

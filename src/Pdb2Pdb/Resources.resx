@@ -120,6 +120,9 @@
   <data name="CantSpecifyBothExtractAndPdbOptions" xml:space="preserve">
     <value>Can't specify both /extract and /pdb options.</value>
   </data>
+  <data name="CantSpecifyBothExtractAndSourcelinkOptions" xml:space="preserve">
+    <value>Can't specify both /extract and /sourcelink options.</value>
+  </data>
   <data name="FileDoesntContainEmbeddedPdb" xml:space="preserve">
     <value>File '{0}' doesn't contain an embedded PDB.</value>
   </data>
@@ -139,13 +142,14 @@
     <value>Missing dll/exe path.</value>
   </data>
   <data name="Pdb2PdbUsage" xml:space="preserve">
-    <value>Usage: Pdb2Pdb &lt;dll/exe path&gt; [/pdb:&lt;path&gt;] [/out:&lt;path&gt;] [/extract]
+    <value><![CDATA[Usage: Pdb2Pdb <dll/exe path> [/pdb:<path>] [/out:<path>] [/extract]
 
-/pdb:&lt;path&gt;    Path to the PDB to convert. If not specified explicitly, the PDB referenced by or embedded in the DLL/EXE is used.
-/out:&lt;path&gt;    Output PDB path.
+/pdb:<path>    Path to the PDB to convert. If not specified explicitly, the PDB referenced by or embedded in the DLL/EXE is used.
+/out:<path>    Output PDB path.
 /extract       Extract PDB embedded in the DLL/EXE. 
+/sourcelink    Preserve Source Link when converting from Portable PDB to Windows PDB, instead of converting to srcsrv format.
 
 /extract and /pdb are mutually exclusive.
-</value>
+]]></value>
   </data>
 </root>

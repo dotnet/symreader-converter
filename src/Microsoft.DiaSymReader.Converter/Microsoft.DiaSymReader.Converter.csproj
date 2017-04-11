@@ -19,6 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Microsoft.DiaSymReader.Converter.UnitTests" />
+    <InternalsVisibleTo Include="Pdb2Pdb.UnitTests" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="ConverterResources.Designer.cs">

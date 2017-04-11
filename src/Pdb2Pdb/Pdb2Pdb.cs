@@ -1,10 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 
@@ -12,19 +9,22 @@ namespace Microsoft.DiaSymReader.Tools
 {
     internal static class Pdb2Pdb
     {
-        private sealed class Args
+        // internal for testing
+        internal sealed class Args
         {
             public readonly string PEFilePath;
-            public readonly bool Extract;
             public readonly string PdbFilePathOpt;
             public readonly string OutPdbFilePath;
+            public readonly bool Extract;
+            public readonly PdbConversionOptions Options;
 
-            public Args(string pEFilePath, bool extract, string pdbFilePathOpt, string outPdbFilePath)
+            public Args(string peFilePath, string pdbFilePathOpt, string outPdbFilePath, PdbConversionOptions options, bool extract)
             {
-                PEFilePath = pEFilePath;
+                PEFilePath = peFilePath;
                 Extract = extract;
                 PdbFilePathOpt = pdbFilePathOpt;
                 OutPdbFilePath = outPdbFilePath;
+                Options = options;
             }
         }
 
@@ -46,10 +46,12 @@ namespace Microsoft.DiaSymReader.Tools
             return Convert(parsedArgs);
         }
 
-        private static Args ParseArgs(string[] args)
+        // internal for testing
+        internal static Args ParseArgs(string[] args)
         {
             string peFile = null;
             bool extract = false;
+            bool sourceLink = false;
             string inPdb = null;
             string outPdb = null;
 
@@ -58,12 +60,16 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 var arg = args[i++];
 
-                string ReadValue() => (i < args.Length) ? args[i] : throw new InvalidDataException(string.Format(Resources.MissingValueForOption, arg));
+                string ReadValue() => (i < args.Length) ? args[i++] : throw new InvalidDataException(string.Format(Resources.MissingValueForOption, arg));
 
                 switch (arg)
                 {
                    case "/extract":
                         extract = true;
+                        break;
+
+                    case "/sourcelink":
+                        sourceLink = true;
                         break;
 
                     case "/pdb":
@@ -96,7 +102,19 @@ namespace Microsoft.DiaSymReader.Tools
 
             if (outPdb == null)
             {
-                outPdb = Path.ChangeExtension(peFile, "pdb2");
+                try
+                {
+                    outPdb = Path.ChangeExtension(peFile, "pdb2");
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidDataException(e.Message);
+                }
+            }
+
+            if (extract && sourceLink)
+            {
+                throw new InvalidDataException(Resources.CantSpecifyBothExtractAndSourcelinkOptions);
             }
 
             if (extract && inPdb != null)
@@ -104,15 +122,17 @@ namespace Microsoft.DiaSymReader.Tools
                 throw new InvalidDataException(Resources.CantSpecifyBothExtractAndPdbOptions);
             }
 
-            if (!File.Exists(peFile))
+            var options = default(PdbConversionOptions);
+            if (sourceLink)
             {
-                throw new InvalidDataException(string.Format(Resources.FileNotFound, peFile));
+                options |= PdbConversionOptions.SuppressSourceLinkConversion;
             }
 
-            return new Args(peFile, extract, inPdb, outPdb);
+            return new Args(peFile, inPdb, outPdb, options, extract);
         }
 
-        private static int Convert(Args args)
+        // internal for testing
+        internal static int Convert(Args args)
         {
             var converter = new PdbConverter();
 

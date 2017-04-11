@@ -70,6 +70,15 @@ namespace Microsoft.DiaSymReader.Tools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t specify both /extract and /sourcelink options..
+        /// </summary>
+        internal static string CantSpecifyBothExtractAndSourcelinkOptions {
+            get {
+                return ResourceManager.GetString("CantSpecifyBothExtractAndSourcelinkOptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File &apos;{0}&apos; doesn&apos;t contain an embedded PDB..
         /// </summary>
         internal static string FileDoesntContainEmbeddedPdb {
@@ -120,6 +129,7 @@ namespace Microsoft.DiaSymReader.Tools {
         ////pdb:&lt;path&gt;    Path to the PDB to convert. If not specified explicitly, the PDB referenced by or embedded in the DLL/EXE is used.
         ////out:&lt;path&gt;    Output PDB path.
         ////extract       Extract PDB embedded in the DLL/EXE. 
+        ////sourcelink    Preserve Source Link when converting from Portable PDB to Windows PDB, instead of converting to srcsrv format.
         ///
         ////extract and /pdb are mutually exclusive.
         ///.
