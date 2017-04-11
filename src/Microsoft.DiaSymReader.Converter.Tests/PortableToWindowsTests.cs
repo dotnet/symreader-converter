@@ -990,7 +990,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 </symbols>");
         }
 
-        [Fact]
+        [Fact(Skip = "DSRN16 -- https://github.com/dotnet/symreader-converter/issues/42")]
         public void Convert_SourceLink()
         {
             VerifyWindowsPdb(

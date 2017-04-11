@@ -365,6 +365,7 @@ namespace Microsoft.DiaSymReader
 
         public override void UpdateSignature(Guid guid, uint stamp, int age)
         {
+#if DSRN16 // https://github.com/dotnet/symreader-converter/issues/42
             try
             {
                 _symWriter.UpdateSignature(guid, stamp, age);
@@ -373,10 +374,14 @@ namespace Microsoft.DiaSymReader
             {
                 throw new PdbWritingException(ex);
             }
+#else
+            throw new NotSupportedException();
+#endif
         }
 
         public unsafe override void SetSourceServerData(byte[] data)
         {
+#if DSRN16 // https://github.com/dotnet/symreader-converter/issues/42
             try
             {
                 fixed (byte* dataPtr = &data[0])
@@ -388,10 +393,14 @@ namespace Microsoft.DiaSymReader
             {
                 throw new PdbWritingException(ex);
             }
+#else
+            throw new NotSupportedException();
+#endif
         }
 
         public unsafe override void SetSourceLinkData(byte[] data)
         {
+#if DSRN16 // https://github.com/dotnet/symreader-converter/issues/42
             try
             {
                 fixed (byte* dataPtr = &data[0])
@@ -403,6 +412,9 @@ namespace Microsoft.DiaSymReader
             {
                 throw new PdbWritingException(ex);
             }
+#else
+            throw new NotSupportedException();
+#endif
         }
     }
 }
