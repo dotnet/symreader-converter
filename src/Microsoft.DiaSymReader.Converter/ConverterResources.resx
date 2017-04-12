@@ -228,4 +228,16 @@
   <data name="NoSupportedUrisFoundInSourceLink" xml:space="preserve">
     <value>No supported URIs found in Source Link</value>
   </data>
+  <data name="PdbNotMatchingDebugDirectory" xml:space="preserve">
+    <value>The PDB doesn't match debug directory record in the PE file</value>
+  </data>
+  <data name="InvalidSourceLinkData" xml:space="preserve">
+    <value>Invalid Source Link data</value>
+  </data>
+  <data name="InvalidSourceServerData" xml:space="preserve">
+    <value>Invalid srcsrv data</value>
+  </data>
+  <data name="BothSourceLinkDataAndSourceServerData" xml:space="preserve">
+    <value>PDB contains both Source Link and srcsrv data</value>
+  </data>
 </root>

@@ -130,6 +130,9 @@
     <EmbeddedResource Include="Resources\SourceData.pdb">
       <LogicalName>SourceData.pdb</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SourceLink.Embedded.dll">
+      <LogicalName>SourceLink.Embedded.dll</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\SourceLink.dll">
       <LogicalName>SourceLink.dll</LogicalName>
     </EmbeddedResource>

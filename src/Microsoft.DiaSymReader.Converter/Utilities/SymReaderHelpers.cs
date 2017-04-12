@@ -2,7 +2,10 @@
 
 using System;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -50,6 +53,23 @@ namespace Microsoft.DiaSymReader.Tools
             }
 
             return ImmutableArray.CreateRange(namespaces.Select(n => n.GetName()));
+        }
+
+        public static bool TryReadPdbId(PEReader peReader, out BlobContentId id, out int age)
+        {
+            var codeViewEntry = peReader.ReadDebugDirectory().FirstOrDefault(entry => entry.Type == DebugDirectoryEntryType.CodeView);
+            if (codeViewEntry.DataSize == 0)
+            {
+                id = default(BlobContentId);
+                age = 0;
+                return false;
+            }
+
+            var codeViewData = peReader.ReadCodeViewDebugDirectoryData(codeViewEntry);
+
+            id = new BlobContentId(codeViewData.Guid, codeViewEntry.Stamp);
+            age = codeViewData.Age;
+            return true;
         }
 
         public static void GetWindowsPdbSignature(ImmutableArray<byte> bytes, out Guid guid, out uint timestamp, out int age)

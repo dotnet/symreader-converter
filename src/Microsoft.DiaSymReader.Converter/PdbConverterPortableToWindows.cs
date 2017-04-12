@@ -60,6 +60,16 @@ namespace Microsoft.DiaSymReader.Tools
 
         internal void Convert(PEReader peReader, MetadataReader pdbReader, PdbWriter<TDocumentWriter> pdbWriter, PdbConversionOptions options)
         {
+            if (!SymReaderHelpers.TryReadPdbId(peReader, out var pePdbId, out int peAge))
+            {
+                throw new InvalidDataException(ConverterResources.SpecifiedPEFileHasNoAssociatedPdb);
+            }
+
+            if (!new BlobContentId(pdbReader.DebugMetadataHeader.Id).Equals(pePdbId))
+            {
+                throw new InvalidDataException(ConverterResources.PdbNotMatchingDebugDirectory);
+            }
+
             string vbDefaultNamespace = MetadataUtilities.GetVisualBasicDefaultNamespace(pdbReader);
             bool vbSemantics = vbDefaultNamespace != null;
             string vbDefaultNamespaceImportString = string.IsNullOrEmpty(vbDefaultNamespace) ? null : "*" + vbDefaultNamespace;

@@ -71,6 +71,15 @@ namespace Microsoft.DiaSymReader.Tools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to PDB contains both Source Link and srcsrv data.
+        /// </summary>
+        internal static string BothSourceLinkDataAndSourceServerData {
+            get {
+                return ResourceManager.GetString("BothSourceLinkDataAndSourceServerData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Both StateMachineTypeName custom debug information and imports are specified.
         /// </summary>
         internal static string BothStateMachineTypeNameAndImportsSpecified {
@@ -224,6 +233,24 @@ namespace Microsoft.DiaSymReader.Tools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid Source Link data.
+        /// </summary>
+        internal static string InvalidSourceLinkData {
+            get {
+                return ResourceManager.GetString("InvalidSourceLinkData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid srcsrv data.
+        /// </summary>
+        internal static string InvalidSourceServerData {
+            get {
+                return ResourceManager.GetString("InvalidSourceServerData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid type name specified in StateMachineTypeName custom debug information: {0}.
         /// </summary>
         internal static string InvalidStateMachineTypeName {
@@ -301,6 +328,15 @@ namespace Microsoft.DiaSymReader.Tools {
         internal static string NoSupportedUrisFoundInSourceLink {
             get {
                 return ResourceManager.GetString("NoSupportedUrisFoundInSourceLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The PDB doesn&apos;t match debug directory record in the PE file.
+        /// </summary>
+        internal static string PdbNotMatchingDebugDirectory {
+            get {
+                return ResourceManager.GetString("PdbNotMatchingDebugDirectory", resourceCulture);
             }
         }
         

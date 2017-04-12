@@ -97,6 +97,15 @@ namespace Microsoft.DiaSymReader.Tools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File &apos;{0}&apos; not found or doesn&apos;t match &apos;{1}&apos;..
+        /// </summary>
+        internal static string MatchingPdbNotFound {
+            get {
+                return ResourceManager.GetString("MatchingPdbNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Missing dll/exe path..
         /// </summary>
         internal static string MissingDllExePath {
@@ -111,6 +120,15 @@ namespace Microsoft.DiaSymReader.Tools {
         internal static string MissingValueForOption {
             get {
                 return ResourceManager.GetString("MissingValueForOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File &apos;{0}&apos; is neither associated with PDB nor does it embed PDB..
+        /// </summary>
+        internal static string NoAssociatedOrEmbeddedPdb {
+            get {
+                return ResourceManager.GetString("NoAssociatedOrEmbeddedPdb", resourceCulture);
             }
         }
         
@@ -130,6 +148,7 @@ namespace Microsoft.DiaSymReader.Tools {
         ////out:&lt;path&gt;    Output PDB path.
         ////extract       Extract PDB embedded in the DLL/EXE. 
         ////sourcelink    Preserve Source Link when converting from Portable PDB to Windows PDB, instead of converting to srcsrv format.
+        ////varbose       Print detailed diagnostics.
         ///
         ////extract and /pdb are mutually exclusive.
         ///.

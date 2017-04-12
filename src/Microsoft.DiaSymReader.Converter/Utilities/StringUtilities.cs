@@ -8,7 +8,22 @@ namespace Microsoft.DiaSymReader.Tools
 {
     internal static class StringUtilities
     {
-        internal static string GetLongestCommonPrefix(IEnumerable<string> strings)
+        public static int GetLongestCommonSuffixLength(string left, string right)
+        {
+            int n = Math.Min(left.Length, right.Length);
+
+            for (int i = 0; i < n - 1; i++)
+            {
+                if (left[left.Length - i - 1] != right[right.Length - i - 1])
+                {
+                    return i;
+                }
+            }
+
+            return n;
+        }
+
+        public static string GetLongestCommonPrefix(IEnumerable<string> strings)
         {
             int prefixLength = 0;
             string firstString = null;
@@ -37,7 +52,7 @@ namespace Microsoft.DiaSymReader.Tools
             return firstString?.Substring(0, prefixLength) ?? string.Empty;
         }
 
-        private static int IndexOfFirstDifference(string left, string right, int length)
+        public static int IndexOfFirstDifference(string left, string right, int length)
         {
             for (int i = 0, n = Math.Min(left.Length, length); i < n; i++)
             {

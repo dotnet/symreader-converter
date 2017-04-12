@@ -1,6 +1,10 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+using System;
 using System.IO;
+using System.Linq;
+using System.Reflection.Metadata;
+using System.Text;
 using Microsoft.CodeAnalysis.Test.Utilities;
 using Roslyn.Test.Utilities;
 using Xunit;
@@ -62,20 +66,20 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         }
 
         [Fact]
-        public void EndToEnd1()
+        public void EndToEnd_PortableToWindows_ExplicitPath_SourceLinkConversion()
         {
             var dir = _temp.CreateDirectory();
             var pe = dir.CreateFile("SourceLink.dll").WriteAllBytes(TestResources.SourceLink.PortableDll);
             var pdb = dir.CreateFile("SourceLink.x.pdb").WriteAllBytes(TestResources.SourceLink.PortablePdb);
             var outPdbPath = Path.Combine(dir.Path, "SourceLink.pdb2");
 
-            Assert.Equal(0, Pdb2Pdb.Convert(new Pdb2Pdb.Args(
+            Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
                 pdbFilePathOpt: pdb.Path,
                 outPdbFilePath: outPdbPath,
                 options: PdbConversionOptions.Default,
                 extract: false,
-                verbose: false)));
+                verbose: false));
 
             using (var peStream = File.OpenRead(pe.Path))
             using (var pdbStream = File.OpenRead(outPdbPath))
@@ -109,20 +113,20 @@ SRCSRV: end ------------------------------------------------", actual);
         }
 
         [Fact]
-        public void EndToEnd2()
+        public void EndToEnd_PortableToWindows_ImplicitPath_SuppressSourceLinkConversion()
         {
             var dir = _temp.CreateDirectory();
             var pe = dir.CreateFile("SourceLink.dll").WriteAllBytes(TestResources.SourceLink.PortableDll);
             dir.CreateFile("SourceLink.pdb").WriteAllBytes(TestResources.SourceLink.PortablePdb);
-            var outPdb = dir.CreateFile("Scopes.converted.pdb").WriteAllText("dummy");
+            var outPdb = dir.CreateFile("SourceLink.converted.pdb").WriteAllText("dummy");
 
-            Assert.Equal(0, Pdb2Pdb.Convert(new Pdb2Pdb.Args(
+            Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
                 pdbFilePathOpt: null,
                 outPdbFilePath: outPdb.Path,
                 options: PdbConversionOptions.SuppressSourceLinkConversion,
                 extract: false,
-                verbose: false)));
+                verbose: false));
 
             using (var peStream = File.OpenRead(pe.Path))
             using (var pdbStream = File.OpenRead(outPdb.Path))
@@ -130,6 +134,114 @@ SRCSRV: end ------------------------------------------------", actual);
                 var symReader = SymReaderFactory.CreateWindowsPdbReader(pdbStream);
                 AssertEx.Equal(TestResources.SourceLink.SourceLinkJson, symReader.GetRawSourceLinkData());
                 Assert.Null(symReader.GetSourceServerData());
+            }
+        }
+
+        [Fact]
+        public void EndToEnd_EmbeddedToWindows_SuppressSourceLinkConversion()
+        {
+            var dir = _temp.CreateDirectory();
+            var pe = dir.CreateFile("SourceLink.Embedded.dll").WriteAllBytes(TestResources.SourceLink.EmbeddedDll);
+            var outPdb = dir.CreateFile("SourceLink.converted.pdb").WriteAllText("dummy");
+
+            Pdb2Pdb.Convert(new Pdb2Pdb.Args(
+                peFilePath: pe.Path,
+                pdbFilePathOpt: null,
+                outPdbFilePath: outPdb.Path,
+                options: PdbConversionOptions.SuppressSourceLinkConversion,
+                extract: false,
+                verbose: false));
+
+            using (var peStream = File.OpenRead(pe.Path))
+            using (var pdbStream = File.OpenRead(outPdb.Path))
+            {
+                var symReader = SymReaderFactory.CreateWindowsPdbReader(pdbStream);
+                AssertEx.Equal(TestResources.SourceLink.SourceLinkJson, symReader.GetRawSourceLinkData());
+                Assert.Null(symReader.GetSourceServerData());
+            }
+        }
+
+        [Fact]
+        public void EndToEnd_EmbeddedToWindows_Extraction()
+        {
+            var dir = _temp.CreateDirectory();
+            var pe = dir.CreateFile("SourceLink.Embedded.dll").WriteAllBytes(TestResources.SourceLink.EmbeddedDll);
+            var outPdb = dir.CreateFile("SourceLink.extracted.pdb").WriteAllText("dummy");
+
+            Pdb2Pdb.Convert(new Pdb2Pdb.Args(
+                peFilePath: pe.Path,
+                pdbFilePathOpt: null,
+                outPdbFilePath: outPdb.Path,
+                options: PdbConversionOptions.Default,
+                extract: true,
+                verbose: false));
+
+            AssertEx.Equal(TestResources.SourceLink.PortablePdb, File.ReadAllBytes(outPdb.Path));
+        }
+
+        [Fact]
+        public void EndToEnd_Extraction_Error()
+        {
+            var dir = _temp.CreateDirectory();
+            var pe = dir.CreateFile("SourceData.dll").WriteAllBytes(TestResources.SourceData.WindowsDll);
+            var outPdb = dir.CreateFile("SourceLink.extracted.pdb").WriteAllText("dummy");
+
+            Assert.Throws<IOException>(() =>
+                Pdb2Pdb.Convert(new Pdb2Pdb.Args(
+                    peFilePath: pe.Path,
+                    pdbFilePathOpt: null,
+                    outPdbFilePath: outPdb.Path,
+                    options: PdbConversionOptions.Default,
+                    extract: true,
+                    verbose: false)));
+
+            Assert.Equal("dummy", outPdb.ReadAllText());
+        }
+
+        [Fact]
+        public void EndToEnd_WindowsToPortable_ImplicitPath()
+        {
+            var dir = _temp.CreateDirectory();
+            var pe = dir.CreateFile("SourceData.dll").WriteAllBytes(TestResources.SourceData.WindowsDll);
+            dir.CreateFile("SourceData.pdb").WriteAllBytes(TestResources.SourceData.WindowsPdb);
+            var outPdb = dir.CreateFile("SourceLink.pdb").WriteAllText("dummy");
+
+            Pdb2Pdb.Convert(new Pdb2Pdb.Args(
+                peFilePath: pe.Path,
+                pdbFilePathOpt: null,
+                outPdbFilePath: outPdb.Path,
+                options: PdbConversionOptions.Default,
+                extract: false,
+                verbose: false));
+
+            using (var provider = MetadataReaderProvider.FromPortablePdbStream(File.OpenRead(outPdb.Path)))
+            {
+                var sourceLinkCdiGuid = new Guid("CC110556-A091-4D38-9FEC-25AB9A351A6A");
+
+                var mdReader = provider.GetMetadataReader();
+                var sourceLink = from cdiHandle in mdReader.CustomDebugInformation
+                                 let cdi = mdReader.GetCustomDebugInformation(cdiHandle)
+                                 where mdReader.GetGuid(cdi.Kind) == sourceLinkCdiGuid
+                                 select Encoding.UTF8.GetString(mdReader.GetBlobBytes(cdi.Value));
+
+                AssertEx.AssertLinesEqual(@"
+{
+""documents"": {
+    ""C:\Documents.cs"": ""http://server/3/Documents.cs.g"",
+    ""C:\a\b\c\d\1.cs"": ""http://server/1/a/b/c/d/1.cs"",
+    ""C:\a\b\c\D\2.cs"": ""http://server/1/a/b/c/D/2.cs"",
+    ""C:\a\b\C\d\3.cs"": ""http://server/1/a/b/C/d/3.cs"",
+    ""C:\a\b\c\d\x.cs"": ""http://server/1/a/b/c/d/x.cs"",
+    ""C:\A\b\c\x.cs"": ""http://server/1/a/b/c/x.cs"",
+    ""C:\a\b\x.cs"": ""http://server/1/a/b/x.cs"",
+    ""C:\a\B\3.cs"": ""http://server/1/a/B/3.cs"",
+    ""C:\a\B\c\4.cs"": ""http://server/1/a/B/c/4.cs"",
+    "":6.cs"": ""http://server/4/:6.cs"",
+    ""C:\a\b\X.cs"": ""http://server/1/a/b/X.cs"",
+    ""C:\a\B\x.cs"": ""http://server/1/a/B/x.cs""
+  }
+}
+", sourceLink.Single());
             }
         }
     }

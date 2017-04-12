@@ -1064,7 +1064,10 @@ C:\a\b\X.cs*1/a/b/X.cs
 C:\a\B\x.cs*1/a/B/x.cs
 SRCSRV: end ------------------------------------------------]]></srcsvr>
 </symbols>
-");
+", new[]
+{
+    new PdbDiagnostic(PdbDiagnosticId.UnmappedDocumentName, 0, new[] { @"C:\*\5.cs" })
+});
         }
     }
 }
