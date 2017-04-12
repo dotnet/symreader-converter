@@ -32,6 +32,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             Assert.Null(args.PdbFilePathOpt);
             Assert.Equal("a.pdb2", args.OutPdbFilePath);
             Assert.False(args.Extract);
+            Assert.False(args.Verbose);
             Assert.Equal(PdbConversionOptions.Default, args.Options);
 
             args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/extract", "/out", "b.pdb" });
@@ -39,6 +40,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             Assert.Null(args.PdbFilePathOpt);
             Assert.Equal("b.pdb", args.OutPdbFilePath);
             Assert.True(args.Extract);
+            Assert.False(args.Verbose);
             Assert.Equal(PdbConversionOptions.Default, args.Options);
 
             args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/sourcelink", "/pdb", "b.pdb", "/out", "c.pdb" });
@@ -46,13 +48,15 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             Assert.Equal("b.pdb", args.PdbFilePathOpt);
             Assert.Equal("c.pdb", args.OutPdbFilePath);
             Assert.False(args.Extract);
+            Assert.False(args.Verbose);
             Assert.Equal(PdbConversionOptions.SuppressSourceLinkConversion, args.Options);
 
-            args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/out", "c.pdb" });
+            args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/out", "c.pdb", "/verbose" });
             Assert.Equal("a.dll", args.PEFilePath);
             Assert.Null(args.PdbFilePathOpt);
             Assert.Equal("c.pdb", args.OutPdbFilePath);
             Assert.False(args.Extract);
+            Assert.True(args.Verbose);
             Assert.Equal(PdbConversionOptions.Default, args.Options);
         }
 
