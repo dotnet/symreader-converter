@@ -8,12 +8,15 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.DiaSymReader.Tools
 {
-    public class PdbConverter
+    public sealed class PdbConverter
     {
         public static readonly PdbConverter Default = new PdbConverter();
 
-        public PdbConverter()
+        private readonly Action<PdbDiagnostic> _diagnosticReporterOpt;
+
+        public PdbConverter(Action<PdbDiagnostic> diagnosticReporter = null)
         {
+            _diagnosticReporterOpt = diagnosticReporter;
         }
 
         /// <exception cref="ArgumentException"/>
@@ -72,7 +75,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             try
             {
-                new PdbConverterWindowsToPortable().Convert(peReader, sourcePdbStream, targetPdbStream);
+                new PdbConverterWindowsToPortable(_diagnosticReporterOpt).Convert(peReader, sourcePdbStream, targetPdbStream);
             }
             catch (COMException e)
             {
@@ -166,7 +169,7 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
         public void ConvertPortableToWindows<TDocumentWriter>(PEReader peReader, MetadataReader pdbReader, PdbWriter<TDocumentWriter> pdbWriter, PdbConversionOptions options)
         {
-            new PdbConverterPortableToWindows<TDocumentWriter>().Convert(
+            new PdbConverterPortableToWindows<TDocumentWriter>(_diagnosticReporterOpt).Convert(
                 peReader ?? throw new ArgumentNullException(nameof(peReader)), 
                 pdbReader ?? throw new ArgumentNullException(nameof(pdbReader)),
                 pdbWriter ?? throw new ArgumentNullException(nameof(pdbWriter)), 

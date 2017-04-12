@@ -31,8 +31,16 @@ namespace Microsoft.DiaSymReader.Tools
         private static readonly Guid s_visualBasicGuid = new Guid("3a12d0b8-c26c-11d0-b442-00a0244a1dd2");
         private static readonly Guid s_fsharpGuid = new Guid("ab4f38c9-b6e6-43ba-be3b-58080b2ccce3");
 
-        public PdbConverterPortableToWindows()
+        private readonly Action<PdbDiagnostic> _diagnosticReporterOpt;
+
+        public PdbConverterPortableToWindows(Action<PdbDiagnostic> diagnosticReporterOpt)
         {
+            _diagnosticReporterOpt = diagnosticReporterOpt;
+        }
+
+        private void ReportDiagnostic(PdbDiagnosticId id, int token, params object[] args)
+        {
+            _diagnosticReporterOpt?.Invoke(new PdbDiagnostic(id, token, args));
         }
 
         /// <summary>
@@ -160,7 +168,7 @@ namespace Microsoft.DiaSymReader.Tools
                     // kickoff methods don't have any scopes emitted to Windows PDBs
                     if (methodBodyOpt == null)
                     {
-                        // TODO: report warning - scope associated with method that has no body
+                        ReportDiagnostic(PdbDiagnosticId.MethodAssociatedWithLocalScopeHasNoBody, MetadataTokens.GetToken(localScopeEnumerator.Current));
                     }
                     else if (!isKickOffMethod)
                     {
@@ -230,13 +238,13 @@ namespace Microsoft.DiaSymReader.Tools
 
                             if (name.Length > MaxEntityNameLength)
                             {
-                                // TODO: report warning
+                                ReportDiagnostic(PdbDiagnosticId.LocalConstantNameTooLong, MetadataTokens.GetToken(localVariableHandle));
                                 continue;
                             }
 
                             if (methodBodyOpt.LocalSignature.IsNil)
                             {
-                                // TODO: report warning
+                                ReportDiagnostic(PdbDiagnosticId.MethodContainingLocalVariablesHasNoLocalSignature, methodToken);
                                 continue;
                             }
 
@@ -264,7 +272,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                             if (name.Length > MaxEntityNameLength)
                             {
-                                // TODO: report warning
+                                ReportDiagnostic(PdbDiagnosticId.LocalConstantNameTooLong, MetadataTokens.GetToken(localConstantHandle));
                                 continue;
                             }
 
@@ -301,14 +309,14 @@ namespace Microsoft.DiaSymReader.Tools
                 CloseOpenScopes(int.MaxValue);
                 if (openScopeEndOffsets.Count > 0)
                 {
-                    // TODO: report warning: scope range exceeds size of the method body
+                    ReportDiagnostic(PdbDiagnosticId.LocalScopeRangesNestingIsInvalid, methodToken);
                     openScopeEndOffsets.Clear();
                 }
 
                 if (!methodDebugInfo.SequencePointsBlob.IsNil)
                 {
                     LazyOpenMethod();
-                    WriteSequencePoints(pdbWriter, documentWriters, symSequencePointBuilder, methodDebugInfo.GetSequencePoints());
+                    WriteSequencePoints(pdbWriter, documentWriters, symSequencePointBuilder, methodDebugInfo.GetSequencePoints(), methodToken);
                 }
 
                 // async method data:
@@ -420,7 +428,7 @@ namespace Microsoft.DiaSymReader.Tools
             pdbWriter.UpdateSignature(guid, stamp, age);
 #endif
         }
-
+               
         private static string GetMethodNamespace(MetadataReader metadataReader, MethodDefinition methodDef)
         {
             var typeDefHandle = methodDef.GetDeclaringType();
@@ -520,7 +528,7 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        private static void AddImportStrings(
+        private void AddImportStrings(
             List<string> importStrings,
             List<int> importGroups,
             HashSet<string> declaredExternAliases,
@@ -549,7 +557,7 @@ namespace Microsoft.DiaSymReader.Tools
                 int importStringCount = 0;
                 foreach (var import in importScope.GetImports())
                 {
-                    var importString = TryEncodeImport(pdbReader, metadataModel, import, declaredExternAliases, aliasedAssemblyRefs, isProjectLevel, vbSemantics);
+                    var importString = TryEncodeImport(pdbReader, metadataModel, importScopeHandle, import, declaredExternAliases, aliasedAssemblyRefs, isProjectLevel, vbSemantics);
                     if (importString == null)
                     {
                         // diagnostic already reported if applicable
@@ -558,7 +566,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                     if (importString.Length > MaxEntityNameLength)
                     {
-                        // TODO: warning
+                        ReportDiagnostic(PdbDiagnosticId.LocalScopeRangesNestingIsInvalid, MetadataTokens.GetToken(importScopeHandle), importString);
                         continue;
                     }
 
@@ -620,9 +628,10 @@ namespace Microsoft.DiaSymReader.Tools
                     select (import.TargetAssembly, pdbReader.GetStringUTF8(import.Alias))).ToImmutableArray();
         }
 
-        private static string TryEncodeImport(
+        private string TryEncodeImport(
             MetadataReader pdbReader, 
             MetadataModel metadataModel, 
+            ImportScopeHandle importScopeHandle,
             ImportDefinition import,
             HashSet<string> declaredExternAliases,
             ImmutableArray<(AssemblyReferenceHandle, string)> aliasedAssemblyRefs,
@@ -649,7 +658,7 @@ namespace Microsoft.DiaSymReader.Tools
                         typeName = metadataModel.GetSerializedTypeName(import.TargetType);
                         if (typeName == null)
                         {
-                            // TODO: report error: unsupported type
+                            ReportDiagnostic(PdbDiagnosticId.UnsupportedImportType, MetadataTokens.GetToken(importScopeHandle), MetadataTokens.GetToken(import.TargetType));
                             return null;
                         }
 
@@ -667,7 +676,7 @@ namespace Microsoft.DiaSymReader.Tools
                         typeName = metadataModel.GetSerializedTypeName(import.TargetType);
                         if (typeName == null)
                         {
-                            // TODO: report error: unsupported type
+                            ReportDiagnostic(PdbDiagnosticId.UnsupportedImportType, MetadataTokens.GetToken(importScopeHandle), MetadataTokens.GetToken(import.TargetType));
                             return null;
                         }
 
@@ -719,7 +728,7 @@ namespace Microsoft.DiaSymReader.Tools
                     string assemblyRefAlias = TryGetAssemblyReferenceAlias(import.TargetAssembly, declaredExternAliases, aliasedAssemblyRefs);
                     if (assemblyRefAlias == null)
                     {
-                        // TODO: report error
+                        ReportDiagnostic(PdbDiagnosticId.UndefinedAssemblyReferenceAlias, MetadataTokens.GetToken(importScopeHandle), MetadataTokens.GetToken(import.TargetAssembly));
                         return null;
                     }
 
@@ -739,7 +748,7 @@ namespace Microsoft.DiaSymReader.Tools
                     return null;
 
                 default:
-                    // TODO: report error
+                    ReportDiagnostic(PdbDiagnosticId.UnknownImportDefinitionKind, MetadataTokens.GetToken(importScopeHandle), (int)import.Kind);
                     return null;
             }
         }
@@ -765,11 +774,12 @@ namespace Microsoft.DiaSymReader.Tools
             return null;
         }
 
-        private static void WriteSequencePoints(
+        private void WriteSequencePoints(
             PdbWriter<TDocumentWriter> pdbWriter, 
             ArrayBuilder<TDocumentWriter> documentWriters, 
             SequencePointsBuilder symSequencePointBuilder, 
-            SequencePointCollection sequencePoints)
+            SequencePointCollection sequencePoints,
+            int methodToken)
         {
             int currentDocumentWriterIndex = -1;
             foreach (var sequencePoint in sequencePoints)
@@ -777,8 +787,8 @@ namespace Microsoft.DiaSymReader.Tools
                 int documentWriterIndex = MetadataTokens.GetRowNumber(sequencePoint.Document) - 1;
                 if (documentWriterIndex > documentWriters.Count)
                 {
-                    // TODO: message
-                    throw new BadImageFormatException();
+                    ReportDiagnostic(PdbDiagnosticId.InvalidSequencePointDocument, methodToken, MetadataTokens.GetToken(sequencePoint.Document));
+                    continue;
                 }
 
                 if (currentDocumentWriterIndex != documentWriterIndex)
@@ -807,53 +817,53 @@ namespace Microsoft.DiaSymReader.Tools
 
         // Avoid loading JSON dependency if not needed.
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void ConvertSourceServerData(string sourceLink, PdbWriter<TDocumentWriter> pdbWriter, IReadOnlyCollection<string> documentNames)
+        private void ConvertSourceServerData(string sourceLink, PdbWriter<TDocumentWriter> pdbWriter, IReadOnlyCollection<string> documentNames)
         {
             var builder = new StringBuilder();
 
             var map = SourceLinkMap.Parse(sourceLink);
             var mapping = new List<(string name, string uri)>();
 
-            string commonProtocol = null;
-            foreach (var documentName in documentNames)
+            string commonScheme = null;
+            foreach (string documentName in documentNames)
             {
                 string uri = map.GetUri(documentName);
                 if (uri == null)
                 {
-                    // TODO: report error
+                    ReportDiagnostic(PdbDiagnosticId.UnmappedDocumentName, 0, documentName);
                     continue;
                 }
 
-                string protocol;
+                string scheme;
                 if (uri.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
                 {
-                    protocol = "http";
+                    scheme = "http";
                 }
                 else if (uri.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
                 {
-                    protocol = "https";
+                    scheme = "https";
                 }
                 else
                 {
-                    // TODO: report error
+                    ReportDiagnostic(PdbDiagnosticId.UriSchemeIsNotHttp, 0, uri);
                     continue;
                 }
 
-                if (commonProtocol == null)
+                if (commonScheme == null)
                 {
-                    commonProtocol = protocol;
+                    commonScheme = scheme;
                 }
-                else if (commonProtocol != protocol)
+                else if (commonScheme != scheme)
                 {
-                    commonProtocol = "http";
+                    commonScheme = "http";
                 }
 
                 mapping.Add((documentName, uri));
             }
 
-            if (commonProtocol == null)
+            if (commonScheme == null)
             {
-                // no http/https uris found
+                ReportDiagnostic(PdbDiagnosticId.NoSupportedUrisFoundInSourceLink, 0);
                 return;
             }
 
@@ -866,7 +876,7 @@ namespace Microsoft.DiaSymReader.Tools
             builder.Append(commonPrefix);
             builder.Append("%var2%\r\n");
             builder.Append("SRCSRVVERCTRL=");
-            builder.Append(commonProtocol);
+            builder.Append(commonScheme);
             builder.Append("\r\n");
             builder.Append("SRCSRVTRG=%RAWURL%\r\n");
             builder.Append("SRCSRV: source files ---------------------------------------\r\n");

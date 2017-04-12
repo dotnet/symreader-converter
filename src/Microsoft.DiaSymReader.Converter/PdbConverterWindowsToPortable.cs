@@ -19,8 +19,16 @@ namespace Microsoft.DiaSymReader.Tools
 {
     internal sealed partial class PdbConverterWindowsToPortable
     {
-        public PdbConverterWindowsToPortable()
+        private readonly Action<PdbDiagnostic> _diagnosticReporterOpt;
+
+        public PdbConverterWindowsToPortable(Action<PdbDiagnostic> diagnosticReporterOpt)
         {
+            _diagnosticReporterOpt = diagnosticReporterOpt;
+        }
+
+        private void ReportDiagnostic(PdbDiagnosticId id, int token, params object[] args)
+        {
+            _diagnosticReporterOpt?.Invoke(new PdbDiagnostic(id, token, args));
         }
 
         /// <exception cref="COMException"/>
@@ -128,6 +136,10 @@ namespace Microsoft.DiaSymReader.Tools
                                     vbFileLevelImports.Add(import);
                                 }
                             }
+                            else
+                            {
+                                ReportDiagnostic(PdbDiagnosticId.InvalidImportStringFormat, methodToken, importString);
+                            }
                         }
 
                         importGroups = ImmutableArray.Create(vbFileLevelImports.ToImmutableAndFree());
@@ -160,7 +172,7 @@ namespace Microsoft.DiaSymReader.Tools
                     }
                     else
                     {
-                        importGroups = ImmutableArray.CreateRange(importStringGroups.Select(g => ParseImportStrings(g, vbSemantics: false)));
+                        importGroups = ImmutableArray.CreateRange(importStringGroups.Select(g => ParseCSharpImportStrings(g, methodToken)));
                     }
                 }
 
@@ -271,28 +283,7 @@ namespace Microsoft.DiaSymReader.Tools
                                 break;
 
                             case CustomDebugInfoKind.ForwardMethodInfo:
-                                if (importScope.IsNil)
-                                {
-                                    int forwardToMethodRowId = MetadataUtilities.GetRowId(CustomDebugInfoReader.DecodeForwardRecord(record.Data));
-                                    if (forwardToMethodRowId >= 1 && forwardToMethodRowId <= importScopesByMethod.Count)
-                                    {
-                                        importScope = importScopesByMethod[forwardToMethodRowId - 1];
-                                    }
-                                    else
-                                    {
-                                        // TODO: _diagnosticsOpt.Error(ErrorCode.InvalidForwardMethodInfo, methodToken);
-                                    }
-
-                                    if (importScope.IsNil)
-                                    {
-                                        // TODO: _diagnosticsOpt.Error(ErrorCode.ForwardedToMethodInfoWithNoScope, methodToken);
-                                    }
-                                }
-                                else
-                                {
-                                    // TODO: _diagnosticsOpt.Error(ErrorCode.BothForwardMethodInfoAndImportsSpecified, methodToken);
-                                }
-
+                                // already processed by GetCSharpGroupedImportStrings
                                 break;
 
                             case CustomDebugInfoKind.StateMachineTypeName:
@@ -306,12 +297,12 @@ namespace Microsoft.DiaSymReader.Tools
                                     }
                                     else
                                     {
-                                        // TODO: _diagnosticsOpt.Error(ErrorCode.InvalidStateMachineTypeName, methodToken);
+                                        ReportDiagnostic(PdbDiagnosticId.InvalidStateMachineTypeName, methodToken, nonGenericName);
                                     }
                                 }
                                 else
                                 {
-                                    // TODO: _diagnosticsOpt.Error(ErrorCode.KickoffMethodWithImports, methodToken);
+                                    ReportDiagnostic(PdbDiagnosticId.BothStateMachineTypeNameAndImportsSpecified, methodToken);
                                 }
 
                                 break;
@@ -355,13 +346,13 @@ namespace Microsoft.DiaSymReader.Tools
 
                 if (childScopes.Length > 0)
                 {
-                    BuildDynamicLocalMaps(dynamicVariables, dynamicConstants, dynamicLocals);
-                    BuildTupleLocalMaps(tupleVariables, tupleConstants, tupleLocals);
+                    BuildDynamicLocalMaps(dynamicVariables, dynamicConstants, dynamicLocals, methodToken);
+                    BuildTupleLocalMaps(tupleVariables, tupleConstants, tupleLocals, methodToken);
 
                     Debug.Assert(scopes.Count == 0);
                     foreach (var child in childScopes)
                     {
-                        AddScopesRecursive(scopes, child, vbSemantics, isTopScope: true);
+                        AddScopesRecursive(scopes, child, methodToken, vbSemantics, isTopScope: true);
                     }
 
                     foreach (var scope in scopes)
@@ -408,10 +399,11 @@ namespace Microsoft.DiaSymReader.Tools
             blobBuilder.WriteContentTo(targetPdbStream);
         }
 
-        private static void BuildDynamicLocalMaps(
+        private void BuildDynamicLocalMaps(
             Dictionary<int, DynamicLocalInfo> variables, 
             Dictionary<string, List<DynamicLocalInfo>> constants, 
-            ImmutableArray<DynamicLocalInfo> infos)
+            ImmutableArray<DynamicLocalInfo> infos,
+            int methodToken)
         {
             Debug.Assert(variables.Count == 0);
             Debug.Assert(constants.Count == 0);
@@ -431,21 +423,22 @@ namespace Microsoft.DiaSymReader.Tools
                         constants.Add(info.LocalName, new List<DynamicLocalInfo> { info });
                     }
                 }
-                else if (!variables.ContainsKey(info.SlotId))
+                else if (variables.ContainsKey(info.SlotId))
                 {
-                    variables.Add(info.SlotId, info);
+                    ReportDiagnostic(PdbDiagnosticId.DuplicateDynamicLocals, methodToken, info.SlotId);
                 }
                 else
                 {
-                    // TODO: warning
+                    variables.Add(info.SlotId, info);
                 }
             }
         }
 
-        private static void BuildTupleLocalMaps(
+        private void BuildTupleLocalMaps(
             Dictionary<int, TupleElementNamesInfo> variables,
             Dictionary<(string name, int scopeStart, int scopeEnd), TupleElementNamesInfo> constants,
-            ImmutableArray<TupleElementNamesInfo> infos)
+            ImmutableArray<TupleElementNamesInfo> infos,
+            int methodToken)
         {
             Debug.Assert(variables.Count == 0);
             Debug.Assert(constants.Count == 0);
@@ -453,11 +446,26 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 if (info.SlotIndex >= 0)
                 {
-                    variables.Add(info.SlotIndex, info);
+                    if (variables.ContainsKey(info.SlotIndex))
+                    {
+                        ReportDiagnostic(PdbDiagnosticId.DuplicateTupleElementNamesForSlot, methodToken, info.SlotIndex);
+                    }
+                    else
+                    {
+                        variables.Add(info.SlotIndex, info);
+                    }
                 }
                 else
                 {
-                    constants.Add((info.LocalName, info.ScopeStart, info.ScopeEnd), info);
+                    var key = (info.LocalName, info.ScopeStart, info.ScopeEnd);
+                    if (constants.ContainsKey(key))
+                    {
+                        ReportDiagnostic(PdbDiagnosticId.DuplicateTupleElementNamesForConstant, methodToken, info.LocalName, info.ScopeStart, info.ScopeEnd);
+                    }
+                    else
+                    {
+                        constants.Add(key, info);
+                    }
                 }
             }
         }
@@ -507,7 +515,6 @@ namespace Microsoft.DiaSymReader.Tools
                 return true;
             }
 
-            // TODO: report warning
             import = default(ImportInfo);
             return false;
         }
@@ -543,7 +550,7 @@ namespace Microsoft.DiaSymReader.Tools
             throw new InvalidDataException(ConverterResources.SpecifiedPEFileHasNoAssociatedPdb);
         }
 
-        private static MethodDefinitionHandle ReadEntryPointHandle(ISymUnmanagedReader symReader)
+        private MethodDefinitionHandle ReadEntryPointHandle(ISymUnmanagedReader symReader)
         {
             var handle = MetadataTokens.EntityHandle(symReader.GetUserEntryPoint());
             if (handle.IsNil)
@@ -553,7 +560,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             if (handle.Kind != HandleKind.MethodDefinition)
             {
-                // TODO: warning ConverterResources.InvalidUserEntryPointInSourcePdb;
+                ReportDiagnostic(PdbDiagnosticId.InvalidEntryPointToken, 0, MetadataTokens.GetToken(handle));
                 return default(MethodDefinitionHandle);
             }
 
@@ -602,15 +609,18 @@ namespace Microsoft.DiaSymReader.Tools
             return parentHandle;
         }
 
-        private static ImmutableArray<ImportInfo> ParseImportStrings(ImmutableArray<string> importStrings, bool vbSemantics)
+        private ImmutableArray<ImportInfo> ParseCSharpImportStrings(ImmutableArray<string> importStrings, int methodToken)
         {
             var builder = ArrayBuilder<ImportInfo>.GetInstance();
             foreach (var importString in importStrings)
             {
-                ImportInfo import;
-                if (TryParseImportString(importString, out import, vbSemantics))
+                if (TryParseImportString(importString, out var import, vbSemantics: false))
                 {
                     builder.Add(import);
+                }
+                else
+                {
+                    ReportDiagnostic(PdbDiagnosticId.InvalidImportStringFormat, methodToken, importString);
                 }
             }
 
@@ -758,21 +768,35 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        private static void AddScopesRecursive(
+        private void AddScopesRecursive(
             List<(int, int, ISymUnmanagedVariable[], ISymUnmanagedConstant[])> builder,
             ISymUnmanagedScope symScope, 
+            int methodToken,
             bool vbSemantics,
             bool isTopScope)
         {
-            // VB Windows PDB encode the range as end-inclusive, 
-            // all Portable PDBs use end-exclusive encoding.
-            int start = symScope.GetStartOffset();
-            int end = symScope.GetEndOffset() + (vbSemantics && !isTopScope ? 1 : 0);
+            int start, end;
+            ISymUnmanagedVariable[] symLocals;
+            ISymUnmanagedConstant[] symConstants;
+            ISymUnmanagedScope[] symChildScopes;
+            
+            try
+            {
+                // VB Windows PDB encode the range as end-inclusive, 
+                // all Portable PDBs use end-exclusive encoding.
+                start = symScope.GetStartOffset();
+                end = symScope.GetEndOffset() + (vbSemantics && !isTopScope ? 1 : 0);
 
-            // TODO: Once https://github.com/dotnet/roslyn/issues/8473 is implemented, convert to State Machine Hoisted Variable Scopes CDI
-            var symLocals = symScope.GetLocals().Where(l => !l.GetName().StartsWith("$VB$ResumableLocal_")).ToArray();
-            var symConstants = symScope.GetConstants();
-            var symChildScopes = symScope.GetChildren();
+                // TODO: Once https://github.com/dotnet/roslyn/issues/8473 is implemented, convert to State Machine Hoisted Variable Scopes CDI
+                symLocals = symScope.GetLocals().Where(l => !l.GetName().StartsWith("$VB$ResumableLocal_")).ToArray();
+                symConstants = symScope.GetConstants();
+                symChildScopes = symScope.GetChildren();
+            }
+            catch (Exception)
+            {
+                ReportDiagnostic(PdbDiagnosticId.InvalidLocalScope, methodToken);
+                return;
+            }
 
             builder.Add((start, end, symLocals, symConstants));
 
@@ -780,20 +804,30 @@ namespace Microsoft.DiaSymReader.Tools
             int previousChildScopeEnd = start;
             foreach (ISymUnmanagedScope child in symChildScopes)
             {
-                int childScopeStart = child.GetStartOffset();
-                int childScopeEnd = child.GetEndOffset();
+                int childScopeStart; 
+                int childScopeEnd;
+
+                try
+                {
+                    childScopeStart = child.GetStartOffset();
+                    childScopeEnd = child.GetEndOffset();
+                }
+                catch (Exception)
+                {
+                    ReportDiagnostic(PdbDiagnosticId.InvalidLocalScope, methodToken);
+                    continue;
+                }
 
                 // scopes are properly nested:
                 if (childScopeStart < previousChildScopeEnd || childScopeEnd > end)
                 {
-                    // TODO: loc/warning
-                    // "Invalid scope IL offset range: [{childScopeStart}, {childScopeEnd})."
+                    ReportDiagnostic(PdbDiagnosticId.InvalidScopeILOffsetRange, methodToken, childScopeStart, childScopeEnd);
                     break;
                 }
 
                 previousChildScopeEnd = childScopeEnd;
 
-                AddScopesRecursive(builder, child, vbSemantics, isTopScope: false);
+                AddScopesRecursive(builder, child, methodToken, vbSemantics, isTopScope: false);
             }
 
             if (!isTopScope && symLocals.Length == 0 && symConstants.Length == 0 && builder.Count == scopeCountBeforeChildren)
@@ -803,7 +837,7 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        private static void SerializeScope(
+        private void SerializeScope(
             MetadataBuilder metadataBuilder,
             MetadataModel metadataModel,
             MethodDefinitionHandle methodHandle,
@@ -855,7 +889,7 @@ namespace Microsoft.DiaSymReader.Tools
                 }
                 catch (Exception)
                 {
-                    // TODO: report warning: bad variable
+                    ReportDiagnostic(PdbDiagnosticId.InvalidLocalConstantData, MetadataTokens.GetToken(methodHandle));
                     continue;
                 }
 
@@ -896,7 +930,7 @@ namespace Microsoft.DiaSymReader.Tools
                 }
                 catch (Exception)
                 {
-                    // TODO: report warning: bad constant
+                    ReportDiagnostic(PdbDiagnosticId.InvalidLocalConstantData, MetadataTokens.GetToken(methodHandle));
                     continue;
                 }
 
@@ -907,7 +941,7 @@ namespace Microsoft.DiaSymReader.Tools
                 }
                 catch (BadImageFormatException)
                 {
-                    // TODO: report warning: bad constant signature
+                    ReportDiagnostic(PdbDiagnosticId.InvalidLocalConstantSignature, MetadataTokens.GetToken(methodHandle), name);
                     continue;
                 }
 

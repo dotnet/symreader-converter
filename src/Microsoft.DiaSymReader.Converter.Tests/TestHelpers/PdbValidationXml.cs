@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -39,7 +40,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             var portablePdbStream = new MemoryStream(portable.Pdb);
             var convertedWindowsPdbStream = new MemoryStream();
 
-            new PdbConverter().ConvertPortableToWindows(portablePEStream, portablePdbStream, convertedWindowsPdbStream);
+            var converter = new PdbConverter(d => Assert.False(true, d.ToString()));
+            converter.ConvertPortableToWindows(portablePEStream, portablePdbStream, convertedWindowsPdbStream);
             VerifyPdb(convertedWindowsPdbStream, portablePEStream, expectedXml, "Comparing Windows PDB converted from Portable PDB with expected XML");
 
 #if DSRN16 // https://github.com/dotnet/symreader-converter/issues/42
