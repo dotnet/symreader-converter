@@ -2,6 +2,7 @@
 
 using System.IO;
 using Microsoft.CodeAnalysis.Test.Utilities;
+using Roslyn.Test.Utilities;
 using Xunit;
 
 namespace Microsoft.DiaSymReader.Tools.UnitTests
@@ -80,7 +81,30 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             using (var pdbStream = File.OpenRead(outPdbPath))
             {
                 var symReader = SymReaderFactory.CreateWindowsPdbReader(pdbStream);
-                // TODO: symReader.GetSoruceServerData
+                Assert.Null(symReader.GetSourceLinkData());
+
+                string actual = symReader.GetSourceServerData();
+                AssertEx.AssertLinesEqual(
+@"SRCSRV: ini ------------------------------------------------
+VERSION=2
+SRCSRV: variables ------------------------------------------
+RAWURL=http://server/%var2%
+SRCSRVVERCTRL=http
+SRCSRVTRG=%RAWURL%
+SRCSRV: source files ---------------------------------------
+C:\Documents.cs*3/Documents.cs.g
+C:\a\b\c\d\1.cs*1/a/b/c/d/1.cs
+C:\a\b\c\D\2.cs*1/a/b/c/D/2.cs
+C:\a\b\C\d\3.cs*1/a/b/C/d/3.cs
+C:\a\b\c\d\x.cs*1/a/b/c/d/x.cs
+C:\A\b\c\x.cs*1/a/b/c/x.cs
+C:\a\b\x.cs*1/a/b/x.cs
+C:\a\B\3.cs*1/a/B/3.cs
+C:\a\B\c\4.cs*1/a/B/c/4.cs
+:6.cs*4/:6.cs
+C:\a\b\X.cs*1/a/b/X.cs
+C:\a\B\x.cs*1/a/B/x.cs
+SRCSRV: end ------------------------------------------------", actual);
             }
         }
 
@@ -104,7 +128,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             using (var pdbStream = File.OpenRead(outPdb.Path))
             {
                 var symReader = SymReaderFactory.CreateWindowsPdbReader(pdbStream);
-                // TODO: symReader.GetSoruceServerData
+                AssertEx.Equal(TestResources.SourceLink.SourceLinkJson, symReader.GetRawSourceLinkData());
+                Assert.Null(symReader.GetSourceServerData());
             }
         }
     }

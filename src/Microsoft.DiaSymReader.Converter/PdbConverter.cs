@@ -82,13 +82,14 @@ namespace Microsoft.DiaSymReader.Tools
                 throw new InvalidDataException(string.Format(ConverterResources.InvalidPdbFormat, e.Message), e);
             }
         }
-        
+
         /// <summary>
         /// Converts Portable PDB stream to Windows PDB.
         /// </summary>
         /// <param name="peStream">PE image stream (.dll or .exe)</param>
         /// <param name="sourcePdbStream">Source stream of Portable PDB data. Must be readable.</param>
         /// <param name="targetPdbStream">Target stream of Windows PDB data. Must be writable.</param>
+        /// <param name="options">Conversion options.</param>
         /// <exception cref="ArgumentNullException"><paramref name="peStream"/>, <paramref name="sourcePdbStream"/>, or <paramref name="targetPdbStream"/> is null.</exception>
         /// <exception cref="ArgumentException"><paramref name="peStream"/> does not support read and seek operations.</exception>
         /// <exception cref="ArgumentException"><paramref name="sourcePdbStream"/> does not support reading.</exception>
@@ -96,12 +97,12 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="BadImageFormatException">The format of the PE image or the source PDB image is invalid.</exception>
         /// <exception cref="InvalidDataException">Unexpected data found in the PE image or the source PDB image.</exception>
         /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
-        public void ConvertPortableToWindows(Stream peStream, Stream sourcePdbStream, Stream targetPdbStream)
+        public void ConvertPortableToWindows(Stream peStream, Stream sourcePdbStream, Stream targetPdbStream, PdbConversionOptions options = default(PdbConversionOptions))
         {
             StreamUtilities.ValidateStream(peStream, nameof(peStream), readRequired: true, seekRequired: true);
             using (var peReader = new PEReader(peStream, PEStreamOptions.LeaveOpen))
             {
-                ConvertPortableToWindows(peReader, sourcePdbStream, targetPdbStream);
+                ConvertPortableToWindows(peReader, sourcePdbStream, targetPdbStream, options);
             }
         }
 

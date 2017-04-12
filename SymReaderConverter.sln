@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pdb2Pdb.UnitTests", "src\Pd
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PdbTestResources", "src\PdbTestResources\PdbTestResources.csproj", "{9AE3AC21-9F31-4CDA-9AF4-2058FCD87F23}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtilities", "src\TestUtilities\TestUtilities.csproj", "{F46DF562-1E18-478E-A322-5DD69B2A5A72}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		src\Microsoft.CodeAnalysis.PooledObjects\Microsoft.CodeAnalysis.PooledObjects.projitems*{c1930979-c824-496b-a630-70f5369a636f}*SharedItemsImports = 13
@@ -119,6 +121,18 @@ Global
 		{9AE3AC21-9F31-4CDA-9AF4-2058FCD87F23}.Release|x64.Build.0 = Release|Any CPU
 		{9AE3AC21-9F31-4CDA-9AF4-2058FCD87F23}.Release|x86.ActiveCfg = Release|Any CPU
 		{9AE3AC21-9F31-4CDA-9AF4-2058FCD87F23}.Release|x86.Build.0 = Release|Any CPU
+		{F46DF562-1E18-478E-A322-5DD69B2A5A72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F46DF562-1E18-478E-A322-5DD69B2A5A72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F46DF562-1E18-478E-A322-5DD69B2A5A72}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F46DF562-1E18-478E-A322-5DD69B2A5A72}.Debug|x64.Build.0 = Debug|Any CPU
+		{F46DF562-1E18-478E-A322-5DD69B2A5A72}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F46DF562-1E18-478E-A322-5DD69B2A5A72}.Debug|x86.Build.0 = Debug|Any CPU
+		{F46DF562-1E18-478E-A322-5DD69B2A5A72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F46DF562-1E18-478E-A322-5DD69B2A5A72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F46DF562-1E18-478E-A322-5DD69B2A5A72}.Release|x64.ActiveCfg = Release|Any CPU
+		{F46DF562-1E18-478E-A322-5DD69B2A5A72}.Release|x64.Build.0 = Release|Any CPU
+		{F46DF562-1E18-478E-A322-5DD69B2A5A72}.Release|x86.ActiveCfg = Release|Any CPU
+		{F46DF562-1E18-478E-A322-5DD69B2A5A72}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

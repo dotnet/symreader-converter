@@ -991,11 +991,11 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         }
 
         [Fact]
-        public void Convert_SourceLink()
+        public void Convert_SourceLinkToSourceData()
         {
             VerifyWindowsPdb(
                 TestResources.SourceLink.DllAndPdb(portable: true),
-                TestResources.SourceLink.DllAndPdb(portable: false),
+                TestResources.SourceData.WindowsDllAndPdb,
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>

@@ -158,7 +158,7 @@ namespace Microsoft.DiaSymReader.Tools
                             var outPdbStream = new MemoryStream();
                             if (PdbConverter.IsPortable(srcPdbStreamOpt))
                             {
-                                converter.ConvertPortableToWindows(peReader, srcPdbStreamOpt, outPdbStream);
+                                converter.ConvertPortableToWindows(peReader, srcPdbStreamOpt, outPdbStream, args.Options);
                             }
                             else
                             {
@@ -180,7 +180,7 @@ namespace Microsoft.DiaSymReader.Tools
                             else
                             {
                                 var dstPdbStream = new MemoryStream();
-                                converter.ConvertPortableToWindows(peReader, pdbReader, dstPdbStream);
+                                converter.ConvertPortableToWindows(peReader, pdbReader, dstPdbStream, args.Options);
                                 WriteAllBytes(args.OutPdbFilePath, dstPdbStream);
                             }
                         }

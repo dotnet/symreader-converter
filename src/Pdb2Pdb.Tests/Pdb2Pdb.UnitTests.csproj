@@ -24,5 +24,6 @@
     <ProjectReference Include="..\Microsoft.DiaSymReader.Converter\Microsoft.DiaSymReader.Converter.csproj" />
     <ProjectReference Include="..\Pdb2Pdb\Pdb2Pdb.csproj" />
     <ProjectReference Include="..\PdbTestResources\PdbTestResources.csproj" />
+    <ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />
   </ItemGroup>
 </Project>

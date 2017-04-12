@@ -16,6 +16,7 @@
     <ProjectReference Include="..\Microsoft.DiaSymReader.Converter.Xml\Microsoft.DiaSymReader.Converter.Xml.csproj" />
     <ProjectReference Include="..\Microsoft.DiaSymReader.Converter\Microsoft.DiaSymReader.Converter.csproj" />
     <ProjectReference Include="..\PdbTestResources\PdbTestResources.csproj" />
+    <ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.DiaSymReader.Native" Version="$(MicrosoftDiaSymReaderNativeVersion)" />

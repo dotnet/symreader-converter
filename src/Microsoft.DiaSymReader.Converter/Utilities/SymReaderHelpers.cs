@@ -3,6 +3,8 @@
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Microsoft.DiaSymReader.Tools
 {
@@ -59,6 +61,79 @@ namespace Microsoft.DiaSymReader.Tools
             int n = guidBytes.Length;
             timestamp = ((uint)bytes[n + 3] << 24) | ((uint)bytes[n + 2] << 16) | ((uint)bytes[n + 1] << 8) | bytes[n];
             age = 1;
+        }
+
+        private unsafe static byte[] GetBytes(byte* data, int size)
+        {
+            var buffer = new byte[size];
+            Marshal.Copy((IntPtr)data, buffer, 0, buffer.Length);
+            return buffer;
+        }
+
+        private unsafe static string GetString(byte* data, int size) =>
+#if NET45
+            new string((sbyte*)data, 0, size, Encoding.UTF8);
+#else
+            Encoding.UTF8.GetString(data, size);
+#endif
+
+        public unsafe static string GetSourceLinkData(this ISymUnmanagedReader5 reader) => 
+            TryGetSourceLinkData(reader, out byte* data, out int size) ? GetString(data, size) : null;
+
+        public unsafe static byte[] GetRawSourceLinkData(this ISymUnmanagedReader5 reader) =>
+            TryGetSourceLinkData(reader, out byte* data, out int size) ? GetBytes(data, size) : null;
+
+        private unsafe static bool TryGetSourceLinkData(ISymUnmanagedReader5 reader, out byte* data, out int size)
+        {
+            int hr = reader.GetSourceServerData(out data, out size);
+            Marshal.ThrowExceptionForHR(hr);
+            return hr != HResult.S_FALSE;
+        }
+
+        public unsafe static byte[] GetRawSourceServerData(this ISymUnmanagedReader reader)
+        {
+            if (!(reader is ISymUnmanagedSourceServerModule srcsrv))
+            {
+                return null;
+            }
+
+            int size = 0;
+            byte* data = null;
+            try
+            {
+                return (srcsrv.GetSourceServerData(out size, out data) == HResult.S_OK) ? 
+                    GetBytes(data, size) : null;
+            }
+            finally
+            {
+                if (data != null)
+                {
+                    Marshal.FreeCoTaskMem((IntPtr)data);
+                }
+            }
+        }
+
+        public unsafe static string GetSourceServerData(this ISymUnmanagedReader reader)
+        {
+            if (!(reader is ISymUnmanagedSourceServerModule srcsrv))
+            {
+                return null;
+            }
+
+            int size = 0;
+            byte* data = null;
+            try
+            {
+                return (srcsrv.GetSourceServerData(out size, out data) == HResult.S_OK) ? 
+                    GetString(data, size) : null;
+            }
+            finally
+            {
+                if (data != null)
+                {
+                    Marshal.FreeCoTaskMem((IntPtr)data);
+                }
+            }
         }
     }
 }
