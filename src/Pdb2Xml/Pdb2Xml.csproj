@@ -6,7 +6,7 @@
     <OutputType>Exe</OutputType>
     <LargeAddressAware>true</LargeAddressAware>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <IsPackable>true</IsPackable>
     <NuspecFile>Pdb2Xml.nuspec</NuspecFile>
     <NuspecBasePath>$(OutputPath)</NuspecBasePath>
