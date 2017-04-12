@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
@@ -15,16 +16,18 @@ namespace Microsoft.DiaSymReader.Tools
             public readonly string PEFilePath;
             public readonly string PdbFilePathOpt;
             public readonly string OutPdbFilePath;
-            public readonly bool Extract;
             public readonly PdbConversionOptions Options;
+            public readonly bool Extract;
+            public readonly bool Verbose;
 
-            public Args(string peFilePath, string pdbFilePathOpt, string outPdbFilePath, PdbConversionOptions options, bool extract)
+            public Args(string peFilePath, string pdbFilePathOpt, string outPdbFilePath, PdbConversionOptions options, bool extract, bool verbose)
             {
                 PEFilePath = peFilePath;
-                Extract = extract;
                 PdbFilePathOpt = pdbFilePathOpt;
                 OutPdbFilePath = outPdbFilePath;
                 Options = options;
+                Extract = extract;
+                Verbose = verbose;
             }
         }
 
@@ -52,6 +55,7 @@ namespace Microsoft.DiaSymReader.Tools
             string peFile = null;
             bool extract = false;
             bool sourceLink = false;
+            bool verbose = false;
             string inPdb = null;
             string outPdb = null;
 
@@ -70,6 +74,10 @@ namespace Microsoft.DiaSymReader.Tools
 
                     case "/sourcelink":
                         sourceLink = true;
+                        break;
+
+                    case "/verbose":
+                        verbose = true;
                         break;
 
                     case "/pdb":
@@ -128,13 +136,15 @@ namespace Microsoft.DiaSymReader.Tools
                 options |= PdbConversionOptions.SuppressSourceLinkConversion;
             }
 
-            return new Args(peFile, inPdb, outPdb, options, extract);
+            return new Args(peFile, inPdb, outPdb, options, extract, verbose);
         }
 
         // internal for testing
         internal static int Convert(Args args)
         {
-            var converter = new PdbConverter();
+            var reporter = args.Verbose ? new Action<PdbDiagnostic>(d => Console.Error.WriteLine(d.ToString(CultureInfo.CurrentCulture))) : null;
+
+            var converter = new PdbConverter(reporter);
 
             try
             {

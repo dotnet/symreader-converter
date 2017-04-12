@@ -69,7 +69,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
                 pdbFilePathOpt: pdb.Path,
                 outPdbFilePath: outPdbPath,
                 options: PdbConversionOptions.Default,
-                extract: false)));
+                extract: false,
+                verbose: false)));
 
             using (var peStream = File.OpenRead(pe.Path))
             using (var pdbStream = File.OpenRead(outPdbPath))
@@ -92,7 +93,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
                 pdbFilePathOpt: null,
                 outPdbFilePath: outPdb.Path,
                 options: PdbConversionOptions.SuppressSourceLinkConversion,
-                extract: false)));
+                extract: false,
+                verbose: false)));
 
             using (var peStream = File.OpenRead(pe.Path))
             using (var pdbStream = File.OpenRead(outPdb.Path))
