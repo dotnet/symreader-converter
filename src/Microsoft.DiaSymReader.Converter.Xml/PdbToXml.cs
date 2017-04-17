@@ -31,6 +31,7 @@ namespace Microsoft.DiaSymReader.Tools
 
         private readonly MetadataReader _metadataReader;
         private readonly ISymUnmanagedReader3 _symReader;
+        private readonly MetadataReader _portablePdbMetadataOpt;
         private readonly PdbToXmlOptions _options;
         private readonly XmlWriter _writer;
 
@@ -48,6 +49,21 @@ namespace Microsoft.DiaSymReader.Tools
             _metadataReader = metadataReader;
             _writer = writer;
             _options = options;
+            _portablePdbMetadataOpt = GetPortablePdbMetadata(symReader);
+        }
+
+        private unsafe static MetadataReader GetPortablePdbMetadata(ISymUnmanagedReader3 symReader)
+        {
+            if (symReader is ISymUnmanagedReader4 symReader4)
+            {
+                int hr = symReader4.GetPortableDebugMetadata(out byte* metadata, out int size);
+                if (hr == HResult.S_OK)
+                {
+                    return new MetadataReader(metadata, size);
+                }
+            }
+
+            return null;
         }
 
         public static string DeltaPdbToXml(Stream deltaPdb, IEnumerable<int> methodTokens)
@@ -151,7 +167,7 @@ namespace Microsoft.DiaSymReader.Tools
         {
             if (SymReaderFactory.IsPortable(pdbStream))
             {
-                return (ISymUnmanagedReader3)new PortablePdb.SymBinder().GetReaderFromStream(pdbStream, 
+                return (ISymUnmanagedReader3)new PortablePdb.SymBinder().GetReaderFromStream(pdbStream,
                     new Roslyn.Test.PdbUtilities.DummyMetadataImport(metadataReaderOpt, metadataMemoryOwnerOpt));
             }
             else
@@ -206,14 +222,23 @@ namespace Microsoft.DiaSymReader.Tools
             int token = _metadataReader.GetToken(methodHandle);
             ISymUnmanagedMethod method = _symReader.GetMethod(token);
 
-            byte[] cdi = null;
+            var windowsCdi = default(byte[]);
+            var portableCdi = ImmutableArray<(Guid kind, ImmutableArray<byte> data)>.Empty;
+
             var sequencePoints = ImmutableArray<SymUnmanagedSequencePoint>.Empty;
             ISymUnmanagedAsyncMethod asyncMethod = null;
             ISymUnmanagedScope rootScope = null;
 
             if ((_options & PdbToXmlOptions.ExcludeCustomDebugInformation) == 0)
             {
-                cdi = _symReader.GetCustomDebugInfo(token, methodVersion: 1);
+                if (_portablePdbMetadataOpt != null)
+                {
+                    portableCdi = GetPortableCustomDebugInfo(methodHandle);
+                }
+                else
+                {
+                    windowsCdi = _symReader.GetCustomDebugInfo(token, methodVersion: 1);
+                }
             }
 
             if (method != null)
@@ -234,7 +259,7 @@ namespace Microsoft.DiaSymReader.Tools
                 }
             }
 
-            if (cdi == null && sequencePoints.IsEmpty && rootScope == null && asyncMethod == null)
+            if (windowsCdi == null && portableCdi.IsEmpty && sequencePoints.IsEmpty && rootScope == null && asyncMethod == null)
             {
                 // no debug info to write
                 return;
@@ -246,11 +271,7 @@ namespace Microsoft.DiaSymReader.Tools
             int tokenToDisplay = (methodRowId <= tokenMap.Length) ? MetadataTokens.GetToken(tokenMap[methodRowId - 1]) : token;
 
             WriteMethodAttributes(tokenToDisplay, isReference: false);
-
-            if (cdi != null)
-            {
-                WriteCustomDebugInfo(cdi);
-            }
+            WriteCustomDebugInfo(windowsCdi, portableCdi);
 
             if (!sequencePoints.IsEmpty)
             {
@@ -270,6 +291,29 @@ namespace Microsoft.DiaSymReader.Tools
             _writer.WriteEndElement();
         }
 
+        private void WriteCustomDebugInfo(byte[] windowsCdi, ImmutableArray<(Guid kind, ImmutableArray<byte> data)> portableCdi)
+        {
+            Debug.Assert(windowsCdi == null || portableCdi.IsEmpty);
+
+            if (windowsCdi == null && portableCdi.IsEmpty)
+            {
+                return;
+            }
+
+            _writer.WriteStartElement("customDebugInfo");
+
+            if (windowsCdi != null)
+            {
+                WriteCustomDebugInfo(windowsCdi);
+            }
+            else
+            {
+                WriteCustomDebugInfo(portableCdi);
+            }
+
+            _writer.WriteEndElement();
+        }
+
         /// <summary>
         /// Given a byte array of custom debug info, parse the array and write out XML describing
         /// its structure and contents.
@@ -277,8 +321,6 @@ namespace Microsoft.DiaSymReader.Tools
         private void WriteCustomDebugInfo(byte[] bytes)
         {
             var records = CustomDebugInfoReader.GetCustomDebugInfoRecords(bytes).ToArray();
-
-            _writer.WriteStartElement("customDebugInfo");
 
             foreach (var record in records)
             {
@@ -288,34 +330,35 @@ namespace Microsoft.DiaSymReader.Tools
                 }
                 else
                 {
+                    var data = record.Data;
                     switch (record.Kind)
                     {
                         case CustomDebugInfoKind.UsingGroups:
-                            WriteUsingGroupsCustomDebugInfo(record);
+                            WriteUsingGroupsCustomDebugInfo(data);
                             break;
                         case CustomDebugInfoKind.ForwardMethodInfo:
-                            WriteForwardMethodInfoCustomDebugInfo(record);
+                            WriteForwardMethodInfoCustomDebugInfo(data);
                             break;
                         case CustomDebugInfoKind.ForwardModuleInfo:
-                            WriteForwardModuleInfoCustomDebugInfo(record);
-                            break;
-                        case CustomDebugInfoKind.StateMachineHoistedLocalScopes:
-                            WriteStateMachineHoistedLocalScopesCustomDebugInfo(record);
-                            break;
-                        case CustomDebugInfoKind.StateMachineTypeName:
-                            WriteStateMachineTypeNameCustomDebugInfo(record);
+                            WriteForwardModuleInfoCustomDebugInfo(data);
                             break;
                         case CustomDebugInfoKind.DynamicLocals:
-                            WriteDynamicLocalsCustomDebugInfo(record);
+                            WriteDynamicLocalsCustomDebugInfo(data);
                             break;
-                        case CustomDebugInfoKind.EditAndContinueLocalSlotMap:
-                            WriteEditAndContinueLocalSlotMap(record);
-                            break;
-                        case CustomDebugInfoKind.EditAndContinueLambdaMap:
-                            WriteEditAndContinueLambdaMap(record);
+                        case CustomDebugInfoKind.StateMachineTypeName:
+                            WriteStateMachineTypeNameCustomDebugInfo(data);
                             break;
                         case CustomDebugInfoKind.TupleElementNames:
-                            WriteTupleElementNamesCustomDebugInfo(record);
+                            WriteTupleElementNamesCustomDebugInfo(data);
+                            break;
+                        case CustomDebugInfoKind.StateMachineHoistedLocalScopes:
+                            WriteStateMachineHoistedLocalScopesCustomDebugInfo(data, isPortable: false);
+                            break;
+                        case CustomDebugInfoKind.EditAndContinueLocalSlotMap:
+                            WriteEditAndContinueLocalSlotMap(data);
+                            break;
+                        case CustomDebugInfoKind.EditAndContinueLambdaMap:
+                            WriteEditAndContinueLambdaAndClosureMap(data);
                             break;
                         default:
                             WriteUnknownCustomDebugInfo(record);
@@ -323,8 +366,64 @@ namespace Microsoft.DiaSymReader.Tools
                     }
                 }
             }
+        }
 
-            _writer.WriteEndElement(); //customDebugInfo
+        // Order in Windows PDBs and Portable PDBs is different, but it doesn't matter. 
+        // To enable matching between XML of both forats use the Windows PDB order for both.
+        private static IReadOnlyDictionary<Guid, int> s_cdiOrdering = new Dictionary<Guid, int>()
+        {
+            {PortableCustomDebugInfoKinds.StateMachineHoistedLocalScopes, 0},
+            {PortableCustomDebugInfoKinds.EncLocalSlotMap, 1},
+            {PortableCustomDebugInfoKinds.EncLambdaAndClosureMap, 2},
+        };
+
+        private void WriteCustomDebugInfo(ImmutableArray<(Guid kind, ImmutableArray<byte> data)> cdis)
+        {
+            var mdReader = _portablePdbMetadataOpt;
+            Debug.Assert(mdReader != null);
+
+            foreach (var (kind, data) in cdis)
+            {
+                if (kind == PortableCustomDebugInfoKinds.StateMachineHoistedLocalScopes)
+                {
+                    WriteStateMachineHoistedLocalScopesCustomDebugInfo(data, isPortable: true);
+                }
+                else if (kind == PortableCustomDebugInfoKinds.EncLambdaAndClosureMap)
+                {
+                    WriteEditAndContinueLambdaAndClosureMap(data);
+                }
+                else if (kind == PortableCustomDebugInfoKinds.EncLocalSlotMap)
+                {
+                    WriteEditAndContinueLocalSlotMap(data);
+                }
+            }
+        }
+
+        private ImmutableArray<(Guid kind, ImmutableArray<byte> data)> GetPortableCustomDebugInfo(MethodDefinitionHandle handle)
+        {
+            var mdReader = _portablePdbMetadataOpt;
+            Debug.Assert(mdReader != null);
+
+            var cdiHandles = mdReader.GetCustomDebugInformation(handle);
+            if (cdiHandles.Count == 0)
+            {
+                return ImmutableArray<(Guid, ImmutableArray<byte>)>.Empty;
+            }
+
+            var builder = new List<(int ordinal, Guid kind, ImmutableArray<byte> data)>();
+
+            foreach (var cdiHandle in cdiHandles)
+            {
+                var cdi = mdReader.GetCustomDebugInformation(cdiHandle);
+                var kind = mdReader.GetGuid(cdi.Kind);
+
+                if (s_cdiOrdering.TryGetValue(kind, out int ordinal))
+                {
+                    builder.Add((ordinal, kind, mdReader.GetBlobContent(cdi.Value)));
+                }
+            }
+
+            return builder.OrderBy(e => e.ordinal).Select(e => (e.kind, e.data)).ToImmutableArray();
         }
 
         /// <summary>
@@ -337,17 +436,8 @@ namespace Microsoft.DiaSymReader.Tools
             _writer.WriteStartElement("unknown");
             _writer.WriteAttributeString("kind", record.Kind.ToString());
             _writer.WriteAttributeString("version", CultureInvariantToString(record.Version));
-
-            PooledStringBuilder pooled = PooledStringBuilder.GetInstance();
-            StringBuilder builder = pooled.Builder;
-            foreach (byte b in record.Data)
-            {
-                builder.AppendFormat("{0:X2}", b);
-            }
-
-            _writer.WriteAttributeString("payload", pooled.ToStringAndFree());
-
-            _writer.WriteEndElement(); //unknown
+            _writer.WriteAttributeString("payload", BitConverter.ToString(record.Data.ToArray()));
+            _writer.WriteEndElement();
         }
 
         /// <summary>
@@ -357,13 +447,11 @@ namespace Microsoft.DiaSymReader.Tools
         /// <remarks>
         /// There's always at least one entry (for the global namespace).
         /// </remarks>
-        private void WriteUsingGroupsCustomDebugInfo(CustomDebugInfoRecord record)
+        private void WriteUsingGroupsCustomDebugInfo(ImmutableArray<byte> data)
         {
-            Debug.Assert(record.Kind == CustomDebugInfoKind.UsingGroups);
-
             _writer.WriteStartElement("using");
 
-            ImmutableArray<short> counts = CustomDebugInfoReader.DecodeUsingRecord(record.Data);
+            ImmutableArray<short> counts = CustomDebugInfoReader.DecodeUsingRecord(data);
 
             foreach (short importCount in counts)
             {
@@ -382,13 +470,11 @@ namespace Microsoft.DiaSymReader.Tools
         /// <remarks>
         /// Emitting tokens makes tests more fragile.
         /// </remarks>
-        private void WriteForwardMethodInfoCustomDebugInfo(CustomDebugInfoRecord record)
+        private void WriteForwardMethodInfoCustomDebugInfo(ImmutableArray<byte> data)
         {
-            Debug.Assert(record.Kind == CustomDebugInfoKind.ForwardMethodInfo);
-
             _writer.WriteStartElement("forward");
 
-            int token = CustomDebugInfoReader.DecodeForwardRecord(record.Data);
+            int token = CustomDebugInfoReader.DecodeForwardRecord(data);
             WriteMethodAttributes(token, isReference: true);
 
             _writer.WriteEndElement(); //forward
@@ -402,33 +488,23 @@ namespace Microsoft.DiaSymReader.Tools
         /// Appears when there are extern aliases and edit-and-continue is disabled.
         /// Emitting tokens makes tests more fragile.
         /// </remarks>
-        private void WriteForwardModuleInfoCustomDebugInfo(CustomDebugInfoRecord record)
+        private void WriteForwardModuleInfoCustomDebugInfo(ImmutableArray<byte> data)
         {
-            Debug.Assert(record.Kind == CustomDebugInfoKind.ForwardModuleInfo);
-
             _writer.WriteStartElement("forwardToModule");
 
-            int token = CustomDebugInfoReader.DecodeForwardRecord(record.Data);
+            int token = CustomDebugInfoReader.DecodeForwardRecord(data);
             WriteMethodAttributes(token, isReference: true);
 
             _writer.WriteEndElement(); //forwardToModule
         }
 
-        /// <summary>
-        /// Appears when iterator locals have to lifted into fields.  Contains a list of buckets with
-        /// start and end offsets (presumably, into IL).
-        /// TODO: comment when the structure is understood.
-        /// </summary>
-        /// <remarks>
-        /// Appears when there are locals in iterator methods.
-        /// </remarks>
-        private void WriteStateMachineHoistedLocalScopesCustomDebugInfo(CustomDebugInfoRecord record)
+        private void WriteStateMachineHoistedLocalScopesCustomDebugInfo(ImmutableArray<byte> data, bool isPortable)
         {
-            Debug.Assert(record.Kind == CustomDebugInfoKind.StateMachineHoistedLocalScopes);
-
             _writer.WriteStartElement("hoistedLocalScopes");
 
-            var scopes = CustomDebugInfoReader.DecodeStateMachineHoistedLocalScopesRecord(record.Data);
+            var scopes = isPortable ? 
+                DecodePortableHoistedLocalScopes(data) :
+                CustomDebugInfoReader.DecodeStateMachineHoistedLocalScopesRecord(data);
 
             foreach (StateMachineHoistedLocalScope scope in scopes)
             {
@@ -446,6 +522,34 @@ namespace Microsoft.DiaSymReader.Tools
             _writer.WriteEndElement();
         }
 
+        // TODO: copied from EE, unify
+
+        /// <exception cref="BadImageFormatException">Invalid data format.</exception>
+        private unsafe static ImmutableArray<StateMachineHoistedLocalScope> DecodePortableHoistedLocalScopes(ImmutableArray<byte> data)
+        {
+            if (data.Length == 0)
+            {
+                return ImmutableArray<StateMachineHoistedLocalScope>.Empty;
+            }
+
+            fixed (byte* buffer = data.ToArray())
+            {
+                var reader = new BlobReader(buffer, data.Length);
+                var result = ImmutableArray.CreateBuilder<StateMachineHoistedLocalScope>();
+
+                do
+                {
+                    int startOffset = reader.ReadInt32();
+                    int length = reader.ReadInt32();
+
+                    result.Add(new StateMachineHoistedLocalScope(startOffset, startOffset + length));
+                }
+                while (reader.RemainingBytes > 0);
+
+                return result.ToImmutable();
+            }
+        }
+
         /// <summary>
         /// Contains a name string.
         /// TODO: comment when the structure is understood.
@@ -453,13 +557,11 @@ namespace Microsoft.DiaSymReader.Tools
         /// <remarks>
         /// Appears when are iterator methods.
         /// </remarks>
-        private void WriteStateMachineTypeNameCustomDebugInfo(CustomDebugInfoRecord record)
+        private void WriteStateMachineTypeNameCustomDebugInfo(ImmutableArray<byte> data)
         {
-            Debug.Assert(record.Kind == CustomDebugInfoKind.StateMachineTypeName);
-
             _writer.WriteStartElement("forwardIterator");
 
-            string name = CustomDebugInfoReader.DecodeForwardIteratorRecord(record.Data);
+            string name = CustomDebugInfoReader.DecodeForwardIteratorRecord(data);
 
             _writer.WriteAttributeString("name", name);
 
@@ -473,13 +575,11 @@ namespace Microsoft.DiaSymReader.Tools
         /// <remarks>
         /// Appears when there are dynamic locals.
         /// </remarks>
-        private void WriteDynamicLocalsCustomDebugInfo(CustomDebugInfoRecord record)
+        private void WriteDynamicLocalsCustomDebugInfo(ImmutableArray<byte> data)
         {
-            Debug.Assert(record.Kind == CustomDebugInfoKind.DynamicLocals);
-
             _writer.WriteStartElement("dynamicLocals");
 
-            var dynamicLocals = CustomDebugInfoReader.DecodeDynamicLocalsRecord(record.Data);
+            var dynamicLocals = CustomDebugInfoReader.DecodeDynamicLocalsRecord(data);
 
             foreach (DynamicLocalInfo dynamicLocal in dynamicLocals)
             {
@@ -502,13 +602,11 @@ namespace Microsoft.DiaSymReader.Tools
             _writer.WriteEndElement(); //dynamicLocals
         }
 
-        private void WriteTupleElementNamesCustomDebugInfo(CustomDebugInfoRecord record)
+        private void WriteTupleElementNamesCustomDebugInfo(ImmutableArray<byte> data)
         {
-            Debug.Assert(record.Kind == CustomDebugInfoKind.TupleElementNames);
-
             _writer.WriteStartElement("tupleElementNames");
 
-            var tuples = CustomDebugInfoReader.DecodeTupleElementNamesRecord(record.Data);
+            var tuples = CustomDebugInfoReader.DecodeTupleElementNamesRecord(data);
 
             foreach (var tuple in tuples)
             {
@@ -539,18 +637,21 @@ namespace Microsoft.DiaSymReader.Tools
             return pooledBuilder.ToStringAndFree();
         }
 
-        private unsafe void WriteEditAndContinueLocalSlotMap(CustomDebugInfoRecord record)
+        private unsafe void WriteEditAndContinueLocalSlotMap(ImmutableArray<byte> data)
         {
-            Debug.Assert(record.Kind == CustomDebugInfoKind.EditAndContinueLocalSlotMap);
-
             _writer.WriteStartElement("encLocalSlotMap");
             try
             {
+                if (data.Length == 0)
+                {
+                    return;
+                }
+
                 int syntaxOffsetBaseline = -1;
 
-                fixed (byte* compressedSlotMapPtr = &record.Data.ToArray()[0])
+                fixed (byte* compressedSlotMapPtr = data.ToArray())
                 {
-                    var blobReader = new BlobReader(compressedSlotMapPtr, record.Data.Length);
+                    var blobReader = new BlobReader(compressedSlotMapPtr, data.Length);
 
                     while (blobReader.RemainingBytes > 0)
                     {
@@ -606,14 +707,12 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        private unsafe void WriteEditAndContinueLambdaMap(CustomDebugInfoRecord record)
+        private unsafe void WriteEditAndContinueLambdaAndClosureMap(ImmutableArray<byte> data)
         {
-            Debug.Assert(record.Kind == CustomDebugInfoKind.EditAndContinueLambdaMap);
-
             _writer.WriteStartElement("encLambdaMap");
             try
             {
-                if (record.Data.Length == 0)
+                if (data.Length == 0)
                 {
                     return;
                 }
@@ -622,9 +721,9 @@ namespace Microsoft.DiaSymReader.Tools
                 int syntaxOffsetBaseline = -1;
                 int closureCount;
 
-                fixed (byte* blobPtr = &record.Data.ToArray()[0])
+                fixed (byte* blobPtr = data.ToArray())
                 {
-                    var blobReader = new BlobReader(blobPtr, record.Data.Length);
+                    var blobReader = new BlobReader(blobPtr, data.Length);
 
                     if (!blobReader.TryReadCompressedInteger(out methodOrdinal))
                     {
