@@ -60,6 +60,16 @@ namespace Microsoft.DiaSymReader.Tools
 
         internal void Convert(PEReader peReader, MetadataReader pdbReader, PdbWriter<TDocumentWriter> pdbWriter, PdbConversionOptions options)
         {
+            if (!SymReaderHelpers.TryReadPdbId(peReader, out var pePdbId, out int peAge))
+            {
+                throw new InvalidDataException(ConverterResources.SpecifiedPEFileHasNoAssociatedPdb);
+            }
+
+            if (!new BlobContentId(pdbReader.DebugMetadataHeader.Id).Equals(pePdbId))
+            {
+                throw new InvalidDataException(ConverterResources.PdbNotMatchingDebugDirectory);
+            }
+
             string vbDefaultNamespace = MetadataUtilities.GetVisualBasicDefaultNamespace(pdbReader);
             bool vbSemantics = vbDefaultNamespace != null;
             string vbDefaultNamespaceImportString = string.IsNullOrEmpty(vbDefaultNamespace) ? null : "*" + vbDefaultNamespace;
@@ -410,7 +420,6 @@ namespace Microsoft.DiaSymReader.Tools
                 pdbWriter.SetEntryPoint(MetadataTokens.GetToken(pdbReader.DebugMetadataHeader.EntryPoint));
             }
 
-#if DSRN16 // https://github.com/dotnet/symreader-converter/issues/42
             var sourceLinkHandle = pdbReader.GetCustomDebugInformation(EntityHandle.ModuleDefinition, PortableCustomDebugInfoKinds.SourceLink);
             if (!sourceLinkHandle.IsNil)
             {
@@ -426,7 +435,6 @@ namespace Microsoft.DiaSymReader.Tools
 
             SymReaderHelpers.GetWindowsPdbSignature(pdbReader.DebugMetadataHeader.Id, out var guid, out var stamp, out var age);
             pdbWriter.UpdateSignature(guid, stamp, age);
-#endif
         }
                
         private static string GetMethodNamespace(MetadataReader metadataReader, MethodDefinition methodDef)

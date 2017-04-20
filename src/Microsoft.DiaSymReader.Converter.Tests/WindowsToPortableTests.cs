@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Microsoft.DiaSymReader.Tools.UnitTests
 {
+    using Roslyn.Test.Utilities;
     using static PdbValidationMetadata;
 
     public class WindowsToPortableTests
@@ -962,6 +963,99 @@ CustomDebugInformation (index: 0x37, size: 6):
 ============================================================
 1: 0x06000001 (MethodDef)  EnC Local Slot Map  01-10-16-01
 ");
+        }
+
+        [Fact]
+        public void ConvertSourceServerToSourceLinkData_Empty()
+        {
+            string data =
+@"SRCSRV: variables ------------------------------------------
+RAWURL=http://server/%var2%
+SRCSRV: source files ---------------------------------------
+SRCSRV: end ------------------------------------------------
+";
+            Assert.Null(PdbConverterWindowsToPortable.ConvertSourceServerToSourceLinkData(data));
+        }
+
+        [Fact]
+        public void ConvertSourceServerToSourceLinkData_AllInvalid()
+        {
+            string data =
+@"SRCSRV: variables ------------------------------------------
+RAWURL=http://server/%var2%
+SRCSRV: source files ---------------------------------------
+*****
+SRCSRV: end ------------------------------------------------
+";
+            Assert.Null(PdbConverterWindowsToPortable.ConvertSourceServerToSourceLinkData(data));
+        }
+
+        [Fact]
+        public void ConvertSourceServerToSourceLinkData_SingleValidMapping()
+        {
+            string data =
+@"SRCSRV: variables ------------------------------------------
+RAWURL=http://server/%var2%
+SRCSRV: source files ---------------------------------------
+C:\a\b\X.cs*X.cs
+*ignored*
+a*
+*a
+*
+C:\a\b\Y.cs*Y.cs
+SRCSRV: end ------------------------------------------------
+";
+            AssertEx.AssertLinesEqual(@"
+{
+  ""documents"": {
+     ""C:\a\b\*"": ""http://server/*""
+  }
+}",
+                PdbConverterWindowsToPortable.ConvertSourceServerToSourceLinkData(data));
+        }
+
+        [Fact]
+        public void ConvertSourceServerToSourceLinkData_MultiMapping1()
+        {
+            string data =
+@"SRCSRV: variables ------------------------------------------
+RAWURL=http://server/%var2%
+SRCSRV: source files ---------------------------------------
+C:\a\b\X.cs*X.cs
+C:\a\b\Y.cs*c/Y.cs
+C:\a\b\U.cs*Z.cs
+SRCSRV: end ------------------------------------------------
+";
+            AssertEx.AssertLinesEqual(@"
+{
+  ""documents"": {
+     ""C:\a\b\Y.cs"": ""http://server/c/Y.cs"",
+     ""C:\a\b\U.cs"": ""http://server/Z.cs"",
+     ""C:\a\b\*"": ""http://server/*""
+  }
+}",
+                PdbConverterWindowsToPortable.ConvertSourceServerToSourceLinkData(data));
+        }
+
+        [Fact]
+        public void ConvertSourceServerToSourceLinkData_MultiMapping2()
+        {
+            string data =
+@"SRCSRV: variables ------------------------------------------
+RAWURL=http://server/%var2%
+SRCSRV: source files ---------------------------------------
+C:\a\b\X.cs*X1.cs
+C:\a\b\Y.cs*Y1.cs
+SRCSRV: end ------------------------------------------------
+";
+            AssertEx.AssertLinesEqual(@"
+{
+  ""documents"": {
+     ""C:\a\b\X.cs"": ""http://server/X1.cs"",
+     ""C:\a\b\Y.cs"": ""http://server/Y1.cs""
+  }
+}",
+                PdbConverterWindowsToPortable.ConvertSourceServerToSourceLinkData(data));
         }
     }
 }

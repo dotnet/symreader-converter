@@ -124,6 +124,15 @@
     <EmbeddedResource Include="Resources\EmbeddedSource.pdbx">
       <LogicalName>EmbeddedSource.pdbx</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SourceData.dll">
+      <LogicalName>SourceData.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SourceData.pdb">
+      <LogicalName>SourceData.pdb</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SourceLink.Embedded.dll">
+      <LogicalName>SourceLink.Embedded.dll</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\SourceLink.dll">
       <LogicalName>SourceLink.dll</LogicalName>
     </EmbeddedResource>
@@ -135,6 +144,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\SourceLink.pdbx">
       <LogicalName>SourceLink.pdbx</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\SourceLink.json">
+      <LogicalName>SourceLink.json</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Misc.dll">
       <LogicalName>Misc.dll</LogicalName>

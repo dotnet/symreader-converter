@@ -16,10 +16,10 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 {
     internal static class PdbValidationXml
     {
-        public static void VerifyWindowsPdb(TestResource portable, TestResource windows, string expectedXml)
+        public static void VerifyWindowsPdb(TestResource portable, TestResource windows, string expectedXml, PdbDiagnostic[] expectedDiagnostics = null)
         {
             VerifyWindowsMatchesExpected(windows, expectedXml);
-            VerifyWindowsConvertedFromPortableMatchesExpected(portable, expectedXml);
+            VerifyWindowsConvertedFromPortableMatchesExpected(portable, expectedXml, expectedDiagnostics);
         }
 
         private static void VerifyWindowsMatchesExpected(TestResource windows, string expectedXml)
@@ -34,24 +34,32 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             AssertEx.AssertLinesEqual(adjustedExpectedXml, adjustedActualXml, "Comparing Windows PDB with expected XML");
         }
 
-        private static void VerifyWindowsConvertedFromPortableMatchesExpected(TestResource portable, string expectedXml)
+        private static void VerifyWindowsConvertedFromPortableMatchesExpected(TestResource portable, string expectedXml, PdbDiagnostic[] expectedDiagnostics)
         {
             var portablePEStream = new MemoryStream(portable.PE);
             var portablePdbStream = new MemoryStream(portable.Pdb);
             var convertedWindowsPdbStream = new MemoryStream();
+            var actualDiagnostics = new List<PdbDiagnostic>();
 
-            var converter = new PdbConverter(d => Assert.False(true, d.ToString()));
+            var converter = new PdbConverter(actualDiagnostics.Add);
             converter.ConvertPortableToWindows(portablePEStream, portablePdbStream, convertedWindowsPdbStream);
+
+            AssertEx.Equal(expectedDiagnostics ?? Array.Empty<PdbDiagnostic>(), actualDiagnostics, itemInspector: InspectDiagnostic);
+
             VerifyPdb(convertedWindowsPdbStream, portablePEStream, expectedXml, "Comparing Windows PDB converted from Portable PDB with expected XML");
 
-#if DSRN16 // https://github.com/dotnet/symreader-converter/issues/42
             portablePdbStream.Position = 0;
             convertedWindowsPdbStream.Position = 0;
             VerifyMatchingSignatures(portablePdbStream, convertedWindowsPdbStream);
-#endif
         }
 
-#if DSRN16 // https://github.com/dotnet/symreader-converter/issues/42
+        private static string InspectDiagnostic(PdbDiagnostic diagnostic)
+        {
+            string args = diagnostic.Args != null ? $", new[] {{ { string.Join(", ", diagnostic.Args.Select(a => "\"" + a + "\""))} }}" : null;
+            string token = diagnostic.Token != 0 ? $"0x{diagnostic.Token:X8}" : "0";
+            return $"new PdbDiagnostic(PdbDiagnosticId.{diagnostic.Id}, {token}{args})";
+        }
+
         private static void VerifyMatchingSignatures(Stream portablePdbStream, Stream windowsPdbStream)
         {
             Guid guid;
@@ -73,7 +81,6 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
                 ((ISymUnmanagedDispose)symReader).Destroy();
             }
         }
-#endif
 
         private static string AdjustForInherentDifferences(string xml)
         {

@@ -2,11 +2,12 @@
 
 using System;
 using System.Globalization;
+using Microsoft.CodeAnalysis.Collections;
 using Roslyn.Utilities;
 
 namespace Microsoft.DiaSymReader.Tools
 {
-    public struct PdbDiagnostic
+    public struct PdbDiagnostic : IEquatable<PdbDiagnostic>
     {
         public PdbDiagnosticId Id { get; }
         public int Token { get; }
@@ -19,7 +20,19 @@ namespace Microsoft.DiaSymReader.Tools
             Args = args;
         }
 
-        public override string ToString() => ToString(CultureInfo.CurrentCulture);
+        public override bool Equals(object obj) => 
+            obj is PdbDiagnostic other && Equals(other);
+
+        public bool Equals(PdbDiagnostic other) =>
+            Id == other.Id &&
+            Token == other.Token &&
+            SequenceComparer<object>.Instance.Equals(Args, other.Args);
+
+        public override int GetHashCode() =>
+            Hash.Combine((int)Id, Hash.Combine(Token, Hash.CombineValues(Args)));
+
+        public override string ToString() =>
+            ToString(CultureInfo.CurrentCulture);
 
         public string ToString(IFormatProvider formatProvider)
         {
@@ -34,44 +47,8 @@ namespace Microsoft.DiaSymReader.Tools
                 throw new ArgumentNullException(nameof(formatProvider));
             }
 
-            var template = GetMessageTemplate();
+            var template = Id.GetMessageTemplate();
             return (Args?.Length > 0) ? string.Format(formatProvider, template, Args) : template;
-        }
-
-        private string GetMessageTemplate()
-        {
-            switch (Id)
-            {
-                case default(PdbDiagnosticId):
-                    return null;
-
-                case PdbDiagnosticId.MethodAssociatedWithLocalScopeHasNoBody: return ConverterResources.MethodAssociatedWithLocalScopeHasNoBody;
-                case PdbDiagnosticId.LocalConstantNameTooLong: return ConverterResources.LocalConstantNameTooLong;
-                case PdbDiagnosticId.LocalVariableNameTooLong: return ConverterResources.LocalVariableNameTooLong;
-                case PdbDiagnosticId.MethodContainingLocalVariablesHasNoLocalSignature: return ConverterResources.MethodContainingLocalVariablesHasNoLocalSignature;
-                case PdbDiagnosticId.LocalScopeRangesNestingIsInvalid: return ConverterResources.LocalScopeRangesNestingIsInvalid;
-                case PdbDiagnosticId.UnsupportedImportType: return ConverterResources.UnsupportedImportType;
-                case PdbDiagnosticId.UndefinedAssemblyReferenceAlias: return ConverterResources.UndefinedAssemblyReferenceAlias;
-                case PdbDiagnosticId.UnknownImportDefinitionKind: return ConverterResources.UnknownImportDefinitionKind;
-                case PdbDiagnosticId.InvalidStateMachineTypeName: return ConverterResources.InvalidStateMachineTypeName;
-                case PdbDiagnosticId.BothStateMachineTypeNameAndImportsSpecified: return ConverterResources.BothStateMachineTypeNameAndImportsSpecified;
-                case PdbDiagnosticId.DuplicateDynamicLocals: return ConverterResources.DuplicateDynamicLocals;
-                case PdbDiagnosticId.DuplicateTupleElementNamesForSlot: return ConverterResources.DuplicateTupleElementNamesForSlot;
-                case PdbDiagnosticId.DuplicateTupleElementNamesForConstant: return ConverterResources.DuplicateTupleElementNamesForConstant;
-                case PdbDiagnosticId.InvalidImportStringFormat: return ConverterResources.InvalidImportStringFormat;
-                case PdbDiagnosticId.InvalidEntryPointToken: return ConverterResources.InvalidEntryPointToken;
-                case PdbDiagnosticId.InvalidScopeILOffsetRange: return ConverterResources.InvalidScopeILOffsetRange;
-                case PdbDiagnosticId.InvalidLocalConstantData: return ConverterResources.InvalidLocalConstantData;
-                case PdbDiagnosticId.InvalidLocalConstantSignature: return ConverterResources.InvalidLocalConstantSignature;
-                case PdbDiagnosticId.InvalidLocalScope: return ConverterResources.InvalidLocalScope;
-                case PdbDiagnosticId.InvalidSequencePointDocument: return ConverterResources.InvalidSequencePointDocument;
-                case PdbDiagnosticId.UnmappedDocumentName: return ConverterResources.UnmappedDocumentName;
-                case PdbDiagnosticId.UriSchemeIsNotHttp: return ConverterResources.UriSchemeIsNotHttp;
-                case PdbDiagnosticId.NoSupportedUrisFoundInSourceLink: return ConverterResources.NoSupportedUrisFoundInSourceLink;
-
-                default:
-                    throw ExceptionUtilities.UnexpectedValue(Id);
-            }
         }
     }
 }

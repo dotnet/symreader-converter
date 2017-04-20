@@ -195,12 +195,26 @@ namespace TestResources
         private static byte[] s_windowsPdb;
         public static byte[] WindowsPdb => ResourceLoader.GetOrCreateResource(ref s_windowsPdb, nameof(SourceLink) + ".pdb");
 
-        private static byte[] s_EmbeddedDll;
-        public static byte[] EmbeddedDll => ResourceLoader.GetOrCreateResource(ref s_EmbeddedDll, nameof(SourceLink) + ".Embedded.dll");
-        
+        private static byte[] s_embeddedDll;
+        public static byte[] EmbeddedDll => ResourceLoader.GetOrCreateResource(ref s_embeddedDll, nameof(SourceLink) + ".Embedded.dll");
+
+        private static byte[] s_sourceLinkJson;
+        public static byte[] SourceLinkJson => ResourceLoader.GetOrCreateResource(ref s_sourceLinkJson, nameof(SourceLink) + ".json");
+
         public static TestResource PortableDllAndPdb => new TestResource(PortableDll, PortablePdb);
         public static TestResource WindowsDllAndPdb => new TestResource(WindowsDll, WindowsPdb);
         public static TestResource DllAndPdb(bool portable) => portable ? PortableDllAndPdb : WindowsDllAndPdb;
+    }
+
+    public static class SourceData
+    {
+        private static byte[] s_windowsDll;
+        public static byte[] WindowsDll => ResourceLoader.GetOrCreateResource(ref s_windowsDll, nameof(SourceData) + ".dll");
+
+        private static byte[] s_windowsPdb;
+        public static byte[] WindowsPdb => ResourceLoader.GetOrCreateResource(ref s_windowsPdb, nameof(SourceData) + ".pdb");
+
+        public static TestResource WindowsDllAndPdb => new TestResource(WindowsDll, WindowsPdb);
     }
 
     public static class Misc

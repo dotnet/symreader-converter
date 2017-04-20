@@ -10,6 +10,7 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Debugging;
 using Microsoft.DiaSymReader.PortablePdb;
@@ -35,11 +36,20 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="InvalidDataException"/>
         public void Convert(PEReader peReader, Stream sourcePdbStream, Stream targetPdbStream)
         {
-            var metadataBuilder = new MetadataBuilder();
-            var pdbId = ReadPdbId(peReader);
+            if (!SymReaderHelpers.TryReadPdbId(peReader, out var pdbId, out int age))
+            {
+                throw new InvalidDataException(ConverterResources.SpecifiedPEFileHasNoAssociatedPdb);
+            }
 
             var symReader = SymReaderFactory.CreateWindowsPdbReader(sourcePdbStream, peReader);
 
+            Marshal.ThrowExceptionForHR(symReader.MatchesModule(pdbId.Guid, pdbId.Stamp, age, out bool isMatching));
+            if (!isMatching)
+            {
+                throw new InvalidDataException(ConverterResources.PdbNotMatchingDebugDirectory);
+            }
+
+            var metadataBuilder = new MetadataBuilder();
             var documents = symReader.GetDocuments();
             bool vbSemantics = documents.Any(d => d.GetLanguage() == SymReaderHelpers.VisualBasicLanguageGuid);
 
@@ -393,6 +403,42 @@ namespace Microsoft.DiaSymReader.Tools
                 }
             }
 
+            byte[] sourceLinkData;
+            try
+            {
+                sourceLinkData = symReader.GetRawSourceLinkData();
+            }
+            catch (Exception)
+            {
+                ReportDiagnostic(PdbDiagnosticId.InvalidSourceLinkData, 0);
+                sourceLinkData = null;
+            }
+
+            byte[] sourceServerData;
+            try
+            {
+                sourceServerData = symReader.GetRawSourceServerData();
+            }
+            catch (Exception)
+            {
+                ReportDiagnostic(PdbDiagnosticId.InvalidSourceLinkData, 0);
+                sourceServerData = null;
+            }
+
+            if (sourceLinkData != null && sourceServerData != null)
+            {
+                ReportDiagnostic(PdbDiagnosticId.BothSourceLinkDataAndSourceServerData, 0);
+            }
+
+            if (sourceLinkData != null)
+            {
+                SerializeSourceLinkData(metadataBuilder, sourceLinkData);
+            }
+            else if (sourceServerData != null)
+            {
+                SerializeSourceLinkData(metadataBuilder, ConvertSourceServerToSourceLinkData(sourceServerData));
+            }
+
             var serializer = new PortablePdbBuilder(metadataBuilder, typeSystemRowCounts, debugEntryPointToken, idProvider: _ => pdbId);
             BlobBuilder blobBuilder = new BlobBuilder();
             serializer.Serialize(blobBuilder);
@@ -529,25 +575,6 @@ namespace Microsoft.DiaSymReader.Tools
             }
 
             return result;
-        }
-
-        private static BlobContentId ReadPdbId(PEReader peReader)
-        {
-            foreach (var entry in peReader.ReadDebugDirectory())
-            {
-                if (entry.Type == DebugDirectoryEntryType.CodeView)
-                {
-                    // TODO: const
-                    if (entry.MajorVersion == 0x504D)
-                    {
-                        throw new InvalidDataException(ConverterResources.SpecifiedPEBuiltWithPortablePdb);
-                    }
-
-                    return new BlobContentId(peReader.ReadCodeViewDebugDirectoryData(entry).Guid, entry.Stamp);
-                }
-            }
-
-            throw new InvalidDataException(ConverterResources.SpecifiedPEFileHasNoAssociatedPdb);
         }
 
         private MethodDefinitionHandle ReadEntryPointHandle(ISymUnmanagedReader symReader)
@@ -1147,6 +1174,130 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 writer.WriteCompressedSignedInteger(deltaColumns);
             }
+        }
+
+        private static void SerializeSourceLinkData(MetadataBuilder metadataBuilder, byte[] data)
+        {
+            metadataBuilder.AddCustomDebugInformation(
+                parent: EntityHandle.ModuleDefinition,
+                kind: metadataBuilder.GetOrAddGuid(PortableCustomDebugInfoKinds.SourceLink),
+                value: metadataBuilder.GetOrAddBlob(data));
+        }
+
+        private static byte[] ConvertSourceServerToSourceLinkData(byte[] sourceServerData)
+        {
+            return Encoding.UTF8.GetBytes(ConvertSourceServerToSourceLinkData(Encoding.UTF8.GetString(sourceServerData)));
+        }
+
+        // internal for testing
+        internal static string ConvertSourceServerToSourceLinkData(string sourceServerData)
+        {
+            // TODO: replicate what debugger does
+
+            string[] lines = sourceServerData.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            int variablesStart = lines.IndexOf(line => line.StartsWith("SRCSRV: variables", StringComparison.Ordinal));
+            int sourceFilesStart = lines.IndexOf(line => line.StartsWith("SRCSRV: source files", StringComparison.Ordinal));
+
+            IEnumerable<(string key, string value)> GetPairs(int startLine, char separator)
+            {
+                for (int i = startLine; i < lines.Length; i++)
+                {
+                    string line = lines[i];
+                    int equals = line.IndexOf(separator);
+                    if (equals <= 0)
+                    {
+                        yield break;
+                    }
+
+                    yield return (line.Substring(0, equals), line.Substring(equals + 1));
+                }
+            }
+
+            var rawurl = GetPairs(variablesStart + 1, '=').FirstOrDefault(v => v.key == "RAWURL");
+            var files = GetPairs(sourceFilesStart + 1, '*').ToArray();
+
+            string commonUriPrefix = rawurl.value?.EndsWith("%var2%", StringComparison.Ordinal) == true ?
+                rawurl.value.Substring(0, rawurl.value.Length - "%var2%".Length) : null;
+
+            var builder = new StringBuilder();
+            bool isFirstEntry = true;
+
+            void AppendMapping(string key, string value, bool isPrefix)
+            {
+                if (key.Contains('*') || value.Contains('*') || key.Length == 0 || value.Length == 0)
+                {
+                    return;
+                }
+
+                string Escape(string str) => str.Replace("\"", "\\\"");
+
+                if (!isFirstEntry)
+                {
+                    builder.AppendLine(",");
+                }
+
+                builder.Append("    \"");
+                builder.Append(Escape(key));
+
+                if (isPrefix)
+                {
+                    builder.Append('*');
+                }
+
+                builder.Append("\": \"");
+                builder.Append(Escape(value));
+
+                if (isPrefix)
+                {
+                    builder.Append('*');
+                }
+
+                builder.Append("\"");
+
+                isFirstEntry = false;
+            }
+
+            string commonPathPrefix = null;
+            var nonMatching = new List<(string key, string value)>();
+
+            foreach (var file in files)
+            {
+                if (!file.key.Replace('\\', '/').EndsWith(file.value, StringComparison.Ordinal))
+                {
+                    nonMatching.Add(file);
+                    continue;
+                }
+
+                if (commonPathPrefix == null)
+                {
+                    commonPathPrefix = file.key.Substring(0, file.key.Length - file.value.Length);
+                }
+                else if (!file.key.StartsWith(commonPathPrefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    nonMatching.Add(file);
+                    continue;
+                }
+            }
+
+            builder.AppendLine("{");
+            builder.AppendLine(@"""documents"": {");
+
+            foreach (var file in nonMatching)
+            {
+                AppendMapping(file.key, commonUriPrefix + file.value, isPrefix: false);
+            }
+
+            if (commonPathPrefix != null)
+            {
+                AppendMapping(commonPathPrefix, commonUriPrefix, isPrefix: true);
+            }
+
+            builder.AppendLine();
+            builder.AppendLine("  }");
+            builder.AppendLine("}");
+
+            return isFirstEntry ? null : builder.ToString();
         }
     }
 }

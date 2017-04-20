@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 
@@ -46,7 +48,16 @@ namespace Microsoft.DiaSymReader.Tools
                 return 1;
             }
 
-            return Convert(parsedArgs);
+            try
+            {
+                Convert(parsedArgs);
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e.Message);
+                return 2;
+            }
         }
 
         // internal for testing
@@ -140,68 +151,105 @@ namespace Microsoft.DiaSymReader.Tools
         }
 
         // internal for testing
-        internal static int Convert(Args args)
+        internal static void Convert(Args args)
         {
             var reporter = args.Verbose ? new Action<PdbDiagnostic>(d => Console.Error.WriteLine(d.ToString(CultureInfo.CurrentCulture))) : null;
 
             var converter = new PdbConverter(reporter);
 
-            try
+            using (var peStream = new FileStream(args.PEFilePath, FileMode.Open, FileAccess.Read))
+            using (var peReader = new PEReader(peStream, PEStreamOptions.LeaveOpen))
             {
-                using (var peStream = new FileStream(args.PEFilePath, FileMode.Open, FileAccess.Read))
-                using (var peReader = new PEReader(peStream, PEStreamOptions.LeaveOpen))
+                string portablePdbFileCandidate = null;
+
+                if (args.PdbFilePathOpt != null)
                 {
-                    if (args.PdbFilePathOpt != null)
-                    {
-                        using (var srcPdbStreamOpt = new FileStream(args.PdbFilePathOpt, FileMode.Open, FileAccess.Read))
-                        {
-                            var outPdbStream = new MemoryStream();
-                            if (PdbConverter.IsPortable(srcPdbStreamOpt))
-                            {
-                                converter.ConvertPortableToWindows(peReader, srcPdbStreamOpt, outPdbStream);
-                            }
-                            else
-                            {
-                                converter.ConvertWindowsToPortable(peReader, srcPdbStreamOpt, outPdbStream);
-                            }
+                    Debug.Assert(!args.Extract);
 
-                            WriteAllBytes(args.OutPdbFilePath, outPdbStream);
+                    using (var srcPdbStreamOpt = OpenFileForRead(args.PdbFilePathOpt))
+                    {
+                        var outPdbStream = new MemoryStream();
+                        if (PdbConverter.IsPortable(srcPdbStreamOpt))
+                        {
+                            converter.ConvertPortableToWindows(peReader, srcPdbStreamOpt, outPdbStream, args.Options);
+                        }
+                        else
+                        {
+                            converter.ConvertWindowsToPortable(peReader, srcPdbStreamOpt, outPdbStream);
+                        }
+
+                        WriteAllBytes(args.OutPdbFilePath, outPdbStream);
+                    }
+                }
+                else if (peReader.TryOpenAssociatedPortablePdb(args.PEFilePath, path => File.OpenRead(portablePdbFileCandidate = path), out var pdbReaderProvider, out _))
+                {
+                    using (pdbReaderProvider)
+                    {
+                        var pdbReader = pdbReaderProvider.GetMetadataReader();
+                        if (args.Extract)
+                        {
+                            File.WriteAllBytes(args.OutPdbFilePath, ReadAllBytes(pdbReader));
+                        }
+                        else
+                        {
+                            var dstPdbStream = new MemoryStream();
+                            converter.ConvertPortableToWindows(peReader, pdbReader, dstPdbStream, args.Options);
+                            WriteAllBytes(args.OutPdbFilePath, dstPdbStream);
                         }
                     }
-                    else if (peReader.TryOpenAssociatedPortablePdb(args.PEFilePath, File.OpenRead, out var pdbReaderProvider, out string associatedPdbPathOpt))
-                    {
-                        using (pdbReaderProvider)
-                        {
-                            var pdbReader = pdbReaderProvider.GetMetadataReader();
-                            if (args.Extract)
-                            {
-                                File.WriteAllBytes(args.OutPdbFilePath, ReadAllBytes(pdbReader));
-                            }
-                            else
-                            {
-                                var dstPdbStream = new MemoryStream();
-                                converter.ConvertPortableToWindows(peReader, pdbReader, dstPdbStream);
-                                WriteAllBytes(args.OutPdbFilePath, dstPdbStream);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Console.Error.WriteLine(associatedPdbPathOpt != null ?
-                            string.Format(Resources.FileNotFound, associatedPdbPathOpt) :
-                            string.Format(Resources.FileDoesntContainEmbeddedPdb, args.PEFilePath));
+                }
+                else if (portablePdbFileCandidate != null)
+                {
+                    throw new FileNotFoundException(string.Format(Resources.MatchingPdbNotFound, portablePdbFileCandidate, args.PEFilePath), portablePdbFileCandidate);
+                }
+                else if (args.Extract)
+                {
+                    throw new IOException(string.Format(Resources.FileDoesntContainEmbeddedPdb, args.PEFilePath));
+                }
+                else
+                {
+                    // We don't have Portable PDB nor Embedded PDB. Try to find Windows PDB.
 
-                        return 4;
+                    var directory = peReader.ReadDebugDirectory();
+                    var codeViewEntry = directory.FirstOrDefault(entry => entry.Type == DebugDirectoryEntryType.CodeView);
+
+                    if (codeViewEntry.DataSize == 0)
+                    {
+                        throw new IOException(string.Format(Resources.NoAssociatedOrEmbeddedPdb, args.PEFilePath));
+                    }
+
+                    var data = peReader.ReadCodeViewDebugDirectoryData(codeViewEntry);
+                    string path;
+
+                    try
+                    {
+                        path = Path.Combine(Path.GetDirectoryName(args.PEFilePath), Path.GetFileName(data.Path));
+                    }
+                    catch (Exception)
+                    {
+                        path = null;
+                    }
+
+                    using (var srcPdbStreamOpt = OpenFileForRead(path))
+                    {
+                        var outPdbStream = new MemoryStream();
+                        converter.ConvertWindowsToPortable(peReader, srcPdbStreamOpt, outPdbStream);
+                        WriteAllBytes(args.OutPdbFilePath, outPdbStream);
                     }
                 }
             }
-            catch (Exception e)
-            {
-                Console.Error.WriteLine(e.Message);
-                return 3;
-            }
+        }
 
-            return 0;
+        private static FileStream OpenFileForRead(string path)
+        {
+            try
+            {
+                return new FileStream(path, FileMode.Open, FileAccess.Read);
+            }
+            catch (Exception e) when (!(e is IOException))
+            {
+                throw new FileNotFoundException(string.Format(Resources.FileNotFound, path), path);
+            }
         }
 
         private static void WriteAllBytes(string path, Stream stream)

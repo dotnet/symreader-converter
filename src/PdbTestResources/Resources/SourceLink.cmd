@@ -4,4 +4,4 @@ csc /target:library /debug:embedded /optimize- /deterministic /out:SourceLink.Em
 copy /y SourceLink.dll SourceLink.dllx
 copy /y SourceLink.pdb SourceLink.pdbx
 
-C:\R1\Binaries\Debug\Exes\csc\csc.exe /target:library /debug:full /optimize- /deterministic /out:SourceLink.dll /sourcelink:SourceLink.json Documents.cs
+csc.exe /target:library /debug:full /optimize- /deterministic /out:SourceLink.dll /sourcelink:SourceLink.json Documents.cs

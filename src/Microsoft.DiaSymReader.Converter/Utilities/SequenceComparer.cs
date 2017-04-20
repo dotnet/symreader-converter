@@ -86,10 +86,10 @@ namespace Microsoft.CodeAnalysis.Collections
             return true;
         }
 
-        bool IEqualityComparer<T[]>.Equals(T[] x, T[] y) => Equals(x, y, _elementComparer);
-        bool IEqualityComparer<ImmutableArray<T>>.Equals(ImmutableArray<T> x, ImmutableArray<T> y) => Equals(x, y, _elementComparer);
+        public bool Equals(T[] x, T[] y) => Equals(x, y, _elementComparer);
+        public bool Equals(ImmutableArray<T> x, ImmutableArray<T> y) => Equals(x, y, _elementComparer);
 
-        int IEqualityComparer<T[]>.GetHashCode(T[] x) => Hash.CombineValues(x, _elementComparer);
-        int IEqualityComparer<ImmutableArray<T>>.GetHashCode(ImmutableArray<T> x) => Hash.CombineValues(x, _elementComparer);
+        public int GetHashCode(T[] x) => Hash.CombineValues(x, _elementComparer);
+        public int GetHashCode(ImmutableArray<T> x) => Hash.CombineValues(x, _elementComparer);
     }
 }

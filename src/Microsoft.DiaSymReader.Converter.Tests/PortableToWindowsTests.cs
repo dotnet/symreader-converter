@@ -990,12 +990,12 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 </symbols>");
         }
 
-        [Fact(Skip = "DSRN16 -- https://github.com/dotnet/symreader-converter/issues/42")]
-        public void Convert_SourceLink()
+        [Fact]
+        public void Convert_SourceLinkToSourceData()
         {
             VerifyWindowsPdb(
                 TestResources.SourceLink.DllAndPdb(portable: true),
-                TestResources.SourceLink.DllAndPdb(portable: false),
+                TestResources.SourceData.WindowsDllAndPdb,
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
@@ -1064,7 +1064,10 @@ C:\a\b\X.cs*1/a/b/X.cs
 C:\a\B\x.cs*1/a/B/x.cs
 SRCSRV: end ------------------------------------------------]]></srcsvr>
 </symbols>
-");
+", new[]
+{
+    new PdbDiagnostic(PdbDiagnosticId.UnmappedDocumentName, 0, new[] { @"C:\*\5.cs" })
+});
         }
     }
 }
