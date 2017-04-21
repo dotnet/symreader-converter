@@ -430,13 +430,14 @@ namespace Microsoft.DiaSymReader.Tools
                 ReportDiagnostic(PdbDiagnosticId.BothSourceLinkDataAndSourceServerData, 0);
             }
 
+            if (sourceLinkData == null && sourceServerData != null)
+            {
+                sourceLinkData = ConvertSourceServerToSourceLinkData(sourceServerData);
+            }
+
             if (sourceLinkData != null)
             {
                 SerializeSourceLinkData(metadataBuilder, sourceLinkData);
-            }
-            else if (sourceServerData != null)
-            {
-                SerializeSourceLinkData(metadataBuilder, ConvertSourceServerToSourceLinkData(sourceServerData));
             }
 
             var serializer = new PortablePdbBuilder(metadataBuilder, typeSystemRowCounts, debugEntryPointToken, idProvider: _ => pdbId);
@@ -1186,13 +1187,14 @@ namespace Microsoft.DiaSymReader.Tools
 
         private static byte[] ConvertSourceServerToSourceLinkData(byte[] sourceServerData)
         {
-            return Encoding.UTF8.GetBytes(ConvertSourceServerToSourceLinkData(Encoding.UTF8.GetString(sourceServerData)));
+            var sourceLinkData = ConvertSourceServerToSourceLinkData(Encoding.UTF8.GetString(sourceServerData));
+            return (sourceLinkData != null) ? Encoding.UTF8.GetBytes(sourceLinkData) : null;
         }
 
         // internal for testing
         internal static string ConvertSourceServerToSourceLinkData(string sourceServerData)
         {
-            // TODO: replicate what debugger does
+            // TODO: replicate what debugger does (https://github.com/dotnet/symreader-converter/issues/510)
 
             string[] lines = sourceServerData.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -1290,7 +1292,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             if (commonPathPrefix != null)
             {
-                AppendMapping(commonPathPrefix, commonUriPrefix, isPrefix: true);
+                AppendMapping(commonPathPrefix, commonUriPrefix ?? string.Empty, isPrefix: true);
             }
 
             builder.AppendLine();

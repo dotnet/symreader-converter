@@ -29,17 +29,21 @@ namespace Microsoft.DiaSymReader
 
         public void Dispose()
         {
-            GC.SuppressFinalize(this);
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         private void Dispose(bool disposing)
         {
             _metadataOwnerOpt?.Dispose();
 
-            foreach (var pinnedBuffer in _pinnedBuffers)
+            var pinnedBuffers = _pinnedBuffers;
+            if (pinnedBuffers != null)
             {
-                pinnedBuffer.Free();
+                foreach (var pinnedBuffer in pinnedBuffers)
+                {
+                    pinnedBuffer.Free();
+                }
             }
         }
 
