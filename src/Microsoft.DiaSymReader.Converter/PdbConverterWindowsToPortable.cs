@@ -32,8 +32,8 @@ namespace Microsoft.DiaSymReader.Tools
             _diagnosticReporterOpt?.Invoke(new PdbDiagnostic(id, token, args));
         }
 
-        /// <exception cref="COMException"/>
-        /// <exception cref="InvalidDataException"/>
+        /// <exception cref="COMException">Invalid PDB format.</exception>
+        /// <exception cref="InvalidDataException">The content of <paramref name="sourcePdbStream"/> doesn't match the CodeView Debug Directory record in the PE image.</exception>
         public void Convert(PEReader peReader, Stream sourcePdbStream, Stream targetPdbStream)
         {
             if (!SymReaderHelpers.TryReadPdbId(peReader, out var pdbId, out int age))
