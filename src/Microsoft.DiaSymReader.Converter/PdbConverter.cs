@@ -19,10 +19,15 @@ namespace Microsoft.DiaSymReader.Tools
             _diagnosticReporterOpt = diagnosticReporter;
         }
 
-        /// <exception cref="ArgumentException"/>
-        /// <exception cref="ArgumentNullException"/>
-        /// <exception cref="IOException"/>
-        /// <exception cref="ObjectDisposedException"/>
+        /// <summary>
+        /// Checks whether given PDB stream has Portable format.
+        /// </summary>
+        /// <param name="pdbStream">Stream.</param>
+        /// <returns>Returns true if the given stream starts with a Portable PDB signature.</returns>
+        /// <exception cref="ArgumentException"><paramref name="pdbStream"/> does not support read and seek operations.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="pdbStream"/> is null.</exception>
+        /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
+        /// <exception cref="ObjectDisposedException">Stream has been disposed while reading.</exception>
         public static bool IsPortable(Stream pdbStream)
         {
             StreamUtilities.ValidateStream(pdbStream, nameof(pdbStream), readRequired: true, seekRequired: true);
@@ -40,8 +45,9 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="ArgumentException"><paramref name="sourcePdbStream"/> does not support reading.</exception>
         /// <exception cref="ArgumentException"><paramref name="targetPdbStream"/> does not support writing.</exception>
         /// <exception cref="BadImageFormatException">The format of the PE image or the source PDB image is invalid.</exception>
-        /// <exception cref="InvalidDataException">Unexpected data found in the PE image or the source PDB image.</exception>
+        /// <exception cref="InvalidDataException">The PDB doesn't match the CodeView Debug Directory record in the PE image.</exception>
         /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
+        /// <exception cref="ObjectDisposedException">Stream has been disposed while reading/writing.</exception>
         public void ConvertWindowsToPortable(Stream peStream, Stream sourcePdbStream, Stream targetPdbStream)
         {
             StreamUtilities.ValidateStream(peStream, nameof(peStream), readRequired: true, seekRequired: true);
@@ -60,9 +66,10 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="ArgumentNullException"><paramref name="peReader"/>, <paramref name="sourcePdbStream"/>, or <paramref name="targetPdbStream"/> is null.</exception>
         /// <exception cref="ArgumentException"><paramref name="sourcePdbStream"/> does not support reading.</exception>
         /// <exception cref="ArgumentException"><paramref name="targetPdbStream"/> does not support writing.</exception>
-        /// <exception cref="BadImageFormatException">The format of the PE image is invalid.</exception>
-        /// <exception cref="InvalidDataException">Unexpected data found in the PE image or the source PDB image.</exception>
+        /// <exception cref="BadImageFormatException">The format of the PE image or the PDB stream is invalid.</exception>
+        /// <exception cref="InvalidDataException">The PDB doesn't match the CodeView Debug Directory record in the PE image.</exception>
         /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
+        /// <exception cref="ObjectDisposedException">Stream has been disposed while reading/writing.</exception>
         public void ConvertWindowsToPortable(PEReader peReader, Stream sourcePdbStream, Stream targetPdbStream)
         {
             if (peReader == null)
@@ -79,7 +86,7 @@ namespace Microsoft.DiaSymReader.Tools
             }
             catch (COMException e)
             {
-                throw new InvalidDataException(string.Format(ConverterResources.InvalidPdbFormat, e.Message), e);
+                throw new BadImageFormatException(string.Format(ConverterResources.InvalidPdbFormat, e.Message), e);
             }
         }
 
@@ -95,8 +102,9 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="ArgumentException"><paramref name="sourcePdbStream"/> does not support reading.</exception>
         /// <exception cref="ArgumentException"><paramref name="targetPdbStream"/> does not support writing.</exception>
         /// <exception cref="BadImageFormatException">The format of the PE image or the source PDB image is invalid.</exception>
-        /// <exception cref="InvalidDataException">Unexpected data found in the PE image or the source PDB image.</exception>
+        /// <exception cref="InvalidDataException">The PDB doesn't match the CodeView Debug Directory record in the PE image.</exception>
         /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
+        /// <exception cref="ObjectDisposedException">Stream has been disposed while reading/writing.</exception>
         public void ConvertPortableToWindows(Stream peStream, Stream sourcePdbStream, Stream targetPdbStream, PdbConversionOptions options = default(PdbConversionOptions))
         {
             StreamUtilities.ValidateStream(peStream, nameof(peStream), readRequired: true, seekRequired: true);
@@ -117,8 +125,9 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="ArgumentException"><paramref name="sourcePdbStream"/> does not support reading.</exception>
         /// <exception cref="ArgumentException"><paramref name="targetPdbStream"/> does not support writing.</exception>
         /// <exception cref="BadImageFormatException">The format of the PE image or the source PDB image is invalid.</exception>
-        /// <exception cref="InvalidDataException">Unexpected data found in the PE image or the source PDB image.</exception>
+        /// <exception cref="InvalidDataException">The PDB doesn't match the CodeView Debug Directory record in the PE image.</exception>
         /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
+        /// <exception cref="ObjectDisposedException">Stream has been disposed while reading/writing.</exception>
         public void ConvertPortableToWindows(PEReader peReader, Stream sourcePdbStream, Stream targetPdbStream, PdbConversionOptions options = default(PdbConversionOptions))
         {
             StreamUtilities.ValidateStream(sourcePdbStream, nameof(sourcePdbStream), readRequired: true);
@@ -139,8 +148,9 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="ArgumentNullException"><paramref name="peReader"/>, <paramref name="pdbReader"/>, or <paramref name="targetPdbStream"/> is null.</exception>
         /// <exception cref="ArgumentException"><paramref name="targetPdbStream"/> does not support writing.</exception>
         /// <exception cref="BadImageFormatException">The format of the PE image or the source PDB image is invalid.</exception>
-        /// <exception cref="InvalidDataException">Unexpected data found in the PE image or the source PDB image.</exception>
+        /// <exception cref="InvalidDataException">The PDB doesn't match the CodeView Debug Directory record in the PE image.</exception>
         /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
+        /// <exception cref="ObjectDisposedException">Stream has been disposed while reading/writing.</exception>
         public void ConvertPortableToWindows(PEReader peReader, MetadataReader pdbReader, Stream targetPdbStream, PdbConversionOptions options = default(PdbConversionOptions))
         {
             if (pdbReader == null)
@@ -166,7 +176,7 @@ namespace Microsoft.DiaSymReader.Tools
         /// <param name="options">Conversion options.</param>
         /// <exception cref="ArgumentNullException"><paramref name="peReader"/>, <paramref name="pdbReader"/>, or <paramref name="pdbWriter"/> is null.</exception>
         /// <exception cref="BadImageFormatException">The format of the PE image or the source PDB image is invalid.</exception>
-        /// <exception cref="InvalidDataException">Unexpected data found in the PE image or the source PDB image.</exception>
+        /// <exception cref="InvalidDataException">The PDB doesn't match the CodeView Debug Directory record in the PE image.</exception>
         /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
         public void ConvertPortableToWindows<TDocumentWriter>(PEReader peReader, MetadataReader pdbReader, PdbWriter<TDocumentWriter> pdbWriter, PdbConversionOptions options)
         {
