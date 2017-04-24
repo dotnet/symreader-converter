@@ -13,5 +13,9 @@
 
     <RepositoryUrl>https://github.com/dotnet/symreader-converter</RepositoryUrl>
     <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
+
+    <!-- SourceLink: Generate source link when building in microbuild. -->
+    <SourceLinkCreate Condition="'$(BUILD_BUILDNUMBER)' != ''">true</SourceLinkCreate>
+    <SourceLinkRepo>$(RepoRoot)</SourceLinkRepo>
   </PropertyGroup>
 </Project>
