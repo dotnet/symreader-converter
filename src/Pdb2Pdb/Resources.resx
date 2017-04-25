@@ -154,7 +154,7 @@
 /out:<path>    Output PDB path.
 /extract       Extract PDB embedded in the DLL/EXE. 
 /sourcelink    Preserve Source Link when converting from Portable PDB to Windows PDB, instead of converting to srcsrv format.
-/varbose       Print detailed diagnostics.
+/verbose       Print detailed diagnostics.
 
 /extract and /pdb are mutually exclusive.
 ]]></value>
