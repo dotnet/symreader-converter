@@ -178,7 +178,7 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="BadImageFormatException">The format of the PE image or the source PDB image is invalid.</exception>
         /// <exception cref="InvalidDataException">The PDB doesn't match the CodeView Debug Directory record in the PE image.</exception>
         /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
-        public void ConvertPortableToWindows<TDocumentWriter>(PEReader peReader, MetadataReader pdbReader, PdbWriter<TDocumentWriter> pdbWriter, PdbConversionOptions options)
+        internal void ConvertPortableToWindows<TDocumentWriter>(PEReader peReader, MetadataReader pdbReader, PdbWriter<TDocumentWriter> pdbWriter, PdbConversionOptions options)
         {
             new PdbConverterPortableToWindows<TDocumentWriter>(_diagnosticReporterOpt).Convert(
                 peReader ?? throw new ArgumentNullException(nameof(peReader)), 

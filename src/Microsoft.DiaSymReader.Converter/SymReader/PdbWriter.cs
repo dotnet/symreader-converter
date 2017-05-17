@@ -5,7 +5,7 @@ using System.Reflection.Metadata;
 
 namespace Microsoft.DiaSymReader
 {
-    public abstract class PdbWriter<TDocumentWriter>
+    internal abstract class PdbWriter<TDocumentWriter>
     {
         public abstract TDocumentWriter DefineDocument(string name, Guid language, Guid vendor, Guid type, Guid algorithmId, byte[] checksum);
         public abstract void DefineSequencePoints(TDocumentWriter document, int count, int[] offsets, int[] startLines, int[] startColumns, int[] endLines, int[] endColumns);
