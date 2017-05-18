@@ -251,7 +251,17 @@ namespace Microsoft.DiaSymReader.Tools
 
                 var symSequencePoints = symMethod.GetSequencePoints().ToImmutableArray();
 
-                BlobHandle sequencePointsBlob = SerializeSequencePoints(metadataBuilder, localSignatureRowId, symSequencePoints, documentIndex, out var singleDocumentHandle);
+                // add a dummy document:
+                if (documentIndex.Count == 0 && symSequencePoints.Length > 0)
+                {
+                    documentIndex.Add(string.Empty, metadataBuilder.AddDocument(
+                        name: metadataBuilder.GetOrAddDocumentName(string.Empty),
+                        hashAlgorithm: default(GuidHandle),
+                        hash: default(BlobHandle),
+                        language: default(GuidHandle)));
+                }
+
+                BlobHandle sequencePointsBlob = SerializeSequencePoints(metadataBuilder, localSignatureRowId, symSequencePoints, documentIndex, methodToken, out var singleDocumentHandle);
 
                 metadataBuilder.AddMethodDebugInformation(
                     document: singleDocumentHandle,
@@ -1022,11 +1032,12 @@ namespace Microsoft.DiaSymReader.Tools
         private static LocalConstantHandle NextHandle(LocalConstantHandle handle) =>
             MetadataTokens.LocalConstantHandle(MetadataTokens.GetRowNumber(handle) + 1);
 
-        private static BlobHandle SerializeSequencePoints(
+        private BlobHandle SerializeSequencePoints(
             MetadataBuilder metadataBuilder,
             int localSignatureRowId,
             ImmutableArray<SymUnmanagedSequencePoint> sequencePoints,
-            Dictionary<string, DocumentHandle> documentIndex,
+            IReadOnlyDictionary<string, DocumentHandle> documentIndex,
+            int methodIndex,
             out DocumentHandle singleDocumentHandle)
         {
             if (sequencePoints.Length == 0)
@@ -1043,7 +1054,7 @@ namespace Microsoft.DiaSymReader.Tools
             // header:
             writer.WriteCompressedInteger(localSignatureRowId);
 
-            DocumentHandle previousDocument = TryGetSingleDocument(sequencePoints, documentIndex);
+            DocumentHandle previousDocument = TryGetSingleDocument(sequencePoints, documentIndex, methodIndex);
             singleDocumentHandle = previousDocument;
 
             int previousOffset = -1;
@@ -1051,7 +1062,7 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 var sequencePoint = SanitizeSequencePoint(sequencePoints[i], previousOffset);
 
-                var currentDocument = documentIndex[sequencePoint.Document.GetName()];
+                var currentDocument = GetDocumentHandle(sequencePoint.Document, documentIndex, methodIndex);
                 if (previousDocument != currentDocument)
                 {
                     // optional document in header or document record:
@@ -1143,18 +1154,40 @@ namespace Microsoft.DiaSymReader.Tools
             return new SymUnmanagedSequencePoint(offset, sequencePoint.Document, startLine, startColumn, endLine, endColumn);
         }
 
-        private static DocumentHandle TryGetSingleDocument(ImmutableArray<SymUnmanagedSequencePoint> sequencePoints, Dictionary<string, DocumentHandle> documentIndex)
+        private DocumentHandle TryGetSingleDocument(ImmutableArray<SymUnmanagedSequencePoint> sequencePoints, IReadOnlyDictionary<string, DocumentHandle> documentIndex, int methodToken)
         {
-            DocumentHandle singleDocument = documentIndex[sequencePoints[0].Document.GetName()];
+            DocumentHandle singleDocument = GetDocumentHandle(sequencePoints[0].Document, documentIndex, methodToken);
             for (int i = 1; i < sequencePoints.Length; i++)
             {
-                if (documentIndex[sequencePoints[i].Document.GetName()] != singleDocument)
+                if (GetDocumentHandle(sequencePoints[i].Document, documentIndex, methodToken) != singleDocument)
                 {
                     return default(DocumentHandle);
                 }
             }
 
             return singleDocument;
+        }
+
+        private DocumentHandle GetDocumentHandle(ISymUnmanagedDocument document, IReadOnlyDictionary<string, DocumentHandle> documentIndex, int methodToken)
+        {
+            string name;
+            try
+            {
+                name = document.GetName();
+            }
+            catch (Exception)
+            {
+                ReportDiagnostic(PdbDiagnosticId.InvalidSequencePointDocument, methodToken);
+                return default(DocumentHandle);
+            }
+
+            if (documentIndex.TryGetValue(name, out var handle))
+            {
+                return handle;
+            }
+
+            ReportDiagnostic(PdbDiagnosticId.InvalidSequencePointDocument, methodToken);
+            return default(DocumentHandle);
         }
 
         private static void SerializeDeltaLinesAndColumns(BlobBuilder writer, SymUnmanagedSequencePoint sequencePoint)
