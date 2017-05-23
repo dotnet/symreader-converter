@@ -41,7 +41,7 @@ namespace Microsoft.DiaSymReader.Tools
                 throw new InvalidDataException(ConverterResources.SpecifiedPEFileHasNoAssociatedPdb);
             }
 
-            var symReader = SymReaderFactory.CreateWindowsPdbReader(sourcePdbStream, peReader);
+            var symReader = SymReaderHelpers.CreateWindowsPdbReader(sourcePdbStream, peReader);
 
             Marshal.ThrowExceptionForHR(symReader.MatchesModule(pdbId.Guid, pdbId.Stamp, age, out bool isMatching));
             if (!isMatching)

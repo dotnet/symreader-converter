@@ -84,7 +84,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             using (var peStream = File.OpenRead(pe.Path))
             using (var pdbStream = File.OpenRead(outPdbPath))
             {
-                var symReader = SymReaderFactory.CreateWindowsPdbReader(pdbStream);
+                var symReader = SymReaderHelpers.CreateWindowsPdbReader(pdbStream);
                 Assert.Null(symReader.GetSourceLinkData());
 
                 string actual = symReader.GetSourceServerData();
@@ -131,7 +131,7 @@ SRCSRV: end ------------------------------------------------", actual);
             using (var peStream = File.OpenRead(pe.Path))
             using (var pdbStream = File.OpenRead(outPdb.Path))
             {
-                var symReader = SymReaderFactory.CreateWindowsPdbReader(pdbStream);
+                var symReader = SymReaderHelpers.CreateWindowsPdbReader(pdbStream);
                 AssertEx.Equal(TestResources.SourceLink.SourceLinkJson, symReader.GetRawSourceLinkData());
                 Assert.Null(symReader.GetSourceServerData());
             }
@@ -155,7 +155,7 @@ SRCSRV: end ------------------------------------------------", actual);
             using (var peStream = File.OpenRead(pe.Path))
             using (var pdbStream = File.OpenRead(outPdb.Path))
             {
-                var symReader = SymReaderFactory.CreateWindowsPdbReader(pdbStream);
+                var symReader = SymReaderHelpers.CreateWindowsPdbReader(pdbStream);
                 AssertEx.Equal(TestResources.SourceLink.SourceLinkJson, symReader.GetRawSourceLinkData());
                 Assert.Null(symReader.GetSourceServerData());
             }

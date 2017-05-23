@@ -31,7 +31,7 @@ namespace Microsoft.DiaSymReader.Tools
         public static bool IsPortable(Stream pdbStream)
         {
             StreamUtilities.ValidateStream(pdbStream, nameof(pdbStream), readRequired: true, seekRequired: true);
-            return SymReaderFactory.IsPortable(pdbStream);
+            return SymReaderHelpers.IsPortable(pdbStream);
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             StreamUtilities.ValidateStream(targetPdbStream, nameof(targetPdbStream), writeRequired: true);
 
-            using (var pdbWriter = new SymUnmanagedWriter(peReader.GetMetadataReader()))
+            using (var pdbWriter = SymUnmanagedWriterFactory.CreateWriter(new SymMetadataProvider(peReader.GetMetadataReader())))
             {
                 ConvertPortableToWindows(peReader, pdbReader, pdbWriter, options);
                 pdbWriter.WriteTo(targetPdbStream);
@@ -178,9 +178,9 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="BadImageFormatException">The format of the PE image or the source PDB image is invalid.</exception>
         /// <exception cref="InvalidDataException">The PDB doesn't match the CodeView Debug Directory record in the PE image.</exception>
         /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
-        internal void ConvertPortableToWindows<TDocumentWriter>(PEReader peReader, MetadataReader pdbReader, PdbWriter<TDocumentWriter> pdbWriter, PdbConversionOptions options)
+        public void ConvertPortableToWindows(PEReader peReader, MetadataReader pdbReader, SymUnmanagedWriter pdbWriter, PdbConversionOptions options)
         {
-            new PdbConverterPortableToWindows<TDocumentWriter>(_diagnosticReporterOpt).Convert(
+            new PdbConverterPortableToWindows(_diagnosticReporterOpt).Convert(
                 peReader ?? throw new ArgumentNullException(nameof(peReader)), 
                 pdbReader ?? throw new ArgumentNullException(nameof(pdbReader)),
                 pdbWriter ?? throw new ArgumentNullException(nameof(pdbWriter)), 

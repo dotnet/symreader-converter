@@ -70,7 +70,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
                 SymReaderHelpers.GetWindowsPdbSignature(provider.GetMetadataReader().DebugMetadataHeader.Id, out guid, out stamp, out age);
             }
 
-            var symReader = SymReaderFactory.CreateWindowsPdbReader(windowsPdbStream);
+            var symReader = SymReaderHelpers.CreateWindowsPdbReader(windowsPdbStream);
             try
             {
                 Marshal.ThrowExceptionForHR(symReader.MatchesModule(guid, stamp, age, out bool result));
