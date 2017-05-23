@@ -47,6 +47,43 @@ namespace Microsoft.DiaSymReader.PortablePdb
 
             return (MetadataTokens.GetRowNumber(typeHandle) << 2) | tag;
         }
+        
+        // Doesn't handle nested types.
+        public static string GetQualifiedTypeName(this MetadataReader reader, EntityHandle typeDefOrRef)
+        {
+            string qualifiedName;
+            if (typeDefOrRef.Kind == HandleKind.TypeDefinition)
+            {
+                var typeDef = reader.GetTypeDefinition((TypeDefinitionHandle)typeDefOrRef);
+                if (typeDef.Namespace.IsNil)
+                {
+                    return reader.GetString(typeDef.Name);
+                }
+                else
+                {
+                    return reader.GetString(typeDef.Namespace) + "." + reader.GetString(typeDef.Name);
+                }
+
+            }
+            else if (typeDefOrRef.Kind == HandleKind.TypeReference)
+            {
+                var typeRef = reader.GetTypeReference((TypeReferenceHandle)typeDefOrRef);
+                if (typeRef.Namespace.IsNil)
+                {
+                    return reader.GetString(typeRef.Name);
+                }
+                else
+                {
+                    return reader.GetString(typeRef.Namespace) + "." + reader.GetString(typeRef.Name);
+                }
+            }
+            else
+            {
+                qualifiedName = null;
+            }
+
+            return qualifiedName;
+        }
 
         internal static BlobHandle GetCustomDebugInformation(this MetadataReader reader, EntityHandle parent, Guid kind)
         {

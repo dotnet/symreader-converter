@@ -149,7 +149,7 @@ namespace Microsoft.DiaSymReader.Tools
             using (var writer = XmlWriter.Create(xmlWriter, s_xmlWriterSettings))
             {
                 // metadata reader is on stack -> no owner needed
-                var symReader = CreateReader(pdbStream, metadataReaderOpt, metadataMemoryOwnerOpt: null);
+                var symReader = CreateReader(pdbStream, metadataReaderOpt);
 
                 try
                 {
@@ -163,16 +163,18 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        private static ISymUnmanagedReader3 CreateReader(Stream pdbStream, MetadataReader metadataReaderOpt, IDisposable metadataMemoryOwnerOpt)
+        private static ISymUnmanagedReader3 CreateReader(Stream pdbStream, MetadataReader metadataReaderOpt)
         {
-            if (SymReaderFactory.IsPortable(pdbStream))
+            var metadataProvider = metadataReaderOpt != null ? new SymMetadataProvider(metadataReaderOpt) : DummySymReaderMetadataProvider.Instance;
+            var importer = SymUnmanagedReaderFactory.CreateSymReaderMetadataImport(metadataProvider);
+
+            if (SymReaderHelpers.IsPortable(pdbStream))
             {
-                return (ISymUnmanagedReader3)new PortablePdb.SymBinder().GetReaderFromStream(pdbStream,
-                    new Roslyn.Test.PdbUtilities.DummyMetadataImport(metadataReaderOpt, metadataMemoryOwnerOpt));
+                return (ISymUnmanagedReader3)new PortablePdb.SymBinder().GetReaderFromStream(pdbStream, importer);
             }
             else
             {
-                return SymReaderFactory.CreateWindowsPdbReader(pdbStream, metadataReaderOpt, metadataMemoryOwnerOpt);
+                return SymUnmanagedReaderFactory.CreateReaderWithMetadataImport(pdbStream, importer);
             }
         }
 

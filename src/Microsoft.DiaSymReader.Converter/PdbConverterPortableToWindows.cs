@@ -22,7 +22,7 @@ using Roslyn.Utilities;
 
 namespace Microsoft.DiaSymReader.Tools
 {
-    internal sealed class PdbConverterPortableToWindows<TDocumentWriter>
+    internal sealed class PdbConverterPortableToWindows
     {
         private static readonly Guid s_languageVendorMicrosoft = new Guid("{994b45c4-e6e9-11d2-903f-00c04fa302a1}");
         private static readonly Guid s_documentTypeText = new Guid("{5a869d0b-6611-11d3-bd2a-0000f80849bd}");
@@ -58,7 +58,7 @@ namespace Microsoft.DiaSymReader.Tools
                 s_languageVendorMicrosoft : default(Guid);
         }
 
-        internal void Convert(PEReader peReader, MetadataReader pdbReader, PdbWriter<TDocumentWriter> pdbWriter, PdbConversionOptions options)
+        internal void Convert(PEReader peReader, MetadataReader pdbReader, SymUnmanagedWriter pdbWriter, PdbConversionOptions options)
         {
             if (!SymReaderHelpers.TryReadPdbId(peReader, out var pePdbId, out int peAge))
             {
@@ -77,9 +77,8 @@ namespace Microsoft.DiaSymReader.Tools
             var metadataReader = peReader.GetMetadataReader();
             var metadataModel = new MetadataModel(metadataReader, vbSemantics);
 
-            var documentWriters = new ArrayBuilder<TDocumentWriter>(pdbReader.Documents.Count);
             var documentNames = new ArrayBuilder<string>(pdbReader.Documents.Count);
-            var symSequencePointBuilder = new SequencePointsBuilder(capacity: 64);
+            var symSequencePointsWriter = new SymUnmanagedSequencePointsWriter(pdbWriter, capacity: 64);
             var declaredExternAliases = new HashSet<string>();
             var importStringsBuilder = new List<string>();
             var importGroups = new List<int>();
@@ -95,6 +94,7 @@ namespace Microsoft.DiaSymReader.Tools
             var importStringsMap = new Dictionary<ImmutableArray<string>, MethodDefinitionHandle>(SequenceComparer<string>.Instance);
 
             var aliasedAssemblyRefs = GetAliasedAssemblyRefs(pdbReader);
+            pdbWriter.DocumentTableCapacity = pdbReader.Documents.Count;
 
             foreach (var documentHandle in pdbReader.Documents)
             {
@@ -103,13 +103,14 @@ namespace Microsoft.DiaSymReader.Tools
                 var name = pdbReader.GetString(document.Name);
                 documentNames.Add(name);
 
-                documentWriters.Add(pdbWriter.DefineDocument(
+                pdbWriter.DefineDocument(
                     name: name,
                     language: languageGuid,
                     type: s_documentTypeText,
                     vendor: GetLanguageVendorGuid(languageGuid),
                     algorithmId: pdbReader.GetGuid(document.HashAlgorithm),
-                    checksum: pdbReader.GetBlobBytes(document.Hash)));
+                    checksum: pdbReader.GetBlobBytes(document.Hash),
+                    source: null); // TODO: support embedded source https://github.com/dotnet/symreader-converter/issues/63
             }
 
             var localScopeEnumerator = pdbReader.LocalScopes.GetEnumerator();
@@ -260,7 +261,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                             // TODO: translate hoisted variable scopes to dummy VB hoisted state machine locals (https://github.com/dotnet/roslyn/issues/8473)
 
-                            pdbWriter.DefineLocalVariable(variable.Index, name, variable.Attributes, MetadataTokens.GetToken(methodBodyOpt.LocalSignature));
+                            pdbWriter.DefineLocalVariable(variable.Index, name, (int)variable.Attributes, MetadataTokens.GetToken(methodBodyOpt.LocalSignature));
 
                             var dynamicFlags = MetadataUtilities.ReadDynamicCustomDebugInformation(pdbReader, localVariableHandle);
                             if (TryGetDynamicLocal(name, variable.Index, dynamicFlags, out var dynamicLocal))
@@ -326,7 +327,7 @@ namespace Microsoft.DiaSymReader.Tools
                 if (!methodDebugInfo.SequencePointsBlob.IsNil)
                 {
                     LazyOpenMethod();
-                    WriteSequencePoints(pdbWriter, documentWriters, symSequencePointBuilder, methodDebugInfo.GetSequencePoints(), methodToken);
+                    WriteSequencePoints(symSequencePointsWriter, methodDebugInfo.GetSequencePoints(), pdbReader.Documents.Count, methodToken);
                 }
 
                 // async method data:
@@ -528,7 +529,7 @@ namespace Microsoft.DiaSymReader.Tools
             return (backtick > 0) ? name.Substring(0, backtick) : name;
         }
 
-        private static void WriteImports(PdbWriter<TDocumentWriter> pdbWriter, ImmutableArray<string> importStrings)
+        private static void WriteImports(SymUnmanagedWriter pdbWriter, ImmutableArray<string> importStrings)
         {
             foreach (var importString in importStrings)
             {
@@ -783,33 +784,22 @@ namespace Microsoft.DiaSymReader.Tools
         }
 
         private void WriteSequencePoints(
-            PdbWriter<TDocumentWriter> pdbWriter, 
-            ArrayBuilder<TDocumentWriter> documentWriters, 
-            SequencePointsBuilder symSequencePointBuilder, 
+            SymUnmanagedSequencePointsWriter symSequencePointsWriter, 
             SequencePointCollection sequencePoints,
+            int documentCount,
             int methodToken)
         {
-            int currentDocumentWriterIndex = -1;
             foreach (var sequencePoint in sequencePoints)
             {
-                int documentWriterIndex = MetadataTokens.GetRowNumber(sequencePoint.Document) - 1;
-                if (documentWriterIndex > documentWriters.Count)
+                int documentIndex = MetadataTokens.GetRowNumber(sequencePoint.Document) - 1;
+                if (documentIndex > documentCount)
                 {
                     ReportDiagnostic(PdbDiagnosticId.InvalidSequencePointDocument, methodToken, MetadataTokens.GetToken(sequencePoint.Document));
                     continue;
                 }
 
-                if (currentDocumentWriterIndex != documentWriterIndex)
-                {
-                    if (currentDocumentWriterIndex >= 0)
-                    {
-                        symSequencePointBuilder.WriteSequencePoints(pdbWriter, documentWriters[currentDocumentWriterIndex]);
-                    }
-
-                    currentDocumentWriterIndex = documentWriterIndex;
-                }
-
-                symSequencePointBuilder.Add(
+                symSequencePointsWriter.Add(
+                    documentIndex: documentIndex,
                     offset: sequencePoint.Offset,
                     startLine: sequencePoint.StartLine,
                     startColumn: sequencePoint.StartColumn,
@@ -817,15 +807,12 @@ namespace Microsoft.DiaSymReader.Tools
                     endColumn: sequencePoint.EndColumn);
             }
 
-            if (currentDocumentWriterIndex >= 0)
-            {
-                symSequencePointBuilder.WriteSequencePoints(pdbWriter, documentWriters[currentDocumentWriterIndex]);
-            }
+            symSequencePointsWriter.Flush();
         }
 
         // Avoid loading JSON dependency if not needed.
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private void ConvertSourceServerData(string sourceLink, PdbWriter<TDocumentWriter> pdbWriter, IReadOnlyCollection<string> documentNames)
+        private void ConvertSourceServerData(string sourceLink, SymUnmanagedWriter pdbWriter, IReadOnlyCollection<string> documentNames)
         {
             var builder = new StringBuilder();
 

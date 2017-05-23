@@ -10,16 +10,11 @@
     <PackageTags>DiaSymReader ISymUnmanagedReader Windows PDB debugging XML Pdb2Xml</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\IMetadataEmit.cs" Link="SymReader\IMetadataEmit.cs" />
-    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\IMetadataImport.cs" Link="SymReader\IMetadataImport.cs" />
-    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\ISymUnmanagedSourceServerModule.cs" Link="SymReader\ISymUnmanagedSourceServerModule.cs" />
-    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\ISymUnmanagedWriter.cs" Link="SymReader\ISymUnmanagedWriter.cs" />
-    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\SuppressUnmanagedCodeSecurityAttribute.cs" Link="SymReader\SuppressUnmanagedCodeSecurityAttribute.cs" />
-    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\SymReaderFactory.cs" Link="SymReader\SymReaderFactory.cs" />
-    <Compile Include="..\Microsoft.DiaSymReader.Converter\SymReader\SymReaderMetadataImport.cs" Link="SymReader\SymReaderMetadataImport.cs" />
     <Compile Include="..\Microsoft.DiaSymReader.Converter\Utilities\HResult.cs" Link="Utilities\HResult.cs" />
-    <Compile Include="..\Microsoft.DiaSymReader.Converter\Utilities\InteropUtilities.cs" Link="SymReader\InteropUtilities.cs" />
     <Compile Include="..\Microsoft.DiaSymReader.Converter\Utilities\StreamUtilities.cs" Link="Utilities\StreamUtilities.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\Utilities\SymReaderHelpers.cs" Link="Utilities\SymReaderHelpers.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\Utilities\SymMetadataProvider.cs" Link="Utilities\SymMetadataProvider.cs" />
+    <Compile Include="..\Microsoft.DiaSymReader.Converter\Utilities\DummySymReaderMetadataProvider.cs" Link="Utilities\DummySymReaderMetadataProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.DiaSymReader" Version="$(MicrosoftDiaSymReaderVersion)" />

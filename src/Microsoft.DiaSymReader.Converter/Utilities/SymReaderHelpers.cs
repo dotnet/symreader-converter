@@ -15,6 +15,32 @@ namespace Microsoft.DiaSymReader.Tools
     {
         internal static readonly Guid VisualBasicLanguageGuid = new Guid("3a12d0b8-c26c-11d0-b442-00a0244a1dd2");
 
+        internal static bool IsPortable(Stream pdbStream)
+        {
+            pdbStream.Position = 0;
+
+            bool isPortable;
+            isPortable = pdbStream.ReadByte() == 'B' && pdbStream.ReadByte() == 'S' && pdbStream.ReadByte() == 'J' && pdbStream.ReadByte() == 'B';
+            pdbStream.Position = 0;
+
+            return isPortable;
+        }
+
+        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream)
+        {
+            return SymUnmanagedReaderFactory.CreateReader(pdbStream, DummySymReaderMetadataProvider.Instance);
+        }
+
+        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream, PEReader peReader)
+        {
+            return CreateWindowsPdbReader(pdbStream, peReader.GetMetadataReader());
+        }
+
+        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream, MetadataReader metadataReader)
+        {
+            return SymUnmanagedReaderFactory.CreateReader(pdbStream, new SymMetadataProvider(metadataReader));
+        }
+
         public static ImmutableArray<string> GetImportStrings(ISymUnmanagedReader reader, int methodToken, int methodVersion)
         {
             var method = reader.GetMethodByVersion(methodToken, methodVersion);
