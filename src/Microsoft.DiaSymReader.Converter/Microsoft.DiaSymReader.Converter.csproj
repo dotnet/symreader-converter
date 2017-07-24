@@ -2,6 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
+    <RootNamespace>Microsoft.DiaSymReader.Tools</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IsPackable>true</IsPackable>
@@ -22,18 +23,7 @@
     <InternalsVisibleTo Include="Pdb2Pdb.UnitTests" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="ConverterResources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ConverterResources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="ConverterResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ConverterResources.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>Microsoft.DiaSymReader.Tools</CustomToolNamespace>
-    </EmbeddedResource>
+    <EmbeddedResource Update="ConverterResources.resx" GenerateSource="true" />
   </ItemGroup>
   <Import Project="..\Microsoft.CodeAnalysis.Metadata\Microsoft.CodeAnalysis.Metadata.projitems" />
   <Import Project="..\Microsoft.CodeAnalysis.PooledObjects\Microsoft.CodeAnalysis.PooledObjects.projitems" />

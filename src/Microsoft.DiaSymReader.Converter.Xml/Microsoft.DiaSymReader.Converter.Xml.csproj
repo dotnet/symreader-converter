@@ -2,6 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
+    <RootNamespace>Microsoft.DiaSymReader.Tools</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IsPackable>true</IsPackable>
@@ -25,32 +26,8 @@
     <PackageReference Include="System.ValueTuple" Version="$(SystemValueTupleVersion)" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="PdbToXmlResources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>PdbToXmlResources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="PdbToXmlResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>PdbToXmlResources.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>Microsoft.DiaSymReader.Tools</CustomToolNamespace>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="ConverterResources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ConverterResources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="ConverterResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ConverterResources.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>Microsoft.DiaSymReader.Tools</CustomToolNamespace>
-    </EmbeddedResource>
+    <EmbeddedResource Update="PdbToXmlResources.resx" GenerateSource="true" />
+    <EmbeddedResource Update="ConverterResources.resx" GenerateSource="true" />
   </ItemGroup>
   <Import Project="..\Microsoft.CodeAnalysis.Metadata\Microsoft.CodeAnalysis.Metadata.projitems" />
   <Import Project="..\Microsoft.CodeAnalysis.PooledObjects\Microsoft.CodeAnalysis.PooledObjects.projitems" />
