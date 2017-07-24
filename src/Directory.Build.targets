@@ -2,6 +2,4 @@
 <Project>
   <!-- This file is imported by all projects at the end of the project files -->
   <Import Project="$(RepoToolsetDir)Imports.targets" />
-  <!-- Source link -->
-  <Import Project="$(NuGetPackageRoot)SourceLink.Create.CommandLine\$(SourceLinkCreateCommandLineVersion)\build\SourceLink.Create.CommandLine.targets" />
 </Project>

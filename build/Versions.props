@@ -4,22 +4,13 @@
     <!-- This repo version -->
     <VersionBase>1.1.0</VersionBase>
     <PreReleaseVersionLabel>beta1</PreReleaseVersionLabel>
-  
-    <!-- Toolset -->
-    <RoslynToolsMicrosoftRepoToolsetVersion>1.0.0-alpha14</RoslynToolsMicrosoftRepoToolsetVersion>
-    <RoslynToolsMicrosoftXUnitLoggerVersion>1.0.0-alpha1</RoslynToolsMicrosoftXUnitLoggerVersion>
-    <RoslynToolsMicrosoftSignToolVersion>0.3.2-beta</RoslynToolsMicrosoftSignToolVersion>
-    <DotNetCliVersion>2.0.0-preview3-006841</DotNetCliVersion>
-    <MicroBuildCoreVersion>0.2.0</MicroBuildCoreVersion>
-    <MicroBuildPluginsSwixBuildVersion>1.0.101</MicroBuildPluginsSwixBuildVersion>
-    <MicrosoftNetCompilersVersion>2.0.1</MicrosoftNetCompilersVersion>
-    <SourceLinkCreateCommandLineVersion>2.1.0</SourceLinkCreateCommandLineVersion>
 
-    <!-- Tests -->
-    <MicrosoftNETTestSdkVersion>15.0.0-preview-20170125-04</MicrosoftNETTestSdkVersion>
-    <XUnitVersion>2.2.0-beta4-build3444</XUnitVersion>
-    <XUnitRunnerVisualStudioVersion>2.2.0-beta4-build1194</XUnitRunnerVisualStudioVersion>
-    
+    <UsingToolXliff>false</UsingToolXliff>
+
+    <!-- Toolset -->
+    <DotNetCliVersion>2.0.0-preview3-006770</DotNetCliVersion>
+    <RoslynToolsMicrosoftRepoToolsetVersion>1.0.0-alpha29</RoslynToolsMicrosoftRepoToolsetVersion>
+
     <!-- libs -->
     <MicrosoftDiaSymReaderVersion>1.2.0-beta1-61723-01</MicrosoftDiaSymReaderVersion>
     <MicrosoftDiaSymReaderNativeVersion>1.6.0-beta2-25219</MicrosoftDiaSymReaderNativeVersion>

@@ -600,7 +600,6 @@ namespace Microsoft.DiaSymReader.Tools
             }
 
             declaredExternAliases.Clear();
-            aliasedAssemblyRefs.Clear();
         }
 
         private static void AddExternAliases(HashSet<string> externAliases, MetadataReader pdbReader, ImportScopeHandle importScopeHandle)
@@ -734,6 +733,9 @@ namespace Microsoft.DiaSymReader.Tools
                 case ImportDefinitionKind.AliasAssemblyNamespace:
                 case ImportDefinitionKind.ImportAssemblyNamespace:
                     // C#
+
+                    // The import string uses extern alias to represent an assembly reference.
+                    // Find one that is declared within the current scope.
                     string assemblyRefAlias = TryGetAssemblyReferenceAlias(import.TargetAssembly, declaredExternAliases, aliasedAssemblyRefs);
                     if (assemblyRefAlias == null)
                     {

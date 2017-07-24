@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Microsoft.DiaSymReader.Tools.UnitTests
 {
-    internal class MetadataUtilitiesTests
+    public class MetadataUtilitiesTests
     {
         [Fact]
         public void SerializeDynamicInfo()
