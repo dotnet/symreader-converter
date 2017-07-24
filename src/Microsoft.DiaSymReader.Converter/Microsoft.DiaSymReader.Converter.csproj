@@ -37,7 +37,4 @@
   </ItemGroup>
   <Import Project="..\Microsoft.CodeAnalysis.Metadata\Microsoft.CodeAnalysis.Metadata.projitems" />
   <Import Project="..\Microsoft.CodeAnalysis.PooledObjects\Microsoft.CodeAnalysis.PooledObjects.projitems" />
-  
-  <!-- Workaround for https://github.com/Microsoft/msbuild/issues/1721. -->
-  <Import Project="..\Directory.Build.targets" Condition="'$(TargetFramework)' == ''" />
 </Project>
