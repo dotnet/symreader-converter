@@ -181,5 +181,28 @@ namespace Microsoft.DiaSymReader.Tools
                 }
             }
         }
+
+        public static byte[] GetRawEmbeddedSource(this ISymUnmanagedDocument document)
+        {
+            Marshal.ThrowExceptionForHR(document.GetSourceLength(out int length));
+            if (length == 0)
+            {
+                return null;
+            }
+
+            if (length < sizeof(int))
+            {
+                throw new InvalidDataException();
+            }
+
+            var sourceBlob = new byte[length];
+            Marshal.ThrowExceptionForHR(document.GetSourceRange(0, 0, int.MaxValue, int.MaxValue, length, out int bytesRead, sourceBlob));
+            if (bytesRead < sizeof(int) || bytesRead > sourceBlob.Length)
+            {
+                throw new InvalidDataException();
+            }
+
+            return sourceBlob;
+        }
     }
 }

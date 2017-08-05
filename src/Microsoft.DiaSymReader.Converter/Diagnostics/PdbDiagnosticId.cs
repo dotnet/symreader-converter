@@ -32,6 +32,7 @@ namespace Microsoft.DiaSymReader.Tools
         InvalidSourceLinkData = 24,
         InvalidSourceServerData = 25,
         BothSourceLinkDataAndSourceServerData = 26,
+        InvalidEmbeddedSource = 27,
     }
 
     internal static class PdbDiagnosticIdExtensions
@@ -69,6 +70,7 @@ namespace Microsoft.DiaSymReader.Tools
                 case PdbDiagnosticId.InvalidSourceLinkData: return ConverterResources.InvalidSourceLinkData;
                 case PdbDiagnosticId.InvalidSourceServerData: return ConverterResources.InvalidSourceServerData;
                 case PdbDiagnosticId.BothSourceLinkDataAndSourceServerData: return ConverterResources.BothSourceLinkDataAndSourceServerData;
+                case PdbDiagnosticId.InvalidEmbeddedSource: return ConverterResources.InvalidEmbeddedSource;
 
                 default:
                     throw ExceptionUtilities.UnexpectedValue(id);

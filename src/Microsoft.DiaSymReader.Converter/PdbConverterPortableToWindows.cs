@@ -103,6 +103,9 @@ namespace Microsoft.DiaSymReader.Tools
                 var name = pdbReader.GetString(document.Name);
                 documentNames.Add(name);
 
+                var embeddedSourceHandle = pdbReader.GetCustomDebugInformation(documentHandle, PortableCustomDebugInfoKinds.EmbeddedSource);
+                var sourceBlob = embeddedSourceHandle.IsNil ? null : pdbReader.GetBlobBytes(embeddedSourceHandle);
+
                 pdbWriter.DefineDocument(
                     name: name,
                     language: languageGuid,
@@ -110,7 +113,7 @@ namespace Microsoft.DiaSymReader.Tools
                     vendor: GetLanguageVendorGuid(languageGuid),
                     algorithmId: pdbReader.GetGuid(document.HashAlgorithm),
                     checksum: pdbReader.GetBlobBytes(document.Hash),
-                    source: null); // TODO: support embedded source https://github.com/dotnet/symreader-converter/issues/63
+                    source: sourceBlob);
             }
 
             var localScopeEnumerator = pdbReader.LocalScopes.GetEnumerator();

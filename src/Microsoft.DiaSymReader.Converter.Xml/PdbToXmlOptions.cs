@@ -20,5 +20,6 @@ namespace Microsoft.DiaSymReader.Tools
         ExcludeAsyncInfo = 1 << 10,
         ExcludeCustomDebugInformation = 1 << 11,
         IncludeSourceServerInformation = 1 << 12,
+        IncludeEmbeddedSources = 1 << 13,
     }
 }

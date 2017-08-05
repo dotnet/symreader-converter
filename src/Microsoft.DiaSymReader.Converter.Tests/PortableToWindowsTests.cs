@@ -1069,5 +1069,88 @@ SRCSRV: end ------------------------------------------------]]></srcsvr>
     new PdbDiagnostic(PdbDiagnosticId.UnmappedDocumentName, 0, new[] { @"C:\*\5.cs" })
 });
         }
+
+        [Fact]
+        public void Convert_EmbeddedSource()
+        {
+            VerifyWindowsPdb(
+                TestResources.EmbeddedSource.DllAndPdb(portable: true),
+                TestResources.EmbeddedSource.DllAndPdb(portable: false),
+@"<?xml version=""1.0"" encoding=""utf-16""?>
+<symbols>
+  <files>
+    <file id=""1"" name=""C:\EmbeddedSourceSmall.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""48, 30, 92, B9, 4A, 92, 50, A7, 75, 33, E8,  5,  D, 2E, DD, CD, 3F, 58, 9F, 7F, "" embeddedSourceLength=""109""><![CDATA[// should be less than compression threshold (200 chars)
+public class Small
+{
+    public Small() {}
+}]]></file>
+    <file id=""2"" name=""C:\EmbeddedSource.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""1D, BB, A3, 11, 47, F6, 42, 7D, 82, 99, B4, 31, E9, 32, 7D, 6B,  9, C3, 59, EB, "" embeddedSourceLength=""229""><![CDATA[// should be higher than compression threshold (200 chars)
+
+using System;
+
+namespace Test
+{
+    public static class SomeCode
+    {
+        public static int SomeMethod(int value)
+        {
+            if (value < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value));
+            }
+
+            return checked(value + 42);
+        }
+    }
+}
+]]></file>
+    <file id=""3"" name=""C:\EmbeddedSourceNoCode.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""4B, 4C, 47, 82, 20, 10, AC, 63, A9, 24, 1E, 33, CE, BA, 74, 76, 40, F3, 33, BB, "" embeddedSourceLength=""26""><![CDATA[// file with no code
+]]></file>
+    <file id=""4"" name=""C:\EmbeddedSourceNoSequencePoints.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""8B, 74, C4, 70, 25, F1, 77, 43, 94, 81, 81, 6A, D1, 80, BA, F4, 57, 12, 58, 5E, "" embeddedSourceLength=""56""><![CDATA[// file with no sequence points
+
+interface I { }
+]]></file>
+  </files>
+  <methods>
+    <method containingType=""Small"" name="".ctor"">
+      <customDebugInfo>
+        <using>
+          <namespace usingCount=""0"" />
+        </using>
+      </customDebugInfo>
+      <sequencePoints>
+        <entry offset=""0x0"" startLine=""4"" startColumn=""5"" endLine=""4"" endColumn=""19"" document=""1"" />
+        <entry offset=""0x7"" startLine=""4"" startColumn=""20"" endLine=""4"" endColumn=""21"" document=""1"" />
+        <entry offset=""0x8"" startLine=""4"" startColumn=""21"" endLine=""4"" endColumn=""22"" document=""1"" />
+      </sequencePoints>
+    </method>
+    <method containingType=""Test.SomeCode"" name=""SomeMethod"" parameterNames=""value"">
+      <customDebugInfo>
+        <using>
+          <namespace usingCount=""0"" />
+          <namespace usingCount=""1"" />
+        </using>
+        <encLocalSlotMap>
+          <slot kind=""1"" offset=""15"" />
+          <slot kind=""21"" offset=""0"" />
+        </encLocalSlotMap>
+      </customDebugInfo>
+      <sequencePoints>
+        <entry offset=""0x0"" startLine=""10"" startColumn=""9"" endLine=""10"" endColumn=""10"" document=""2"" />
+        <entry offset=""0x1"" startLine=""11"" startColumn=""13"" endLine=""11"" endColumn=""27"" document=""2"" />
+        <entry offset=""0x6"" hidden=""true"" document=""2"" />
+        <entry offset=""0x9"" startLine=""12"" startColumn=""13"" endLine=""12"" endColumn=""14"" document=""2"" />
+        <entry offset=""0xa"" startLine=""13"" startColumn=""17"" endLine=""13"" endColumn=""70"" document=""2"" />
+        <entry offset=""0x15"" startLine=""16"" startColumn=""13"" endLine=""16"" endColumn=""40"" document=""2"" />
+        <entry offset=""0x1c"" startLine=""17"" startColumn=""9"" endLine=""17"" endColumn=""10"" document=""2"" />
+      </sequencePoints>
+      <scope startOffset=""0x0"" endOffset=""0x1e"">
+        <namespace name=""System"" />
+      </scope>
+    </method>
+  </methods>
+</symbols>
+");
+        }
     }
 }

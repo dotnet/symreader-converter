@@ -1532,6 +1532,11 @@ namespace Microsoft.DiaSymReader.Tools
                 {
                     Marshal.ThrowExceptionForHR(doc.GetSourceLength(out int sourceLength));
                     _writer.WriteAttributeString("embeddedSourceLength", sourceLength.ToString());
+
+                    if ((_options & PdbToXmlOptions.IncludeEmbeddedSources) != 0)
+                    {
+                        WriteEmbeddedSource(doc);
+                    }
                 }
 
                 _writer.WriteEndElement();
@@ -1540,6 +1545,31 @@ namespace Microsoft.DiaSymReader.Tools
             if (hasDocument)
             {
                 _writer.WriteEndElement();
+            }
+        }
+
+        private void WriteEmbeddedSource(ISymUnmanagedDocument doc)
+        {
+            var sourceBlob = doc.GetEmbeddedSource();
+            Debug.Assert(sourceBlob.Array != null);
+
+            string str = Encoding.UTF8.GetString(sourceBlob.Array, sourceBlob.Offset, sourceBlob.Count);
+
+            try
+            {
+                _writer.WriteCData(str);
+            }
+            catch (ArgumentException)
+            {
+                try
+                {
+                    _writer.WriteValue(str);
+                }
+                catch (ArgumentException)
+                {
+                    _writer.WriteAttributeString("encoding", "base64");
+                    _writer.WriteBase64(sourceBlob.Array, sourceBlob.Offset, sourceBlob.Count);
+                }
             }
         }
 

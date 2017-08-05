@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,114 +9,174 @@ namespace Microsoft.DiaSymReader.Tools
 {
     internal static class PdbToXmlApp
     {
+        internal sealed class Args
+        {
+            public readonly string InputPath;
+            public readonly string OutputPath;
+            public readonly PdbToXmlOptions Options;
+            public readonly bool Delta;
+
+            public Args(string inputPath, string outputPath, bool delta, PdbToXmlOptions options)
+            {
+                InputPath = inputPath;
+                OutputPath = outputPath;
+                Delta = delta;
+                Options = options;
+            }
+        }
+
         public static int Main(string[] args)
         {
-            if (args.Length == 0)
+            Args parsedArgs;
+            try
             {
-                Console.WriteLine("Usage: Pdb2Xml <PEFile | DeltaPdb> [<output file>] [/tokens] [/methodSpans] [/delta] [/srcsvr]");
+                parsedArgs = ParseArgs(args);
+            }
+            catch (InvalidDataException e)
+            {
+                Console.Error.WriteLine("Usage: Pdb2Xml <PEFile | DeltaPdb> [/out <output file>] [/tokens] [/methodSpans] [/delta] [/srcsvr] [/sources]");
+                Console.Error.WriteLine();
+                Console.Error.WriteLine(e.Message);
                 return 1;
-            }
-
-            var argList = new List<string>(args);
-
-            bool isDelta = argList.Remove("/delta");
-
-            var options = PdbToXmlOptions.ResolveTokens;
-
-            if (argList.Remove("/tokens"))
-            {
-                options |= PdbToXmlOptions.IncludeTokens;
-            }
-
-            if (argList.Remove("/methodSpans"))
-            {
-                options |= PdbToXmlOptions.IncludeMethodSpans;
-            }
-
-            if (argList.Remove("/srcsvr"))
-            {
-                options |= PdbToXmlOptions.IncludeSourceServerInformation;
-            }
-
-            string peFile;
-            string pdbFile;
-
-            if (isDelta)
-            {
-                peFile = null;
-                pdbFile = argList[0];
-            }
-            else
-            {
-                peFile = argList[0];
-                pdbFile = Path.ChangeExtension(peFile, ".pdb");
-            }
-
-            if (peFile != null && !File.Exists(peFile))
-            {
-                Console.WriteLine($"File not found: {peFile}");
-                return 2;
-            }
-
-            if (!File.Exists(pdbFile))
-            {
-                Console.WriteLine($"PDB File not found: {pdbFile}");
-                return 2;
-            }
-
-            string xmlFile;
-            if (argList.Count > 1)
-            {
-                xmlFile = argList[1];
-            }
-            else
-            {
-                xmlFile = Path.ChangeExtension(pdbFile, ".xml");
-            }
-
-            if (File.Exists(xmlFile))
-            {
-                try
-                {
-                    File.Delete(xmlFile);
-                }
-                catch
-                {
-                }
             }
 
             try
             {
-                if (isDelta)
-                {
-                    GenXmlFromDeltaPdb(pdbFile, xmlFile, options);
-                }
-                else
-                {
-                    GenXmlFromPdb(peFile, pdbFile, xmlFile, options);
-                }
+                Convert(parsedArgs);
+                Console.WriteLine($"PDB dump written to {parsedArgs.OutputPath}");
+                return 0;
             }
             catch (Exception e)
             {
                 Console.Error.WriteLine(e.Message);
-                return e.HResult;
+                return 2;
+            }
+        }
+
+        // internal for testing
+        internal static Args ParseArgs(string[] args)
+        {
+            string inputPath = null;
+            string outputPath = null;
+            bool delta = false;
+            var options = PdbToXmlOptions.ResolveTokens;
+
+            int i = 0;
+            while (i < args.Length)
+            {
+                var arg = args[i++];
+
+                string ReadValue() => (i < args.Length) ? args[i++] : throw new InvalidDataException(string.Format("Missing value for option '{0}'", arg));
+
+                switch (arg)
+                {
+                    case "/out":
+                        outputPath = ReadValue();
+                        break;
+
+                    case "/delta":
+                        delta = true;
+                        break;
+
+                    case "/tokens":
+                        options |= PdbToXmlOptions.IncludeTokens;
+                        break;
+
+                    case "/methodSpans":
+                        options |= PdbToXmlOptions.IncludeMethodSpans;
+                        break;
+
+                    case "/srcsvr":
+                        options |= PdbToXmlOptions.IncludeSourceServerInformation;
+                        break;
+
+                    case "/sources":
+                        options |= PdbToXmlOptions.IncludeEmbeddedSources;
+                        break;
+
+                    default:
+                        if (inputPath == null)
+                        {
+                            inputPath = arg;
+                        }
+                        else
+                        {
+                            throw new InvalidDataException((arg.StartsWith("/", StringComparison.Ordinal) ?
+                                string.Format("Unrecognized option: '{0}'", arg) :
+                                "Only one input file path can be specified"));
+                        }
+                        break;
+                }
             }
 
-            Console.WriteLine($"PDB dump written to {xmlFile}");
-            return 0;
+            if (inputPath == null)
+            {
+                throw new InvalidDataException("Missing input file path.");
+            }
+
+            if (outputPath == null)
+            {
+                try
+                {
+                    outputPath = Path.ChangeExtension(inputPath, "xml");
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidDataException(e.Message);
+                }
+            }
+
+            return new Args(
+                inputPath: inputPath,
+                outputPath: outputPath,
+                delta: delta,
+                options: options);
+        }
+
+        public static void Convert(Args args)
+        {
+            string peFile;
+            string pdbFile;
+
+            if (args.Delta)
+            {
+                peFile = null;
+                pdbFile = args.InputPath;
+            }
+            else
+            {
+                peFile = args.InputPath;
+                pdbFile = Path.ChangeExtension(args.InputPath, ".pdb");
+            }
+
+            if (peFile != null && !File.Exists(peFile))
+            {
+                throw new FileNotFoundException($"File not found: {peFile}");
+            }
+
+            if (!File.Exists(pdbFile))
+            {
+                throw new FileNotFoundException($"PDB File not found: {pdbFile}");
+            }
+
+            if (args.Delta)
+            {
+                GenXmlFromDeltaPdb(pdbFile, args.OutputPath, args.Options);
+            }
+            else
+            {
+                GenXmlFromPdb(peFile, pdbFile, args.OutputPath, args.Options);
+            }
         }
 
         public static void GenXmlFromPdb(string exePath, string pdbPath, string outPath, PdbToXmlOptions options)
         {
-            using (var exebits = new FileStream(exePath, FileMode.Open, FileAccess.Read))
+            using (var peStream = new FileStream(exePath, FileMode.Open, FileAccess.Read))
+            using (var pdbStream = new FileStream(pdbPath, FileMode.Open, FileAccess.Read))
+            using (var dstFileStream = new FileStream(outPath, FileMode.Create, FileAccess.ReadWrite))
+            using (var sw = new StreamWriter(dstFileStream, Encoding.UTF8))
             {
-                using (var pdbbits = new FileStream(pdbPath, FileMode.Open, FileAccess.Read))
-                {
-                    using (var sw = new StreamWriter(outPath, append: false, encoding: Encoding.UTF8))
-                    {
-                        PdbToXmlConverter.ToXml(sw, pdbbits, exebits, options);
-                    }
-                }
+                PdbToXmlConverter.ToXml(sw, pdbStream, peStream, options);
             }
         }
 
