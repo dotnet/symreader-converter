@@ -65,18 +65,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             foreach (var document in documents)
             {
-                string name = document.GetName();
-                Guid language = document.GetLanguage();
-                var hashAlgorithm = document.GetHashAlgorithm();
-                var checksumHandle = (hashAlgorithm != default(Guid)) ? metadataBuilder.GetOrAddBlob(document.GetChecksum()) : default(BlobHandle);
-
-                var rid = metadataBuilder.AddDocument(
-                    name: metadataBuilder.GetOrAddDocumentName(name),
-                    hashAlgorithm: metadataBuilder.GetOrAddGuid(hashAlgorithm),
-                    hash: checksumHandle,
-                    language: metadataBuilder.GetOrAddGuid(language));
-
-                documentIndex.Add(name, rid);
+                DefineDocument(metadataBuilder, document, documentIndex);
             }
 
             var lastLocalVariableHandle = default(LocalVariableHandle);
@@ -454,6 +443,42 @@ namespace Microsoft.DiaSymReader.Tools
             BlobBuilder blobBuilder = new BlobBuilder();
             serializer.Serialize(blobBuilder);
             blobBuilder.WriteContentTo(targetPdbStream);
+        }
+
+        private void DefineDocument(MetadataBuilder metadataBuilder, ISymUnmanagedDocument document, Dictionary<string, DocumentHandle> documentIndex)
+        {
+            string name = document.GetName();
+            Guid language = document.GetLanguage();
+            var hashAlgorithm = document.GetHashAlgorithm();
+            var checksumHandle = (hashAlgorithm != default(Guid)) ? metadataBuilder.GetOrAddBlob(document.GetChecksum()) : default(BlobHandle);
+
+            var documentHandle = metadataBuilder.AddDocument(
+                name: metadataBuilder.GetOrAddDocumentName(name),
+                hashAlgorithm: metadataBuilder.GetOrAddGuid(hashAlgorithm),
+                hash: checksumHandle,
+                language: metadataBuilder.GetOrAddGuid(language));
+
+            byte[] sourceBlob;
+
+            try
+            {
+                sourceBlob = document.GetRawEmbeddedSource();
+            }
+            catch
+            {
+                ReportDiagnostic(PdbDiagnosticId.InvalidEmbeddedSource, 0, name);
+                sourceBlob = null;
+            }
+
+            if (sourceBlob != null)
+            {
+                metadataBuilder.AddCustomDebugInformation(
+                    documentHandle,
+                    metadataBuilder.GetOrAddGuid(PortableCustomDebugInfoKinds.EmbeddedSource),
+                    metadataBuilder.GetOrAddBlob(sourceBlob));
+            }
+
+            documentIndex.Add(name, documentHandle);
         }
 
         private void BuildDynamicLocalMaps(

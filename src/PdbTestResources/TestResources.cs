@@ -176,6 +176,12 @@ namespace TestResources
         private static byte[] s_csSmall;
         public static byte[] CSSmall => ResourceLoader.GetOrCreateResource(ref s_csSmall, nameof(EmbeddedSource) + "Small.cs");
 
+        private static byte[] s_csNoCode;
+        public static byte[] CSNoCode => ResourceLoader.GetOrCreateResource(ref s_csNoCode, nameof(EmbeddedSource) + "NoCode.cs");
+
+        private static byte[] s_csNoSequencePoints;
+        public static byte[] CSNoSequencePoints => ResourceLoader.GetOrCreateResource(ref s_csNoSequencePoints, nameof(EmbeddedSource) + "NoSequencePoints.cs");
+
         public static TestResource PortableDllAndPdb => new TestResource(PortableDll, PortablePdb);
         public static TestResource WindowsDllAndPdb => new TestResource(WindowsDll, WindowsPdb);
         public static TestResource DllAndPdb(bool portable) => portable ? PortableDllAndPdb : WindowsDllAndPdb;

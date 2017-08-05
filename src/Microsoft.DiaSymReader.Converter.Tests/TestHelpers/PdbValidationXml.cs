@@ -16,6 +16,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 {
     internal static class PdbValidationXml
     {
+        private const PdbToXmlOptions Options = PdbToXmlOptions.IncludeSourceServerInformation | PdbToXmlOptions.IncludeEmbeddedSources | PdbToXmlOptions.ResolveTokens;
+
         public static void VerifyWindowsPdb(TestResource portable, TestResource windows, string expectedXml, PdbDiagnostic[] expectedDiagnostics = null)
         {
             VerifyWindowsMatchesExpected(windows, expectedXml);
@@ -26,7 +28,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         {
             var windowsPEStream = new MemoryStream(windows.PE);
             var windowsPdbStream = new MemoryStream(windows.Pdb);
-            var actualXml = PdbToXmlConverter.ToXml(windowsPdbStream, windowsPEStream, PdbToXmlOptions.IncludeSourceServerInformation | PdbToXmlOptions.ResolveTokens);
+            var actualXml = PdbToXmlConverter.ToXml(windowsPdbStream, windowsPEStream, Options);
 
             var adjustedExpectedXml = AdjustForInherentDifferences(expectedXml);
             var adjustedActualXml = AdjustForInherentDifferences(actualXml);
@@ -156,7 +158,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         {
             pdbStream.Position = 0;
             peStream.Position = 0;
-            var actualXml = PdbToXmlConverter.ToXml(pdbStream, peStream, PdbToXmlOptions.IncludeSourceServerInformation | PdbToXmlOptions.ResolveTokens);
+            var actualXml = PdbToXmlConverter.ToXml(pdbStream, peStream, Options);
 
             AssertEx.AssertLinesEqual(expectedXml, actualXml, message);
         }
