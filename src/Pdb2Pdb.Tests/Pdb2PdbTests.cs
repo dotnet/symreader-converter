@@ -35,15 +35,23 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             var args = Pdb2Pdb.ParseArgs(new[] { "a.dll" });
             Assert.Equal("a.dll", args.PEFilePath);
             Assert.Null(args.PdbFilePathOpt);
-            Assert.Equal("a.pdb2", args.OutPdbFilePath);
+            Assert.Equal("a.pdb2", args.OutPdbFilePathOpt);
             Assert.False(args.Extract);
+            Assert.False(args.Verbose);
+            Assert.Equal(PdbConversionOptions.Default, args.Options);
+
+            args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/extract" });
+            Assert.Equal("a.dll", args.PEFilePath);
+            Assert.Null(args.PdbFilePathOpt);
+            Assert.Null(args.OutPdbFilePathOpt);
+            Assert.True(args.Extract);
             Assert.False(args.Verbose);
             Assert.Equal(PdbConversionOptions.Default, args.Options);
 
             args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/extract", "/out", "b.pdb" });
             Assert.Equal("a.dll", args.PEFilePath);
             Assert.Null(args.PdbFilePathOpt);
-            Assert.Equal("b.pdb", args.OutPdbFilePath);
+            Assert.Equal("b.pdb", args.OutPdbFilePathOpt);
             Assert.True(args.Extract);
             Assert.False(args.Verbose);
             Assert.Equal(PdbConversionOptions.Default, args.Options);
@@ -51,7 +59,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/sourcelink", "/pdb", "b.pdb", "/out", "c.pdb" });
             Assert.Equal("a.dll", args.PEFilePath);
             Assert.Equal("b.pdb", args.PdbFilePathOpt);
-            Assert.Equal("c.pdb", args.OutPdbFilePath);
+            Assert.Equal("c.pdb", args.OutPdbFilePathOpt);
             Assert.False(args.Extract);
             Assert.False(args.Verbose);
             Assert.Equal(PdbConversionOptions.SuppressSourceLinkConversion, args.Options);
@@ -59,7 +67,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/out", "c.pdb", "/verbose" });
             Assert.Equal("a.dll", args.PEFilePath);
             Assert.Null(args.PdbFilePathOpt);
-            Assert.Equal("c.pdb", args.OutPdbFilePath);
+            Assert.Equal("c.pdb", args.OutPdbFilePathOpt);
             Assert.False(args.Extract);
             Assert.True(args.Verbose);
             Assert.Equal(PdbConversionOptions.Default, args.Options);
@@ -76,7 +84,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
                 pdbFilePathOpt: pdb.Path,
-                outPdbFilePath: outPdbPath,
+                outPdbFilePathOpt: outPdbPath,
                 options: PdbConversionOptions.Default,
                 extract: false,
                 verbose: false));
@@ -123,7 +131,7 @@ SRCSRV: end ------------------------------------------------", actual);
             Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
                 pdbFilePathOpt: null,
-                outPdbFilePath: outPdb.Path,
+                outPdbFilePathOpt: outPdb.Path,
                 options: PdbConversionOptions.SuppressSourceLinkConversion,
                 extract: false,
                 verbose: false));
@@ -147,7 +155,7 @@ SRCSRV: end ------------------------------------------------", actual);
             Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
                 pdbFilePathOpt: null,
-                outPdbFilePath: outPdb.Path,
+                outPdbFilePathOpt: outPdb.Path,
                 options: PdbConversionOptions.SuppressSourceLinkConversion,
                 extract: false,
                 verbose: false));
@@ -166,18 +174,37 @@ SRCSRV: end ------------------------------------------------", actual);
         {
             var dir = _temp.CreateDirectory();
             var pe = dir.CreateFile("SourceLink.Embedded.dll").WriteAllBytes(TestResources.SourceLink.EmbeddedDll);
-            var outPdb = dir.CreateFile("SourceLink.extracted.pdb").WriteAllText("dummy");
+            var outPdb = dir.CreateFile("SourceLink.Embedded.pdb").WriteAllText("dummy");
 
             Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
                 pdbFilePathOpt: null,
-                outPdbFilePath: outPdb.Path,
+                outPdbFilePathOpt: null,
                 options: PdbConversionOptions.Default,
                 extract: true,
                 verbose: false));
 
             AssertEx.Equal(TestResources.SourceLink.PortablePdb, File.ReadAllBytes(outPdb.Path));
         }
+
+        [Fact]
+        public void EndToEnd_EmbeddedToWindows_Extraction_OutPath()
+        {
+            var dir = _temp.CreateDirectory();
+            var pe = dir.CreateFile("SourceLink.Embedded.dll").WriteAllBytes(TestResources.SourceLink.EmbeddedDll);
+            var outPdb = dir.CreateFile("SourceLink.extracted.pdb").WriteAllText("dummy");
+
+            Pdb2Pdb.Convert(new Pdb2Pdb.Args(
+                peFilePath: pe.Path,
+                pdbFilePathOpt: null,
+                outPdbFilePathOpt: outPdb.Path,
+                options: PdbConversionOptions.Default,
+                extract: true,
+                verbose: false));
+
+            AssertEx.Equal(TestResources.SourceLink.PortablePdb, File.ReadAllBytes(outPdb.Path));
+        }
+
 
         [Fact]
         public void EndToEnd_Extraction_Error()
@@ -190,7 +217,7 @@ SRCSRV: end ------------------------------------------------", actual);
                 Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                     peFilePath: pe.Path,
                     pdbFilePathOpt: null,
-                    outPdbFilePath: outPdb.Path,
+                    outPdbFilePathOpt: outPdb.Path,
                     options: PdbConversionOptions.Default,
                     extract: true,
                     verbose: false)));
@@ -209,7 +236,7 @@ SRCSRV: end ------------------------------------------------", actual);
             Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
                 pdbFilePathOpt: null,
-                outPdbFilePath: outPdb.Path,
+                outPdbFilePathOpt: outPdb.Path,
                 options: PdbConversionOptions.Default,
                 extract: false,
                 verbose: false));

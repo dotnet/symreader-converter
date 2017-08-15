@@ -17,16 +17,16 @@ namespace Microsoft.DiaSymReader.Tools
         {
             public readonly string PEFilePath;
             public readonly string PdbFilePathOpt;
-            public readonly string OutPdbFilePath;
+            public readonly string OutPdbFilePathOpt;
             public readonly PdbConversionOptions Options;
             public readonly bool Extract;
             public readonly bool Verbose;
 
-            public Args(string peFilePath, string pdbFilePathOpt, string outPdbFilePath, PdbConversionOptions options, bool extract, bool verbose)
+            public Args(string peFilePath, string pdbFilePathOpt, string outPdbFilePathOpt, PdbConversionOptions options, bool extract, bool verbose)
             {
                 PEFilePath = peFilePath;
                 PdbFilePathOpt = pdbFilePathOpt;
-                OutPdbFilePath = outPdbFilePath;
+                OutPdbFilePathOpt = outPdbFilePathOpt;
                 Options = options;
                 Extract = extract;
                 Verbose = verbose;
@@ -119,7 +119,7 @@ namespace Microsoft.DiaSymReader.Tools
                 throw new InvalidDataException(Resources.MissingDllExePath);
             }
 
-            if (outPdb == null)
+            if (!extract && outPdb == null)
             {
                 try
                 {
@@ -165,6 +165,7 @@ namespace Microsoft.DiaSymReader.Tools
                 if (args.PdbFilePathOpt != null)
                 {
                     Debug.Assert(!args.Extract);
+                    Debug.Assert(args.OutPdbFilePathOpt != null);
 
                     using (var srcPdbStreamOpt = OpenFileForRead(args.PdbFilePathOpt))
                     {
@@ -178,7 +179,7 @@ namespace Microsoft.DiaSymReader.Tools
                             converter.ConvertWindowsToPortable(peReader, srcPdbStreamOpt, outPdbStream);
                         }
 
-                        WriteAllBytes(args.OutPdbFilePath, outPdbStream);
+                        WriteAllBytes(args.OutPdbFilePathOpt, outPdbStream);
                     }
                 }
                 else if (peReader.TryOpenAssociatedPortablePdb(args.PEFilePath, path => File.OpenRead(portablePdbFileCandidate = path), out var pdbReaderProvider, out _))
@@ -188,13 +189,20 @@ namespace Microsoft.DiaSymReader.Tools
                         var pdbReader = pdbReaderProvider.GetMetadataReader();
                         if (args.Extract)
                         {
-                            File.WriteAllBytes(args.OutPdbFilePath, ReadAllBytes(pdbReader));
+                            string pdbPath = 
+                                args.OutPdbFilePathOpt ??
+                                GetPdbPathFromCodeViewEntry(peReader, args.PEFilePath, portable: true) ?? 
+                                Path.ChangeExtension(args.PEFilePath, "pdb");
+
+                            File.WriteAllBytes(pdbPath, ReadAllBytes(pdbReader));
                         }
                         else
                         {
+                            Debug.Assert(args.OutPdbFilePathOpt != null);
+
                             var dstPdbStream = new MemoryStream();
                             converter.ConvertPortableToWindows(peReader, pdbReader, dstPdbStream, args.Options);
-                            WriteAllBytes(args.OutPdbFilePath, dstPdbStream);
+                            WriteAllBytes(args.OutPdbFilePathOpt, dstPdbStream);
                         }
                     }
                 }
@@ -208,35 +216,45 @@ namespace Microsoft.DiaSymReader.Tools
                 }
                 else
                 {
+                    Debug.Assert(args.OutPdbFilePathOpt != null);
+
                     // We don't have Portable PDB nor Embedded PDB. Try to find Windows PDB.
 
-                    var directory = peReader.ReadDebugDirectory();
-                    var codeViewEntry = directory.FirstOrDefault(entry => entry.Type == DebugDirectoryEntryType.CodeView);
-
-                    if (codeViewEntry.DataSize == 0)
+                    string path = GetPdbPathFromCodeViewEntry(peReader, args.PEFilePath, portable: false);
+                    if (path == null)
                     {
                         throw new IOException(string.Format(Resources.NoAssociatedOrEmbeddedPdb, args.PEFilePath));
-                    }
-
-                    var data = peReader.ReadCodeViewDebugDirectoryData(codeViewEntry);
-                    string path;
-
-                    try
-                    {
-                        path = Path.Combine(Path.GetDirectoryName(args.PEFilePath), Path.GetFileName(data.Path));
-                    }
-                    catch (Exception)
-                    {
-                        path = null;
                     }
 
                     using (var srcPdbStreamOpt = OpenFileForRead(path))
                     {
                         var outPdbStream = new MemoryStream();
                         converter.ConvertWindowsToPortable(peReader, srcPdbStreamOpt, outPdbStream);
-                        WriteAllBytes(args.OutPdbFilePath, outPdbStream);
+                        WriteAllBytes(args.OutPdbFilePathOpt, outPdbStream);
                     }
                 }
+            }
+        }
+
+        private static string GetPdbPathFromCodeViewEntry(PEReader peReader, string peFilePath, bool portable)
+        {
+            var directory = peReader.ReadDebugDirectory();
+
+            var codeViewEntry = directory.FirstOrDefault(entry => entry.Type == DebugDirectoryEntryType.CodeView && entry.IsPortableCodeView == portable);
+            if (codeViewEntry.DataSize == 0)
+            {
+                return null;
+            }
+
+            var data = peReader.ReadCodeViewDebugDirectoryData(codeViewEntry);
+
+            try
+            {
+                return Path.Combine(Path.GetDirectoryName(peFilePath), Path.GetFileName(data.Path));
+            }
+            catch (Exception)
+            {
+                throw new BadImageFormatException(string.Format(Resources.InvalidPdbPathInDebugDirectory, peFilePath));
             }
         }
 
