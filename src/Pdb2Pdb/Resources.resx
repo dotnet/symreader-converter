@@ -147,11 +147,14 @@
   <data name="NoAssociatedOrEmbeddedPdb" xml:space="preserve">
     <value>File '{0}' is neither associated with PDB nor does it embed PDB.</value>
   </data>
+  <data name="InvalidPdbPathInDebugDirectory" xml:space="preserve">
+    <value>Invalid PDB path in Debug Directory (file '{0}').</value>
+  </data>
   <data name="Pdb2PdbUsage" xml:space="preserve">
-    <value><![CDATA[Usage: Pdb2Pdb <dll/exe path> [/pdb:<path>] [/out:<path>] [/extract]
+    <value><![CDATA[Usage: Pdb2Pdb <dll/exe path> [/pdb <path>] [/out <path>] [/extract]
 
-/pdb:<path>    Path to the PDB to convert. If not specified explicitly, the PDB referenced by or embedded in the DLL/EXE is used.
-/out:<path>    Output PDB path.
+/pdb <path>    Path to the PDB to convert. If not specified explicitly, the PDB referenced by or embedded in the DLL/EXE is used.
+/out <path>    Output PDB path.
 /extract       Extract PDB embedded in the DLL/EXE. 
 /sourcelink    Preserve Source Link when converting from Portable PDB to Windows PDB, instead of converting to srcsrv format.
 /verbose       Print detailed diagnostics.

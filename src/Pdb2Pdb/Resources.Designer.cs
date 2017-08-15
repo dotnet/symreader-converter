@@ -19,7 +19,7 @@ namespace Microsoft.DiaSymReader.Tools {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -97,6 +97,15 @@ namespace Microsoft.DiaSymReader.Tools {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid PDB path in Debug Directory (file &apos;{0}&apos;)..
+        /// </summary>
+        internal static string InvalidPdbPathInDebugDirectory {
+            get {
+                return ResourceManager.GetString("InvalidPdbPathInDebugDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File &apos;{0}&apos; not found or doesn&apos;t match &apos;{1}&apos;..
         /// </summary>
         internal static string MatchingPdbNotFound {
@@ -142,13 +151,13 @@ namespace Microsoft.DiaSymReader.Tools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Usage: Pdb2Pdb &lt;dll/exe path&gt; [/pdb:&lt;path&gt;] [/out:&lt;path&gt;] [/extract]
+        ///   Looks up a localized string similar to Usage: Pdb2Pdb &lt;dll/exe path&gt; [/pdb &lt;path&gt;] [/out &lt;path&gt;] [/extract]
         ///
-        ////pdb:&lt;path&gt;    Path to the PDB to convert. If not specified explicitly, the PDB referenced by or embedded in the DLL/EXE is used.
-        ////out:&lt;path&gt;    Output PDB path.
+        ////pdb &lt;path&gt;    Path to the PDB to convert. If not specified explicitly, the PDB referenced by or embedded in the DLL/EXE is used.
+        ////out &lt;path&gt;    Output PDB path.
         ////extract       Extract PDB embedded in the DLL/EXE. 
         ////sourcelink    Preserve Source Link when converting from Portable PDB to Windows PDB, instead of converting to srcsrv format.
-        ////varbose       Print detailed diagnostics.
+        ////verbose       Print detailed diagnostics.
         ///
         ////extract and /pdb are mutually exclusive.
         ///.
