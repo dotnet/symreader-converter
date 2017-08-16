@@ -14,7 +14,7 @@
     <!-- libs -->
     <MicrosoftDiaSymReaderVersion>1.2.0-beta1-62008-01</MicrosoftDiaSymReaderVersion>
     <MicrosoftDiaSymReaderNativeVersion>1.7.0-private-25604</MicrosoftDiaSymReaderNativeVersion>
-    <MicrosoftDiaSymReaderPortablePdbVersion>1.3.0-beta1-62008-01</MicrosoftDiaSymReaderPortablePdbVersion>
+    <MicrosoftDiaSymReaderPortablePdbVersion>1.4.0-beta1-62016-01</MicrosoftDiaSymReaderPortablePdbVersion>
     <MicrosoftMetadataVisualizerVersion>1.0.0-beta1-61530-02</MicrosoftMetadataVisualizerVersion>
     <NewtonsoftJsonVersion>9.0.1</NewtonsoftJsonVersion>
     
