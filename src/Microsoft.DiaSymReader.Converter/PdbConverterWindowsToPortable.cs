@@ -1211,7 +1211,7 @@ namespace Microsoft.DiaSymReader.Tools
                 return handle;
             }
 
-            ReportDiagnostic(PdbDiagnosticId.InvalidSequencePointDocument, methodToken);
+            ReportDiagnostic(PdbDiagnosticId.InvalidSequencePointDocument, methodToken, name);
             return default(DocumentHandle);
         }
 

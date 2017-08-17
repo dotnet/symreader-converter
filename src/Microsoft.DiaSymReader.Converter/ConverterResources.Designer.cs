@@ -233,7 +233,7 @@ namespace Microsoft.DiaSymReader.Tools {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid sequence point document.
+        ///   Looks up a localized string similar to Invalid sequence point document name: &apos;{0}&apos;.
         /// </summary>
         internal static string InvalidSequencePointDocument {
             get {
