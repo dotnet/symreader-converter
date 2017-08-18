@@ -217,7 +217,7 @@
     <value>Invalid local scope</value>
   </data>
   <data name="InvalidSequencePointDocument" xml:space="preserve">
-    <value>Invalid sequence point document</value>
+    <value>Invalid sequence point document name: '{0}'</value>
   </data>
   <data name="UnmappedDocumentName" xml:space="preserve">
     <value>Document name doesn't match any pattern in Source Link: '{0}'</value>
