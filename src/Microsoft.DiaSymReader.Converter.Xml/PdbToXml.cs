@@ -1424,16 +1424,13 @@ namespace Microsoft.DiaSymReader.Tools
 
                 int documentId;
                 string documentName = sequencePoint.Document.GetName();
-                if (documentName.Length > 0)
+                if (documentIndex.TryGetValue(documentName, out documentId))
                 {
-                    if (documentIndex.TryGetValue(documentName, out documentId))
-                    {
-                        _writer.WriteAttributeString("document", CultureInvariantToString(documentId));
-                    }
-                    else
-                    {
-                        _writer.WriteAttributeString("document", "?");
-                    }
+                    _writer.WriteAttributeString("document", CultureInvariantToString(documentId));
+                }
+                else
+                {
+                    _writer.WriteAttributeString("document", "?");
                 }
 
                 _writer.WriteEndElement();
@@ -1465,14 +1462,6 @@ namespace Microsoft.DiaSymReader.Tools
             foreach (var document in documents)
             {
                 string name = document.GetName();
-
-                // Native PDB doesn't allow no-name documents. SymWriter silently ignores them.
-                // In Portable PDB all methods must be contained in a document, whose name may be empty. 
-                // Skip such documents - like they were never in the document table.
-                if (name.Length == 0)
-                {
-                    continue;
-                }
 
                 // Skip adding dups into the index, but increment id so that we 
                 // can tell what methods are referring to the duplicate.
