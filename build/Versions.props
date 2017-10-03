@@ -8,8 +8,8 @@
     <UsingToolXliff>false</UsingToolXliff>
 
     <!-- Toolset -->
-    <DotNetCliVersion>2.0.0-preview3-006770</DotNetCliVersion>
-    <RoslynToolsMicrosoftRepoToolsetVersion>1.0.0-alpha40</RoslynToolsMicrosoftRepoToolsetVersion>
+    <DotNetCliVersion>2.1.0-preview1-007228</DotNetCliVersion>
+    <RoslynToolsMicrosoftRepoToolsetVersion>1.0.0-alpha41</RoslynToolsMicrosoftRepoToolsetVersion>
 
     <!-- libs -->
     <MicrosoftDiaSymReaderVersion>1.2.0-beta1-62008-01</MicrosoftDiaSymReaderVersion>
