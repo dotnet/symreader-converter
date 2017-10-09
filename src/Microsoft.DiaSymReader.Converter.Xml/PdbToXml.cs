@@ -174,7 +174,7 @@ namespace Microsoft.DiaSymReader.Tools
             }
             else
             {
-                return SymUnmanagedReaderFactory.CreateReaderWithMetadataImport(pdbStream, importer);
+                return SymUnmanagedReaderFactory.CreateReaderWithMetadataImport<ISymUnmanagedReader3>(pdbStream, importer, SymUnmanagedReaderCreationOptions.UseComRegistry);
             }
         }
 

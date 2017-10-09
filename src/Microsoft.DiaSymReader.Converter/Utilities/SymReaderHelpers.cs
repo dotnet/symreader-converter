@@ -28,7 +28,7 @@ namespace Microsoft.DiaSymReader.Tools
 
         public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream)
         {
-            return SymUnmanagedReaderFactory.CreateReader(pdbStream, DummySymReaderMetadataProvider.Instance);
+            return SymUnmanagedReaderFactory.CreateReader<ISymUnmanagedReader5>(pdbStream, DummySymReaderMetadataProvider.Instance);
         }
 
         public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream, PEReader peReader)
@@ -38,7 +38,7 @@ namespace Microsoft.DiaSymReader.Tools
 
         public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream, MetadataReader metadataReader)
         {
-            return SymUnmanagedReaderFactory.CreateReader(pdbStream, new SymMetadataProvider(metadataReader));
+            return SymUnmanagedReaderFactory.CreateReader<ISymUnmanagedReader5>(pdbStream, new SymMetadataProvider(metadataReader));
         }
 
         public static ImmutableArray<string> GetImportStrings(ISymUnmanagedReader reader, int methodToken, int methodVersion)
