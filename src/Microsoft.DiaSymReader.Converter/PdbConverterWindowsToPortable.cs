@@ -850,7 +850,7 @@ namespace Microsoft.DiaSymReader.Tools
                 start = symScope.GetStartOffset();
                 end = symScope.GetEndOffset() + (vbSemantics && !isTopScope ? 1 : 0);
 
-                // TODO: Once https://github.com/dotnet/roslyn/issues/8473 is implemented, convert to State Machine Hoisted Variable Scopes CDI
+                // TODO: convert to State Machine Hoisted Variable Scopes CDI: https://github.com/dotnet/symreader-converter/issues/80
                 symLocals = symScope.GetLocals().Where(l => !l.GetName().StartsWith("$VB$ResumableLocal_")).ToArray();
                 symConstants = symScope.GetConstants();
                 symChildScopes = symScope.GetChildren();

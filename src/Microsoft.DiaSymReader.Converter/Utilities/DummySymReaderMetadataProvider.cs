@@ -12,10 +12,10 @@ namespace Microsoft.DiaSymReader.Tools
         public unsafe bool TryGetStandaloneSignature(int standaloneSignatureToken, out byte* signature, out int length)
             => throw new NotSupportedException(ConverterResources.MetadataNotAvailable);
 
-        public bool TryGetTypeDefinitionInfo(int typeDefinitionToken, out string namespaceName, out string typeName, out TypeAttributes attributes, out int baseTypeToken)
+        public bool TryGetTypeDefinitionInfo(int typeDefinitionToken, out string namespaceName, out string typeName, out TypeAttributes attributes)
             => throw new NotSupportedException(ConverterResources.MetadataNotAvailable);
 
-        public bool TryGetTypeReferenceInfo(int typeReferenceToken, out string namespaceName, out string typeName, out int resolutionScopeToken)
+        public bool TryGetTypeReferenceInfo(int typeReferenceToken, out string namespaceName, out string typeName)
             => throw new NotSupportedException(ConverterResources.MetadataNotAvailable);
     }
 }
