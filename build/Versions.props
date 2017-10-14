@@ -6,6 +6,7 @@
     <PreReleaseVersionLabel>beta1</PreReleaseVersionLabel>
 
     <UsingToolXliff>false</UsingToolXliff>
+    <UsingToolPdbConverter>true</UsingToolPdbConverter>
 
     <!-- Toolset -->
     <DotNetCliVersion>2.0.2</DotNetCliVersion>
