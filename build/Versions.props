@@ -9,7 +9,7 @@
     <UsingToolPdbConverter>true</UsingToolPdbConverter>
 
     <!-- Toolset -->
-    <DotNetCliVersion>2.0.2</DotNetCliVersion>
+    <DotNetCliVersion>15.5.0-preview-007044</DotNetCliVersion>
     <RoslynToolsMicrosoftRepoToolsetVersion>1.0.0-alpha43</RoslynToolsMicrosoftRepoToolsetVersion>
 
     <!-- libs -->
