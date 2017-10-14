@@ -6,15 +6,16 @@
     <PreReleaseVersionLabel>beta1</PreReleaseVersionLabel>
 
     <UsingToolXliff>false</UsingToolXliff>
+    <UsingToolPdbConverter>true</UsingToolPdbConverter>
 
     <!-- Toolset -->
-    <DotNetCliVersion>2.0.0-preview3-006770</DotNetCliVersion>
-    <RoslynToolsMicrosoftRepoToolsetVersion>1.0.0-alpha40</RoslynToolsMicrosoftRepoToolsetVersion>
+    <DotNetCliVersion>2.0.2</DotNetCliVersion>
+    <RoslynToolsMicrosoftRepoToolsetVersion>1.0.0-alpha43</RoslynToolsMicrosoftRepoToolsetVersion>
 
     <!-- libs -->
-    <MicrosoftDiaSymReaderVersion>1.2.0-beta1-62209-01</MicrosoftDiaSymReaderVersion>
+    <MicrosoftDiaSymReaderVersion>1.2.0-beta1-62213-04</MicrosoftDiaSymReaderVersion>
     <MicrosoftDiaSymReaderNativeVersion>1.7.0-beta-25631</MicrosoftDiaSymReaderNativeVersion>
-    <MicrosoftDiaSymReaderPortablePdbVersion>1.4.0-beta1-62209-01</MicrosoftDiaSymReaderPortablePdbVersion>
+    <MicrosoftDiaSymReaderPortablePdbVersion>1.4.0-beta1-62214-02</MicrosoftDiaSymReaderPortablePdbVersion>
     <MicrosoftMetadataVisualizerVersion>1.0.0-beta1-61530-02</MicrosoftMetadataVisualizerVersion>
     <NewtonsoftJsonVersion>9.0.1</NewtonsoftJsonVersion>
     
