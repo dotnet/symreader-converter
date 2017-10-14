@@ -5,9 +5,13 @@
       "strongName": "MsSharedLib72",
       "values": [
         "bin/Microsoft.DiaSymReader.Converter/netstandard1.3/Microsoft.DiaSymReader.Converter.dll",
+        "bin/Microsoft.DiaSymReader.Converter/netstandard1.3/*/Microsoft.DiaSymReader.Converter.resources.dll",
         "bin/Microsoft.DiaSymReader.Converter/net45/Microsoft.DiaSymReader.Converter.dll",
+        "bin/Microsoft.DiaSymReader.Converter/net45/*/Microsoft.DiaSymReader.Converter.resources.dll",
         "bin/Microsoft.DiaSymReader.Converter.Xml/netstandard1.3/Microsoft.DiaSymReader.Converter.Xml.dll",
+        "bin/Microsoft.DiaSymReader.Converter.Xml/netstandard1.3/*/Microsoft.DiaSymReader.Converter.Xml.resources.dll",
         "bin/Pdb2Xml/net46/Pdb2Xml.exe",
+        "bin/Pdb2Xml/net46/*/Pdb2Xml.resources.dll",
         "bin/Pdb2Pdb/net46/Pdb2Pdb.exe"
       ]
     }
