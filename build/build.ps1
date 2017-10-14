@@ -75,7 +75,7 @@ function InstallDotNetCli {
   Create-Directory $DotNetRoot
   $dotnetCliVersion = GetDotNetCliVersion
 
-  $installScript="https://raw.githubusercontent.com/dotnet/cli/release/2.0.0/scripts/obtain/dotnet-install.ps1"
+  $installScript="https://raw.githubusercontent.com/dotnet/cli/release/15.5/scripts/obtain/dotnet-install.ps1"
   Invoke-WebRequest $installScript -OutFile "$DotNetRoot\dotnet-install.ps1"
   
   & "$DotNetRoot\dotnet-install.ps1" -Version $dotnetCliVersion -InstallDir $DotNetRoot
