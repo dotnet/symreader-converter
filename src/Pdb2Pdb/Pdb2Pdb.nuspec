@@ -25,6 +25,7 @@
     <file src="net46\Microsoft.DiaSymReader.Native.*.dll" target="tools" />
     <file src="net46\System.*.dll" target="tools" />
     <file src="net46\*.exe" target="tools" />
-    <file src="net46\*.exe.config" target="tools" />
+    <file src="net46\*.exe.config" target="tools" />    
+    <file src="net46\**\*.resources.dll" target="tools" />
   </files>
 </package>
