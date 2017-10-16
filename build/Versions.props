@@ -13,9 +13,9 @@
     <RoslynToolsMicrosoftRepoToolsetVersion>1.0.0-alpha43</RoslynToolsMicrosoftRepoToolsetVersion>
 
     <!-- libs -->
-    <MicrosoftDiaSymReaderVersion>1.2.0-beta1-62213-04</MicrosoftDiaSymReaderVersion>
+    <MicrosoftDiaSymReaderVersion>1.2.0</MicrosoftDiaSymReaderVersion>
     <MicrosoftDiaSymReaderNativeVersion>1.7.0-beta-25631</MicrosoftDiaSymReaderNativeVersion>
-    <MicrosoftDiaSymReaderPortablePdbVersion>1.4.0-beta1-62214-02</MicrosoftDiaSymReaderPortablePdbVersion>
+    <MicrosoftDiaSymReaderPortablePdbVersion>1.4.0</MicrosoftDiaSymReaderPortablePdbVersion>
     <MicrosoftMetadataVisualizerVersion>1.0.0-beta1-61530-02</MicrosoftMetadataVisualizerVersion>
     <NewtonsoftJsonVersion>9.0.1</NewtonsoftJsonVersion>
     
