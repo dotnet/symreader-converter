@@ -5,7 +5,6 @@
     <VersionBase>1.1.0</VersionBase>
     <PreReleaseVersionLabel>beta1</PreReleaseVersionLabel>
 
-    <UsingToolXliff>false</UsingToolXliff>
     <UsingToolPdbConverter>true</UsingToolPdbConverter>
 
     <!-- Toolset -->
