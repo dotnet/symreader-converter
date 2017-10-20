@@ -785,10 +785,10 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
           <slot kind=""0"" offset=""4"" />
           <slot kind=""6"" offset=""62"" />
           <slot kind=""8"" offset=""62"" />
-          <slot kind=""0"" offset=""62"" />
-          <slot kind=""6"" offset=""163"" />
-          <slot kind=""8"" offset=""163"" />
-          <slot kind=""0"" offset=""163"" />
+          <slot kind=""0"" offset=""71"" />
+          <slot kind=""6"" offset=""174"" />
+          <slot kind=""8"" offset=""174"" />
+          <slot kind=""0"" offset=""183"" />
         </encLocalSlotMap>
       </customDebugInfo>
     </method>
@@ -801,26 +801,26 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         <encLocalSlotMap>
           <slot kind=""6"" offset=""0"" />
           <slot kind=""8"" offset=""0"" />
-          <slot kind=""0"" offset=""0"" />
-          <slot kind=""0"" offset=""41"" />
+          <slot kind=""0"" offset=""9"" />
+          <slot kind=""0"" offset=""52"" />
           <slot kind=""1"" offset=""0"" />
-          <slot kind=""6"" offset=""118"" />
-          <slot kind=""8"" offset=""118"" />
-          <slot kind=""0"" offset=""118"" />
-          <slot kind=""0"" offset=""159"" />
-          <slot kind=""1"" offset=""118"" />
+          <slot kind=""6"" offset=""129"" />
+          <slot kind=""8"" offset=""129"" />
+          <slot kind=""0"" offset=""138"" />
+          <slot kind=""0"" offset=""181"" />
+          <slot kind=""1"" offset=""129"" />
         </encLocalSlotMap>
       </customDebugInfo>
       <sequencePoints>
         <entry offset=""0x0"" startLine=""42"" startColumn=""5"" endLine=""42"" endColumn=""17"" document=""1"" />
-        <entry offset=""0x1"" startLine=""43"" startColumn=""9"" endLine=""43"" endColumn=""32"" document=""1"" />
+        <entry offset=""0x1"" startLine=""43"" startColumn=""9"" endLine=""43"" endColumn=""43"" document=""1"" />
         <entry offset=""0x15"" hidden=""true"" document=""1"" />
         <entry offset=""0x1b"" startLine=""44"" startColumn=""17"" endLine=""44"" endColumn=""68"" document=""1"" />
         <entry offset=""0x23"" startLine=""45"" startColumn=""9"" endLine=""45"" endColumn=""13"" document=""1"" />
         <entry offset=""0x24"" hidden=""true"" document=""1"" />
         <entry offset=""0x28"" hidden=""true"" document=""1"" />
         <entry offset=""0x30"" hidden=""true"" document=""1"" />
-        <entry offset=""0x34"" startLine=""47"" startColumn=""9"" endLine=""47"" endColumn=""32"" document=""1"" />
+        <entry offset=""0x34"" startLine=""47"" startColumn=""9"" endLine=""47"" endColumn=""43"" document=""1"" />
         <entry offset=""0x4a"" hidden=""true"" document=""1"" />
         <entry offset=""0x53"" startLine=""48"" startColumn=""17"" endLine=""48"" endColumn=""54"" document=""1"" />
         <entry offset=""0x5b"" startLine=""49"" startColumn=""9"" endLine=""49"" endColumn=""13"" document=""1"" />
@@ -838,10 +838,6 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         <xmlnamespace prefix=""prjlevel1"" name=""http://NewNamespace"" importlevel=""project"" />
         <alias name=""A1"" target=""System.Collections.Generic"" kind=""namespace"" importlevel=""project"" />
         <alias name=""A2"" target=""System.Int64"" kind=""namespace"" importlevel=""project"" />
-        <namespace name=""System"" importlevel=""project"" />
-        <namespace name=""Microsoft.VisualBasic"" importlevel=""project"" />
-        <namespace name=""System.Linq"" importlevel=""project"" />
-        <namespace name=""System.Xml.Linq"" importlevel=""project"" />
         <namespace name=""System.Threading"" importlevel=""project"" />
         <currentnamespace name="""" />
         <scope startOffset=""0x17"" endOffset=""0x27"">
@@ -858,10 +854,24 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         </scope>
       </scope>
     </method>
-    <method containingType=""NoSequencePoints"" name=""M"">
-      <scope startOffset=""0x0"" endOffset=""0x8"">
-        <importsforward declaringType=""F"" methodName=""Tuples"" />
-      </scope>
+    <method containingType=""N3.G"" name=""It1"">
+      <customDebugInfo>
+        <forwardIterator name=""VB$StateMachine_1_It1"" />
+        <encLocalSlotMap>
+          <slot kind=""0"" offset=""4"" />
+        </encLocalSlotMap>
+      </customDebugInfo>
+    </method>
+    <method containingType=""N3.G"" name=""It2"">
+      <customDebugInfo>
+        <forwardIterator name=""VB$StateMachine_2_It2"" />
+        <encLocalSlotMap>
+          <slot kind=""0"" offset=""4"" />
+          <slot kind=""0"" offset=""41"" />
+          <slot kind=""0"" offset=""78"" />
+          <slot kind=""0"" offset=""115"" />
+        </encLocalSlotMap>
+      </customDebugInfo>
     </method>
     <method containingType=""N1.C+VB$StateMachine_1_Foo"" name=""MoveNext"">
       <customDebugInfo>
@@ -869,7 +879,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
           <slot kind=""20"" offset=""-1"" />
           <slot kind=""27"" offset=""-1"" />
           <slot kind=""1"" offset=""62"" />
-          <slot kind=""1"" offset=""163"" />
+          <slot kind=""1"" offset=""174"" />
         </encLocalSlotMap>
       </customDebugInfo>
       <sequencePoints>
@@ -877,7 +887,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         <entry offset=""0x41"" startLine=""11"" startColumn=""9"" endLine=""11"" endColumn=""59"" document=""1"" />
         <entry offset=""0x42"" startLine=""12"" startColumn=""17"" endLine=""12"" endColumn=""23"" document=""1"" />
         <entry offset=""0x4e"" startLine=""13"" startColumn=""13"" endLine=""13"" endColumn=""24"" document=""1"" />
-        <entry offset=""0x58"" startLine=""15"" startColumn=""13"" endLine=""15"" endColumn=""30"" document=""1"" />
+        <entry offset=""0x58"" startLine=""15"" startColumn=""13"" endLine=""15"" endColumn=""41"" document=""1"" />
         <entry offset=""0x6b"" hidden=""true"" document=""1"" />
         <entry offset=""0x80"" startLine=""16"" startColumn=""17"" endLine=""16"" endColumn=""24"" document=""1"" />
         <entry offset=""0xa0"" startLine=""17"" startColumn=""17"" endLine=""17"" endColumn=""24"" document=""1"" />
@@ -885,7 +895,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         <entry offset=""0xc1"" hidden=""true"" document=""1"" />
         <entry offset=""0xcf"" hidden=""true"" document=""1"" />
         <entry offset=""0xe0"" hidden=""true"" document=""1"" />
-        <entry offset=""0xe3"" startLine=""20"" startColumn=""13"" endLine=""20"" endColumn=""36"" document=""1"" />
+        <entry offset=""0xe3"" startLine=""20"" startColumn=""13"" endLine=""20"" endColumn=""47"" document=""1"" />
         <entry offset=""0x101"" hidden=""true"" document=""1"" />
         <entry offset=""0x116"" startLine=""21"" startColumn=""17"" endLine=""21"" endColumn=""24"" document=""1"" />
         <entry offset=""0x136"" startLine=""22"" startColumn=""17"" endLine=""22"" endColumn=""24"" document=""1"" />
@@ -904,12 +914,17 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         <xmlnamespace prefix=""prjlevel1"" name=""http://NewNamespace"" importlevel=""project"" />
         <alias name=""A1"" target=""System.Collections.Generic"" kind=""namespace"" importlevel=""project"" />
         <alias name=""A2"" target=""System.Int64"" kind=""namespace"" importlevel=""project"" />
-        <namespace name=""System"" importlevel=""project"" />
-        <namespace name=""Microsoft.VisualBasic"" importlevel=""project"" />
-        <namespace name=""System.Linq"" importlevel=""project"" />
-        <namespace name=""System.Xml.Linq"" importlevel=""project"" />
         <namespace name=""System.Threading"" importlevel=""project"" />
         <currentnamespace name=""N1"" />
+        <scope startOffset=""0x41"" endOffset=""0x17a"">
+          <local name=""$VB$ResumableLocal_arr$0"" il_index=""0"" il_start=""0x41"" il_end=""0x17a"" attributes=""0"" />
+          <scope startOffset=""0x6d"" endOffset=""0xce"">
+            <local name=""$VB$ResumableLocal_x$3"" il_index=""3"" il_start=""0x6d"" il_end=""0xce"" attributes=""0"" />
+          </scope>
+          <scope startOffset=""0x103"" endOffset=""0x164"">
+            <local name=""$VB$ResumableLocal_x$6"" il_index=""6"" il_start=""0x103"" il_end=""0x164"" attributes=""0"" />
+          </scope>
+        </scope>
       </scope>
     </method>
     <method containingType=""N2.D+E"" name=""M"">
@@ -926,15 +941,73 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         <xmlnamespace prefix=""prjlevel1"" name=""http://NewNamespace"" importlevel=""project"" />
         <alias name=""A1"" target=""System.Collections.Generic"" kind=""namespace"" importlevel=""project"" />
         <alias name=""A2"" target=""System.Int64"" kind=""namespace"" importlevel=""project"" />
-        <namespace name=""System"" importlevel=""project"" />
-        <namespace name=""Microsoft.VisualBasic"" importlevel=""project"" />
-        <namespace name=""System.Linq"" importlevel=""project"" />
-        <namespace name=""System.Xml.Linq"" importlevel=""project"" />
         <namespace name=""System.Threading"" importlevel=""project"" />
         <currentnamespace name=""N2"" />
         <constant name=""D1"" value=""0"" type=""Decimal"" />
         <constant name=""D2"" value=""1.23"" type=""Decimal"" />
         <constant name=""DT"" value=""3.479442310755E-266"" runtime-type=""Double"" unknown-signature="""" />
+      </scope>
+    </method>
+    <method containingType=""N3.G+VB$StateMachine_1_It1"" name=""MoveNext"">
+      <customDebugInfo>
+        <encLocalSlotMap>
+          <slot kind=""20"" offset=""-1"" />
+          <slot kind=""27"" offset=""-1"" />
+        </encLocalSlotMap>
+      </customDebugInfo>
+      <sequencePoints>
+        <entry offset=""0x0"" hidden=""true"" document=""1"" />
+        <entry offset=""0x21"" startLine=""65"" startColumn=""9"" endLine=""65"" endColumn=""59"" document=""1"" />
+        <entry offset=""0x22"" startLine=""66"" startColumn=""17"" endLine=""66"" endColumn=""35"" document=""1"" />
+        <entry offset=""0x29"" startLine=""67"" startColumn=""13"" endLine=""67"" endColumn=""20"" document=""1"" />
+        <entry offset=""0x44"" startLine=""68"" startColumn=""13"" endLine=""68"" endColumn=""35"" document=""1"" />
+        <entry offset=""0x50"" startLine=""69"" startColumn=""9"" endLine=""69"" endColumn=""21"" document=""1"" />
+      </sequencePoints>
+      <scope startOffset=""0x0"" endOffset=""0x52"">
+        <xmlnamespace prefix=""file1"" name=""http://stuff/fromFile"" importlevel=""file"" />
+        <xmlnamespace prefix="""" name=""http://stuff/fromFile1"" importlevel=""file"" />
+        <alias name=""AliasE"" target=""N2.D.E"" kind=""namespace"" importlevel=""file"" />
+        <namespace name=""System"" importlevel=""file"" />
+        <namespace name=""System.Collections.Generic"" importlevel=""file"" />
+        <xmlnamespace prefix=""prjlevel1"" name=""http://NewNamespace"" importlevel=""project"" />
+        <alias name=""A1"" target=""System.Collections.Generic"" kind=""namespace"" importlevel=""project"" />
+        <alias name=""A2"" target=""System.Int64"" kind=""namespace"" importlevel=""project"" />
+        <namespace name=""System.Threading"" importlevel=""project"" />
+        <currentnamespace name=""N3"" />
+        <scope startOffset=""0x21"" endOffset=""0x51"">
+          <local name=""$VB$ResumableLocal_var$0"" il_index=""0"" il_start=""0x21"" il_end=""0x51"" attributes=""0"" />
+        </scope>
+      </scope>
+    </method>
+    <method containingType=""N3.G+VB$StateMachine_2_It2"" name=""MoveNext"">
+      <customDebugInfo>
+        <encLocalSlotMap>
+          <slot kind=""20"" offset=""-1"" />
+          <slot kind=""27"" offset=""-1"" />
+        </encLocalSlotMap>
+      </customDebugInfo>
+      <sequencePoints>
+        <entry offset=""0x0"" hidden=""true"" document=""1"" />
+        <entry offset=""0x21"" startLine=""71"" startColumn=""9"" endLine=""71"" endColumn=""59"" document=""1"" />
+        <entry offset=""0x22"" startLine=""72"" startColumn=""17"" endLine=""72"" endColumn=""36"" document=""1"" />
+        <entry offset=""0x29"" startLine=""73"" startColumn=""17"" endLine=""73"" endColumn=""36"" document=""1"" />
+        <entry offset=""0x30"" startLine=""74"" startColumn=""17"" endLine=""74"" endColumn=""36"" document=""1"" />
+        <entry offset=""0x37"" startLine=""75"" startColumn=""17"" endLine=""75"" endColumn=""36"" document=""1"" />
+        <entry offset=""0x3e"" startLine=""76"" startColumn=""13"" endLine=""76"" endColumn=""20"" document=""1"" />
+        <entry offset=""0x59"" startLine=""77"" startColumn=""13"" endLine=""77"" endColumn=""36"" document=""1"" />
+        <entry offset=""0x65"" startLine=""78"" startColumn=""13"" endLine=""78"" endColumn=""36"" document=""1"" />
+        <entry offset=""0x71"" startLine=""79"" startColumn=""13"" endLine=""79"" endColumn=""36"" document=""1"" />
+        <entry offset=""0x7d"" startLine=""80"" startColumn=""13"" endLine=""80"" endColumn=""36"" document=""1"" />
+        <entry offset=""0x89"" startLine=""81"" startColumn=""9"" endLine=""81"" endColumn=""21"" document=""1"" />
+      </sequencePoints>
+      <scope startOffset=""0x0"" endOffset=""0x8b"">
+        <importsforward declaringType=""N3.G+VB$StateMachine_1_It1"" methodName=""MoveNext"" />
+        <scope startOffset=""0x21"" endOffset=""0x8a"">
+          <local name=""$VB$ResumableLocal_var1$0"" il_index=""0"" il_start=""0x21"" il_end=""0x8a"" attributes=""0"" />
+          <local name=""$VB$ResumableLocal_var2$1"" il_index=""1"" il_start=""0x21"" il_end=""0x8a"" attributes=""0"" />
+          <local name=""$VB$ResumableLocal_var3$2"" il_index=""2"" il_start=""0x21"" il_end=""0x8a"" attributes=""0"" />
+          <local name=""$VB$ResumableLocal_var4$3"" il_index=""3"" il_start=""0x21"" il_end=""0x8a"" attributes=""0"" />
+        </scope>
       </scope>
     </method>
   </methods>

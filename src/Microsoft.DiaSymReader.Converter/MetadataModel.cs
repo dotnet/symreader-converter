@@ -365,7 +365,7 @@ namespace Microsoft.DiaSymReader.Tools
                         if (fixedArgs.Length != 1)
                         {
                             // TODO: report error
-                            return default(MethodDefinitionHandle);
+                            return default;
                         }
 
                         string serializedName = (string)fixedArgs[0].Value;
@@ -373,7 +373,7 @@ namespace Microsoft.DiaSymReader.Tools
                         if (nameIndex < 0)
                         {
                             // TODO: report error
-                            return default(MethodDefinitionHandle);
+                            return default;
                         }
 
                         string typeName = serializedName.Substring(nameIndex + 1);
@@ -390,7 +390,7 @@ namespace Microsoft.DiaSymReader.Tools
                 return FindMethodByName(Reader.GetTypeDefinition(stateMachineTypeHandle), "MoveNext");
             }
 
-            return default(MethodDefinitionHandle);
+            return default;
         }
 
         public MethodDefinitionHandle FindStateMachineMoveNextMethod(MethodDefinition kickoffMethodDef, string stateMachineTypeName, bool isGenericSuffixIncluded)
@@ -407,7 +407,7 @@ namespace Microsoft.DiaSymReader.Tools
                 return FindMethodByName(Reader.GetTypeDefinition(nestedTypeHandle), "MoveNext");
             }
 
-            return default(MethodDefinitionHandle);
+            return default;
         }
 
         private TypeDefinitionHandle FindNestedStateMachineTypeByNamePattern(MethodDefinition kickoffMethodDef, bool vbSemantics)
@@ -513,7 +513,7 @@ namespace Microsoft.DiaSymReader.Tools
                     break;
             }
 
-            namespaceHandle = nameHandle = default(StringHandle);
+            namespaceHandle = nameHandle = default;
             return false;
         }
 
@@ -533,7 +533,49 @@ namespace Microsoft.DiaSymReader.Tools
             public string GetSZArrayType(string elementType) => null;
             public string GetTypeFromDefinition(MetadataReader reader, TypeDefinitionHandle handle, byte rawTypeKind) => null;
             public string GetTypeFromReference(MetadataReader reader, TypeReferenceHandle handle, byte rawTypeKind) => null;
-            public PrimitiveTypeCode GetUnderlyingEnumType(string type) => default(PrimitiveTypeCode);
+            public PrimitiveTypeCode GetUnderlyingEnumType(string type) => default;
+        }
+
+        internal static bool TryParseVisualBasicResumableLocalIndex(string synthesizedName, out int index)
+        {
+            const string prefix = "$VB$ResumableLocal_";
+            index = 0;
+
+            if (!synthesizedName.StartsWith(prefix, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            int separator = synthesizedName.LastIndexOf('$');
+            if (separator <= prefix.Length)
+            {
+                return false;
+            }
+
+            return int.TryParse(synthesizedName.Substring(separator + 1), out index);
+        }
+
+        public ImmutableArray<string> GetVisualBasicHoistedLocalNames(TypeDefinitionHandle stateMachineTypeDefinitionHandle)
+        {
+            var builder = ImmutableArray.CreateBuilder<string>();
+
+            var typeDef = Reader.GetTypeDefinition(stateMachineTypeDefinitionHandle);
+            foreach (var fieldHandle in typeDef.GetFields())
+            {
+                var fieldDef = Reader.GetFieldDefinition(fieldHandle);
+                string fieldName = Reader.GetString(fieldDef.Name);
+                if (TryParseVisualBasicResumableLocalIndex(fieldName, out int index))
+                {
+                    if (index >= builder.Count)
+                    {
+                        builder.Count = index + 1;
+                    }
+
+                    builder[index] = fieldName;
+                }
+            }
+
+            return builder.ToImmutable();
         }
     }
 }

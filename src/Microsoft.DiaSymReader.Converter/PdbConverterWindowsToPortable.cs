@@ -208,6 +208,10 @@ namespace Microsoft.DiaSymReader.Tools
             var tupleVariables = new Dictionary<int, TupleElementNamesInfo>();
             var tupleConstants = new Dictionary<(string name, int scopeStart, int scopeEnd), TupleElementNamesInfo>();
             var scopes = new List<(int Start, int End, ISymUnmanagedVariable[] Variables, ISymUnmanagedConstant[] Constants)>();
+            var vbHoistedLocalScopes = new List<StateMachineHoistedLocalScope>();
+
+            // maps MoveNext method definitions to the corresponding kickoff definitions:
+            var stateMachineMethods = new Dictionary<MethodDefinitionHandle, MethodDefinitionHandle>();
 
             // methods:
             metadataBuilder.SetCapacity(TableIndex.MethodDebugInformation, metadataReader.MethodDefinitions.Count);
@@ -260,10 +264,17 @@ namespace Microsoft.DiaSymReader.Tools
                 var symAsyncMethod = symMethod.AsAsyncMethod();
                 if (symAsyncMethod != null)
                 {
-                    var kickoffToken = MetadataTokens.Handle(symAsyncMethod.GetKickoffMethod());
-                    metadataBuilder.AddStateMachineMethod(
-                        moveNextMethod: methodHandle,
-                        kickoffMethod: (MethodDefinitionHandle)kickoffToken);
+                    var kickoffToken = symAsyncMethod.GetKickoffMethod();
+                    var kickoffHandle = (MethodDefinitionHandle)MetadataTokens.Handle(kickoffToken);
+
+                    if (!stateMachineMethods.TryGetValue(methodHandle, out var existingKickoff))
+                    {
+                        stateMachineMethods[methodHandle] = kickoffHandle;
+                    }
+                    else if (kickoffHandle != existingKickoff)
+                    {
+                        ReportDiagnostic(PdbDiagnosticId.InconsistentStateMachineMethodMapping, methodToken,  kickoffToken, MetadataTokens.GetToken(existingKickoff));
+                    }
 
                     metadataBuilder.AddCustomDebugInformation(
                         parent: methodHandle,
@@ -303,6 +314,19 @@ namespace Microsoft.DiaSymReader.Tools
                                     if (!moveNextHandle.IsNil)
                                     {
                                         importScope = importScopesByMethod[MetadataTokens.GetRowNumber(moveNextHandle) - 1];
+
+                                        if (!stateMachineMethods.TryGetValue(moveNextHandle, out var existingKickoff))
+                                        {
+                                            stateMachineMethods.Add(moveNextHandle, methodHandle);
+                                        }
+                                        else if (existingKickoff != methodHandle)
+                                        {
+                                            ReportDiagnostic(
+                                                PdbDiagnosticId.InconsistentStateMachineMethodMapping, 
+                                                MetadataTokens.GetToken(moveNextHandle),
+                                                methodToken,
+                                                MetadataTokens.GetToken(existingKickoff));
+                                        }
                                     }
                                     else
                                     {
@@ -350,7 +374,7 @@ namespace Microsoft.DiaSymReader.Tools
                 }
                 else
                 {
-                   childScopes = rootScope.GetChildren(); 
+                    childScopes = rootScope.GetChildren(); 
                 }
 
                 if (childScopes.Length > 0)
@@ -359,9 +383,10 @@ namespace Microsoft.DiaSymReader.Tools
                     BuildTupleLocalMaps(tupleVariables, tupleConstants, tupleLocals, methodToken);
 
                     Debug.Assert(scopes.Count == 0);
+                    Debug.Assert(vbHoistedLocalScopes.Count == 0);
                     foreach (var child in childScopes)
                     {
-                        AddScopesRecursive(scopes, child, methodToken, vbSemantics, isTopScope: true);
+                        AddScopesRecursive(scopes, vbHoistedLocalScopes, child, methodToken, vbSemantics, isTopScope: true);
                     }
 
                     foreach (var scope in scopes)
@@ -384,11 +409,20 @@ namespace Microsoft.DiaSymReader.Tools
                             lastLocalConstantHandle: ref lastLocalConstantHandle);
                     }
 
+                    if (vbHoistedLocalScopes.Count > 0)
+                    {
+                        metadataBuilder.AddCustomDebugInformation(
+                            parent: methodHandle,
+                            kind: metadataBuilder.GetOrAddGuid(PortableCustomDebugInfoKinds.StateMachineHoistedLocalScopes),
+                            value: SerializeStateMachineHoistedLocalsBlob(metadataBuilder, vbHoistedLocalScopes.ToImmutableArray()));
+                    }
+
                     dynamicConstants.Clear();
                     dynamicVariables.Clear();
                     tupleConstants.Clear();
                     tupleVariables.Clear();
                     scopes.Clear();
+                    vbHoistedLocalScopes.Clear();
                 }
                 else if (methodBodyOpt != null)
                 {
@@ -400,6 +434,11 @@ namespace Microsoft.DiaSymReader.Tools
                         startOffset: 0,
                         length: methodBodyOpt.GetILReader().Length);
                 }
+            }
+
+            foreach (var entry in stateMachineMethods.OrderBy(kvp => MetadataTokens.GetToken(kvp.Key)))
+            {
+                metadataBuilder.AddStateMachineMethod(entry.Key, entry.Value);
             }
 
             byte[] sourceLinkData;
@@ -833,6 +872,7 @@ namespace Microsoft.DiaSymReader.Tools
 
         private void AddScopesRecursive(
             List<(int, int, ISymUnmanagedVariable[], ISymUnmanagedConstant[])> builder,
+            List<StateMachineHoistedLocalScope> vbHoistedLocalScopeBuilder,
             ISymUnmanagedScope symScope, 
             int methodToken,
             bool vbSemantics,
@@ -845,13 +885,37 @@ namespace Microsoft.DiaSymReader.Tools
             
             try
             {
-                // VB Windows PDB encode the range as end-inclusive, 
+                // VB Windows PDBs encode the range as end-inclusive, 
                 // all Portable PDBs use end-exclusive encoding.
                 start = symScope.GetStartOffset();
                 end = symScope.GetEndOffset() + (vbSemantics && !isTopScope ? 1 : 0);
 
-                // TODO: convert to State Machine Hoisted Variable Scopes CDI: https://github.com/dotnet/symreader-converter/issues/80
-                symLocals = symScope.GetLocals().Where(l => !l.GetName().StartsWith("$VB$ResumableLocal_")).ToArray();
+                symLocals = symScope.GetLocals();
+
+                if (vbSemantics)
+                {
+                    int realLocalsCount = 0;
+                    foreach (var symLocal in symLocals)
+                    {
+                        var name = symLocal.GetName();
+                        if (MetadataModel.TryParseVisualBasicResumableLocalIndex(name, out int index))
+                        {
+                            while (vbHoistedLocalScopeBuilder.Count <= index)
+                            {
+                                vbHoistedLocalScopeBuilder.Add(new StateMachineHoistedLocalScope());
+                            }
+
+                            vbHoistedLocalScopeBuilder[index] = new StateMachineHoistedLocalScope(start, end);
+                        }
+                        else
+                        {
+                            symLocals[realLocalsCount++] = symLocal;
+                        }
+                    }
+
+                    Array.Resize(ref symLocals, realLocalsCount);
+                }
+
                 symConstants = symScope.GetConstants();
                 symChildScopes = symScope.GetChildren();
             }
@@ -890,7 +954,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                 previousChildScopeEnd = childScopeEnd;
 
-                AddScopesRecursive(builder, child, methodToken, vbSemantics, isTopScope: false);
+                AddScopesRecursive(builder, vbHoistedLocalScopeBuilder, child, methodToken, vbSemantics, isTopScope: false);
             }
 
             if (!isTopScope && symLocals.Length == 0 && symConstants.Length == 0 && builder.Count == scopeCountBeforeChildren)
