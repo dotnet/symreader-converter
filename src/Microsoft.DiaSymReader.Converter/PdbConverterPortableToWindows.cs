@@ -55,7 +55,26 @@ namespace Microsoft.DiaSymReader.Tools
         private static Guid GetLanguageVendorGuid(Guid languageGuid)
         {
             return (languageGuid == s_csharpGuid || languageGuid == s_visualBasicGuid || languageGuid == s_fsharpGuid) ?
-                s_languageVendorMicrosoft : default(Guid);
+                s_languageVendorMicrosoft : default;
+        }
+
+        private struct LocalScopeInfo
+        {
+            public readonly LocalScope? LocalScope;
+
+            public readonly int HoistedVariableStartIndex;
+            public readonly int HoistedVariableEndIndex;
+
+            public LocalScopeInfo(LocalScope? localScope, int hoistedVariableStartIndex, int hoistedVariableEndIndex)
+            {
+                LocalScope = localScope;
+                HoistedVariableStartIndex = hoistedVariableStartIndex;
+                HoistedVariableEndIndex = hoistedVariableEndIndex;
+            }
+
+            public bool IsDefault => !IsLocalScope && !IsHoistedScope;
+            public bool IsLocalScope => LocalScope.HasValue;
+            public bool IsHoistedScope => HoistedVariableStartIndex < HoistedVariableEndIndex;
         }
 
         internal void Convert(PEReader peReader, MetadataReader pdbReader, SymUnmanagedWriter pdbWriter, PdbConversionOptions options)
@@ -116,12 +135,15 @@ namespace Microsoft.DiaSymReader.Tools
                     source: sourceBlob);
             }
 
-            var localScopeEnumerator = pdbReader.LocalScopes.GetEnumerator();
-            LocalScope? currentLocalScope = NextLocalScope();
+            int localScopeRowNumber = 0;
+            int localScopeCount = pdbReader.GetTableRowCount(TableIndex.LocalScope);
 
-            LocalScope? NextLocalScope() => 
-                localScopeEnumerator.MoveNext() ? pdbReader.GetLocalScope(localScopeEnumerator.Current) : default(LocalScope?);
-
+            int CompareScopeRanges(int leftStart, int leftEnd, int rightStart, int rightEnd)
+            {
+                int result = leftStart.CompareTo(rightStart);
+                return (result != 0) ? result : rightEnd.CompareTo(leftEnd);
+            }
+            
             // Handle of the method that is gonna contain list of AssemblyRef aliases.
             // Other methods will forward to it.
             var methodDefHandleWithAssemblyRefAliases = default(MethodDefinitionHandle);
@@ -145,6 +167,27 @@ namespace Microsoft.DiaSymReader.Tools
                 var vbCurrentMethodNamespace = vbSemantics ? GetMethodNamespace(metadataReader, methodDef) : null;
                 var moveNextHandle = metadataModel.FindStateMachineMoveNextMethod(methodDefHandle, vbSemantics);
                 bool isKickOffMethod = !moveNextHandle.IsNil;
+                var hoistedLocalScopes = isKickOffMethod ? default : GetStateMachineHoistedLocalScopes(pdbReader, methodDefHandle);
+
+                int vbHoistedScopeIndex = -1;
+                ImmutableArray<(StateMachineHoistedLocalScope Scope, int Index)> vbHoistedScopes;
+                
+                // Names of local variables hoisted to state machine fields indexed by variable slot index extracted from the field name.
+                ImmutableArray<string> vbResumableLocalNames;
+
+                if (vbSemantics && !hoistedLocalScopes.IsDefault)
+                {
+                    // we are in MoveNext method
+                    vbHoistedScopes = hoistedLocalScopes.SelectWithIndex().Where(s => !s.Value.IsDefault).ToImmutableArray().
+                        Sort((left, right) => CompareScopeRanges(left.Value.StartOffset, left.Value.EndOffset, right.Value.StartOffset, right.Value.EndOffset));
+
+                    vbResumableLocalNames = metadataModel.GetVisualBasicHoistedLocalNames(methodDef.GetDeclaringType());
+                }
+                else
+                {
+                    vbHoistedScopes = default;
+                    vbResumableLocalNames = default;
+                }
 
                 var forwardImportScopesToMethodDef = default(MethodDefinitionHandle);
                 Debug.Assert(dynamicLocals.Count == 0);
@@ -163,6 +206,65 @@ namespace Microsoft.DiaSymReader.Tools
                     }
                 }
 
+                LocalScopeInfo GetNextLocalScope()
+                {
+                    Debug.Assert(localScopeRowNumber <= localScopeCount);
+
+                    LocalScope? nextLocalScope = null;
+                    int nextLocalScopeIndex = localScopeRowNumber + 1;
+                    if (nextLocalScopeIndex <= localScopeCount)
+                    {
+                        var scope = pdbReader.GetLocalScope(MetadataTokens.LocalScopeHandle(nextLocalScopeIndex));
+                        if (scope.Method == methodDefHandle)
+                        {
+                            nextLocalScope = scope;
+                        }
+                    }
+
+                    StateMachineHoistedLocalScope? nextHoistedScope = null;
+                    int nextHoistedScopeIndex = vbHoistedScopeIndex + 1;
+                    if (!vbHoistedScopes.IsDefault && nextHoistedScopeIndex < vbHoistedScopes.Length)
+                    {
+                        nextHoistedScope = vbHoistedScopes[nextHoistedScopeIndex].Scope;
+                    }
+
+                    int c = nextLocalScope == null ? +1 :
+                            nextHoistedScope == null ? -1 :
+                            CompareScopeRanges(nextLocalScope.Value.StartOffset, nextLocalScope.Value.EndOffset, nextHoistedScope.Value.StartOffset, nextHoistedScope.Value.EndOffset);
+
+                    int hoistedScopeStartIndex = 0;
+                    int hoistedScopeEndIndex = 0;
+
+                    if (c <= 0 && nextLocalScope != null)
+                    {
+                        localScopeRowNumber = nextLocalScopeIndex;
+                    }
+                    else
+                    {
+                        nextLocalScope = null;
+                    }
+
+                    if (c >= 0 && nextHoistedScope != null)
+                    {
+                        // determine all hoisted variables that have equal scopes:
+                        int i = nextHoistedScopeIndex + 1;
+                        while (i < vbHoistedScopes.Length && nextHoistedScope.Value == vbHoistedScopes[i].Scope)
+                        {
+                            i++;
+                        }
+
+                        hoistedScopeStartIndex = nextHoistedScopeIndex;
+                        hoistedScopeEndIndex = i;
+                        vbHoistedScopeIndex = i - 1;
+                    }
+                    else
+                    {
+                        hoistedScopeStartIndex = hoistedScopeEndIndex = 0;
+                    }
+
+                    return new LocalScopeInfo(nextLocalScope, hoistedScopeStartIndex, hoistedScopeEndIndex);
+                }
+
                 void CloseOpenScopes(int currentScopeStartOffset)
                 {
                     // close all open scopes that end before this scope starts:
@@ -176,149 +278,193 @@ namespace Microsoft.DiaSymReader.Tools
                     }
                 }
 
-                bool isFirstMethodScope = true;
-                while (currentLocalScope.HasValue && currentLocalScope.Value.Method == methodDefHandle)
+                bool hasAnyScopes = false;
+
+                void OpenScope(int startOffset, int endOffset)
                 {
+                    CloseOpenScopes(startOffset);
+
+                    Debug.WriteLine($"Open Scope [{startOffset}, {endOffset})");
+                    pdbWriter.OpenScope(startOffset);
+                    openScopeEndOffsets.Push(endOffset);
+
+                    hasAnyScopes = true;
+                }
+
+                bool isFirstMethodLocalScope = true;
+                while (true)
+                {
+                    var currentLocalScope = GetNextLocalScope();
+                    if (currentLocalScope.IsDefault)
+                    {
+                        break;
+                    }
+
                     // kickoff methods don't have any scopes emitted to Windows PDBs
                     if (methodBodyOpt == null)
                     {
-                        ReportDiagnostic(PdbDiagnosticId.MethodAssociatedWithLocalScopeHasNoBody, MetadataTokens.GetToken(localScopeEnumerator.Current));
+                        ReportDiagnostic(PdbDiagnosticId.MethodAssociatedWithLocalScopeHasNoBody, MetadataTokens.GetToken(MetadataTokens.LocalScopeHandle(localScopeRowNumber)));
                     }
                     else if (!isKickOffMethod)
                     {
                         LazyOpenMethod();
 
-                        var localScope = currentLocalScope.Value;
-                        CloseOpenScopes(localScope.StartOffset);
-
-                        Debug.WriteLine($"Open Scope [{localScope.StartOffset}, {localScope.EndOffset})");
-                        pdbWriter.OpenScope(localScope.StartOffset);
-                        openScopeEndOffsets.Push(localScope.EndOffset);
-
-                        if (isFirstMethodScope)
+                        if (currentLocalScope.IsLocalScope)
                         {
-                            if (lastImportScopeHandle == localScope.ImportScope && vbLastImportScopeNamespace == vbCurrentMethodNamespace)
-                            {
-                                // forward to a method that has the same imports:
-                                forwardImportScopesToMethodDef = lastImportScopeMethodDefHandle;
-                            }
-                            else
-                            {
-                                Debug.Assert(importStringsBuilder.Count == 0);
-                                Debug.Assert(declaredExternAliases.Count == 0);
-                                Debug.Assert(importGroups.Count == 0);
+                            var localScope = currentLocalScope.LocalScope.Value;
+                            OpenScope(localScope.StartOffset, localScope.EndOffset);
 
-                                AddImportStrings(importStringsBuilder, importGroups, declaredExternAliases, pdbReader, metadataModel, localScope.ImportScope, aliasedAssemblyRefs, vbDefaultNamespaceImportString, vbCurrentMethodNamespace, vbSemantics);
-                                var importStrings = importStringsBuilder.ToImmutableArray();
-                                importStringsBuilder.Clear();
-
-                                if (importStringsMap.TryGetValue(importStrings, out forwardImportScopesToMethodDef))
+                            if (isFirstMethodLocalScope)
+                            {
+                                if (lastImportScopeHandle == localScope.ImportScope && vbLastImportScopeNamespace == vbCurrentMethodNamespace)
                                 {
                                     // forward to a method that has the same imports:
-                                    lastImportScopeMethodDefHandle = forwardImportScopesToMethodDef;
+                                    forwardImportScopesToMethodDef = lastImportScopeMethodDefHandle;
                                 }
                                 else
                                 {
-                                    // attach import strings to the current method:
-                                    WriteImports(pdbWriter, importStrings);
-                                    lastImportScopeMethodDefHandle = methodDefHandle;
-                                    importStringsMap[importStrings] = methodDefHandle;
+                                    Debug.Assert(importStringsBuilder.Count == 0);
+                                    Debug.Assert(declaredExternAliases.Count == 0);
+                                    Debug.Assert(importGroups.Count == 0);
+
+                                    AddImportStrings(importStringsBuilder, importGroups, declaredExternAliases, pdbReader, metadataModel, localScope.ImportScope, aliasedAssemblyRefs, vbDefaultNamespaceImportString, vbCurrentMethodNamespace, vbSemantics);
+                                    var importStrings = importStringsBuilder.ToImmutableArray();
+                                    importStringsBuilder.Clear();
+
+                                    if (importStringsMap.TryGetValue(importStrings, out forwardImportScopesToMethodDef))
+                                    {
+                                        // forward to a method that has the same imports:
+                                        lastImportScopeMethodDefHandle = forwardImportScopesToMethodDef;
+                                    }
+                                    else
+                                    {
+                                        // attach import strings to the current method:
+                                        WriteImports(pdbWriter, importStrings);
+                                        lastImportScopeMethodDefHandle = methodDefHandle;
+                                        importStringsMap[importStrings] = methodDefHandle;
+                                    }
+
+                                    lastImportScopeHandle = localScope.ImportScope;
+                                    vbLastImportScopeNamespace = vbCurrentMethodNamespace;
                                 }
 
-                                lastImportScopeHandle = localScope.ImportScope;
-                                vbLastImportScopeNamespace = vbCurrentMethodNamespace;
-                            }
-
-                            if (vbSemantics && !forwardImportScopesToMethodDef.IsNil)
-                            {
-                                pdbWriter.UsingNamespace("@" + MetadataTokens.GetToken(forwardImportScopesToMethodDef));
-                            }
-
-                            // This is the method that's gonna have AssemblyRef aliases attached:
-                            if (methodDefHandleWithAssemblyRefAliases.IsNil)
-                            {
-                                foreach (var (assemblyRefHandle, alias) in aliasedAssemblyRefs)
+                                if (vbSemantics && !forwardImportScopesToMethodDef.IsNil)
                                 {
-                                    var assemblyRef = metadataReader.GetAssemblyReference(assemblyRefHandle);
-                                    pdbWriter.UsingNamespace("Z" + alias + " " + AssemblyDisplayNameBuilder.GetAssemblyDisplayName(metadataReader, assemblyRef));
+                                    pdbWriter.UsingNamespace("@" + MetadataTokens.GetToken(forwardImportScopesToMethodDef));
+                                }
+
+                                // This is the method that's gonna have AssemblyRef aliases attached:
+                                if (methodDefHandleWithAssemblyRefAliases.IsNil)
+                                {
+                                    foreach (var (assemblyRefHandle, alias) in aliasedAssemblyRefs)
+                                    {
+                                        var assemblyRef = metadataReader.GetAssemblyReference(assemblyRefHandle);
+                                        pdbWriter.UsingNamespace("Z" + alias + " " + AssemblyDisplayNameBuilder.GetAssemblyDisplayName(metadataReader, assemblyRef));
+                                    }
+                                }
+                            }
+
+                            foreach (var localVariableHandle in localScope.GetLocalVariables())
+                            {
+                                var variable = pdbReader.GetLocalVariable(localVariableHandle);
+                                string name = pdbReader.GetString(variable.Name);
+
+                                if (name.Length > MaxEntityNameLength)
+                                {
+                                    ReportDiagnostic(PdbDiagnosticId.LocalConstantNameTooLong, MetadataTokens.GetToken(localVariableHandle));
+                                    continue;
+                                }
+
+                                if (methodBodyOpt.LocalSignature.IsNil)
+                                {
+                                    ReportDiagnostic(PdbDiagnosticId.MethodContainingLocalVariablesHasNoLocalSignature, methodToken);
+                                    continue;
+                                }
+
+                                pdbWriter.DefineLocalVariable(variable.Index, name, (int)variable.Attributes, MetadataTokens.GetToken(methodBodyOpt.LocalSignature));
+
+                                var dynamicFlags = MetadataUtilities.ReadDynamicCustomDebugInformation(pdbReader, localVariableHandle);
+                                if (TryGetDynamicLocal(name, variable.Index, dynamicFlags, out var dynamicLocal))
+                                {
+                                    dynamicLocals.Add(dynamicLocal);
+                                }
+
+                                var tupleElementNames = MetadataUtilities.ReadTupleCustomDebugInformation(pdbReader, localVariableHandle);
+                                if (!tupleElementNames.IsDefaultOrEmpty)
+                                {
+                                    tupleLocals.Add((name, SlotIndex: variable.Index, ScopeStart: 0, ScopeEnd: 0, Names: tupleElementNames));
+                                }
+                            }
+
+                            foreach (var localConstantHandle in localScope.GetLocalConstants())
+                            {
+                                var constant = pdbReader.GetLocalConstant(localConstantHandle);
+                                string name = pdbReader.GetString(constant.Name);
+
+                                if (name.Length > MaxEntityNameLength)
+                                {
+                                    ReportDiagnostic(PdbDiagnosticId.LocalConstantNameTooLong, MetadataTokens.GetToken(localConstantHandle));
+                                    continue;
+                                }
+
+                                var (value, signature) = PortableConstantSignature.GetConstantValueAndSignature(pdbReader, localConstantHandle, metadataReader.GetQualifiedTypeName);
+                                if (!metadataModel.TryGetStandaloneSignatureHandle(signature, out var constantSignatureHandle))
+                                {
+                                    // Signature will be unspecified. At least we store the name and the value.
+                                    constantSignatureHandle = default(StandaloneSignatureHandle);
+                                }
+
+                                pdbWriter.DefineLocalConstant(name, value, MetadataTokens.GetToken(constantSignatureHandle));
+
+                                var dynamicFlags = MetadataUtilities.ReadDynamicCustomDebugInformation(pdbReader, localConstantHandle);
+                                if (TryGetDynamicLocal(name, 0, dynamicFlags, out var dynamicLocal))
+                                {
+                                    dynamicLocals.Add(dynamicLocal);
+                                }
+
+                                var tupleElementNames = MetadataUtilities.ReadTupleCustomDebugInformation(pdbReader, localConstantHandle);
+                                if (!tupleElementNames.IsDefaultOrEmpty)
+                                {
+                                    // Note that the end offset of tuple locals is always end-exclusive, regardless of whether the PDB uses VB semantics or not.
+                                    tupleLocals.Add((name, SlotIndex: -1, ScopeStart: localScope.StartOffset, ScopeEnd: localScope.EndOffset, Names: tupleElementNames));
                                 }
                             }
                         }
 
-                        foreach (var localVariableHandle in localScope.GetLocalVariables())
+                        if (currentLocalScope.IsHoistedScope)
                         {
-                            var variable = pdbReader.GetLocalVariable(localVariableHandle);
-                            string name = pdbReader.GetString(variable.Name);
+                            Debug.Assert(vbSemantics);
+                            Debug.Assert(!vbResumableLocalNames.IsDefault);
 
-                            if (name.Length > MaxEntityNameLength)
+                            bool scopeOpened = currentLocalScope.IsLocalScope;
+
+                            // add $VB$ResumableLocal pseudo-variables:
+                            for (int i = currentLocalScope.HoistedVariableStartIndex; i < currentLocalScope.HoistedVariableEndIndex; i++)
                             {
-                                ReportDiagnostic(PdbDiagnosticId.LocalConstantNameTooLong, MetadataTokens.GetToken(localVariableHandle));
-                                continue;
-                            }
+                                var (scope, index) = vbHoistedScopes[i];
+                                if (index >= vbResumableLocalNames.Length)
+                                {
+                                    // TODO: report error
+                                    continue;
+                                }
 
-                            if (methodBodyOpt.LocalSignature.IsNil)
-                            {
-                                ReportDiagnostic(PdbDiagnosticId.MethodContainingLocalVariablesHasNoLocalSignature, methodToken);
-                                continue;
-                            }
+                                if (!scopeOpened)
+                                {
+                                    OpenScope(scope.StartOffset, scope.EndOffset);
+                                    scopeOpened = true;
+                                }
 
-                            // TODO: translate hoisted variable scopes to dummy VB hoisted state machine locals (https://github.com/dotnet/roslyn/issues/8473)
-
-                            pdbWriter.DefineLocalVariable(variable.Index, name, (int)variable.Attributes, MetadataTokens.GetToken(methodBodyOpt.LocalSignature));
-
-                            var dynamicFlags = MetadataUtilities.ReadDynamicCustomDebugInformation(pdbReader, localVariableHandle);
-                            if (TryGetDynamicLocal(name, variable.Index, dynamicFlags, out var dynamicLocal))
-                            {
-                                dynamicLocals.Add(dynamicLocal);
-                            }
-
-                            var tupleElementNames = MetadataUtilities.ReadTupleCustomDebugInformation(pdbReader, localVariableHandle);
-                            if (!tupleElementNames.IsDefaultOrEmpty)
-                            {
-                                tupleLocals.Add((name, SlotIndex: variable.Index, ScopeStart: 0, ScopeEnd: 0, Names: tupleElementNames));
-                            }
-                        }
-
-                        foreach (var localConstantHandle in localScope.GetLocalConstants())
-                        {
-                            var constant = pdbReader.GetLocalConstant(localConstantHandle);
-                            string name = pdbReader.GetString(constant.Name);
-
-                            if (name.Length > MaxEntityNameLength)
-                            {
-                                ReportDiagnostic(PdbDiagnosticId.LocalConstantNameTooLong, MetadataTokens.GetToken(localConstantHandle));
-                                continue;
-                            }
-
-                            var (value, signature) = PortableConstantSignature.GetConstantValueAndSignature(pdbReader, localConstantHandle, metadataReader.GetQualifiedTypeName);
-                            if (!metadataModel.TryGetStandaloneSignatureHandle(signature, out var constantSignatureHandle))
-                            {
-                                // Signature will be unspecified. At least we store the name and the value.
-                                constantSignatureHandle = default(StandaloneSignatureHandle);
-                            }
-
-                            pdbWriter.DefineLocalConstant(name, value, MetadataTokens.GetToken(constantSignatureHandle));
-
-                            var dynamicFlags = MetadataUtilities.ReadDynamicCustomDebugInformation(pdbReader, localConstantHandle);
-                            if (TryGetDynamicLocal(name, 0, dynamicFlags, out var dynamicLocal))
-                            {
-                                dynamicLocals.Add(dynamicLocal);
-                            }
-
-                            var tupleElementNames = MetadataUtilities.ReadTupleCustomDebugInformation(pdbReader, localConstantHandle);
-                            if (!tupleElementNames.IsDefaultOrEmpty)
-                            {
-                                // Note that the end offset of tuple locals is always end-exclusive, regardless of whether the PDB uses VB semantics or not.
-                                tupleLocals.Add((name, SlotIndex: -1, ScopeStart: localScope.StartOffset, ScopeEnd: localScope.EndOffset, Names: tupleElementNames));
+                                pdbWriter.DefineLocalVariable(
+                                    index,
+                                    vbResumableLocalNames[index],
+                                    attributes: 0,
+                                    localSignatureToken: MetadataTokens.GetToken(methodBodyOpt.LocalSignature));
                             }
                         }
                     }
 
-                    currentLocalScope = NextLocalScope();
-                    isFirstMethodScope = false;
+                    isFirstMethodLocalScope = false;
                 }
-
-                bool hasAnyScopes = !isFirstMethodScope;
 
                 CloseOpenScopes(int.MaxValue);
                 if (openScopeEndOffsets.Count > 0)
@@ -374,8 +520,7 @@ namespace Microsoft.DiaSymReader.Tools
                         }
                     }
 
-                    var hoistedLocalScopes = GetStateMachineHoistedLocalScopes(pdbReader, methodDefHandle);
-                    if (!hoistedLocalScopes.IsDefault)
+                    if (!vbSemantics && !hoistedLocalScopes.IsDefault)
                     {
                         cdiEncoder.AddStateMachineHoistedLocalScopes(hoistedLocalScopes);
                     }
@@ -514,7 +659,7 @@ namespace Microsoft.DiaSymReader.Tools
             var cdiHandle = pdbReader.GetCustomDebugInformation(methodDefHandle, PortableCustomDebugInfoKinds.StateMachineHoistedLocalScopes);
             if (cdiHandle.IsNil)
             {
-                return default(ImmutableArray<StateMachineHoistedLocalScope>);
+                return default;
             }
 
             return MetadataUtilities.DecodeHoistedLocalScopes(pdbReader.GetBlobReader(cdiHandle));

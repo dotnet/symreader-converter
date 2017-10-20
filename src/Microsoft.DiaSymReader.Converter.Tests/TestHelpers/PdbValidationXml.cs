@@ -2,8 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -105,53 +103,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
                 }
             }
 
-            RemoveUnsupportedElements(element);
-
             return element.ToString();
-        }
-
-        private static void RemoveUnsupportedElements(XElement xml)
-        {
-            var pendingRemoval = new List<XElement>();
-
-            foreach (var e in xml.DescendantsAndSelf())
-            {
-                if (e.Name == "defunct")
-                {
-                    pendingRemoval.Add(e);
-                }
-                else if (e.Name == "local" && e.Attributes().Any(a => a.Name.LocalName == "name" && a.Value.StartsWith("$VB$ResumableLocal_")))
-                {
-                    // TODO: Remove once https://github.com/dotnet/roslyn/issues/8473 is implemented
-                    pendingRemoval.Add(e);
-                }
-            }
-
-            foreach (var e in pendingRemoval)
-            {
-                e.Remove();
-            }
-
-            // TODO: Remove once https://github.com/dotnet/roslyn/issues/8473 is implemented
-            RemoveEmptyScopes(xml);
-        }
-
-        private static void RemoveEmptyScopes(XElement pdb)
-        {
-            XElement[] emptyScopes;
-
-            do
-            {
-                emptyScopes = (from e in pdb.DescendantsAndSelf()
-                               where e.Name == "scope" && !e.HasElements
-                               select e).ToArray();
-
-                foreach (var e in emptyScopes)
-                {
-                    e.Remove();
-                }
-            }
-            while (emptyScopes.Any());
         }
 
         private static void VerifyPdb(Stream pdbStream, Stream peStream, string expectedXml, string message)

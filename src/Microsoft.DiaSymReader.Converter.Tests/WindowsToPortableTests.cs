@@ -356,6 +356,7 @@ MethodDebugInformation (index: 0x31, size: 80):
 6: nil
 7: 
 {
+  Kickoff Method: 0x06000002 (MethodDef)
   Locals: 0x11000001 (StandAloneSig)
   Document: #1
 
@@ -383,6 +384,7 @@ d: nil
 e: nil
 f: 
 {
+  Kickoff Method: 0x06000003 (MethodDef)
   Locals: «0x11000003»«0x11000004» (StandAloneSig)
   Document: #1
 
@@ -781,7 +783,7 @@ Document (index: 0x30, size: 8):
 ===================================================
 1: 'C:\VB.vb'  Visual Basic  nil            nil   
 
-MethodDebugInformation (index: 0x31, size: 68): 
+MethodDebugInformation (index: 0x31, size: 144): 
 ==================================================
 1: nil
 2: nil
@@ -793,14 +795,14 @@ MethodDebugInformation (index: 0x31, size: 68):
   Document: #1
 
   IL_0000: (42, 5) - (42, 17)
-  IL_0001: (43, 9) - (43, 32)
+  IL_0001: (43, 9) - (43, 43)
   IL_0015: <hidden>
   IL_001B: (44, 17) - (44, 68)
   IL_0023: (45, 9) - (45, 13)
   IL_0024: <hidden>
   IL_0028: <hidden>
   IL_0030: <hidden>
-  IL_0034: (47, 9) - (47, 32)
+  IL_0034: (47, 9) - (47, 43)
   IL_004A: <hidden>
   IL_0053: (48, 17) - (48, 54)
   IL_005B: (49, 9) - (49, 13)
@@ -813,16 +815,20 @@ MethodDebugInformation (index: 0x31, size: 68):
 7: nil
 8: nil
 9: nil
-a: 
+a: nil
+b: nil
+c: nil
+d: 
 {
-  Locals: 0x11000003 (StandAloneSig)
+  Kickoff Method: 0x06000002 (MethodDef)
+  Locals: 0x11000005 (StandAloneSig)
   Document: #1
 
   IL_0000: <hidden>
   IL_0041: (11, 9) - (11, 59)
   IL_0042: (12, 17) - (12, 23)
   IL_004E: (13, 13) - (13, 24)
-  IL_0058: (15, 13) - (15, 30)
+  IL_0058: (15, 13) - (15, 41)
   IL_006B: <hidden>
   IL_0080: (16, 17) - (16, 24)
   IL_00A0: (17, 17) - (17, 24)
@@ -830,7 +836,7 @@ a:
   IL_00C1: <hidden>
   IL_00CF: <hidden>
   IL_00E0: <hidden>
-  IL_00E3: (20, 13) - (20, 36)
+  IL_00E3: (20, 13) - (20, 47)
   IL_0101: <hidden>
   IL_0116: (21, 17) - (21, 24)
   IL_0136: (22, 17) - (22, 24)
@@ -840,21 +846,67 @@ a:
   IL_0176: <hidden>
   IL_0179: (25, 9) - (25, 21)
 }
-b: nil
-c: nil
-d: nil
 e: nil
 f: nil
 10: nil
-11: 
+11: nil
+12: nil
+13: nil
+14: 
 {
   Document: #1
 
   IL_0000: (32, 13) - (32, 20)
   IL_0001: (36, 13) - (36, 20)
 }
+15: nil
+16: nil
+17: 
+{
+  Kickoff Method: 0x06000009 (MethodDef)
+  Locals: «0x11000006»«0x11000008» (StandAloneSig)
+  Document: #1
 
-LocalScope (index: 0x32, size: 144): 
+  IL_0000: <hidden>
+  IL_0021: (65, 9) - (65, 59)
+  IL_0022: (66, 17) - (66, 35)
+  IL_0029: (67, 13) - (67, 20)
+  IL_0044: (68, 13) - (68, 35)
+  IL_0050: (69, 9) - (69, 21)
+}
+18: nil
+19: nil
+1a: nil
+1b: nil
+1c: nil
+1d: nil
+1e: nil
+1f: 
+{
+  Kickoff Method: 0x0600000a (MethodDef)
+  Locals: «0x11000006»«0x11000008» (StandAloneSig)
+  Document: #1
+
+  IL_0000: <hidden>
+  IL_0021: (71, 9) - (71, 59)
+  IL_0022: (72, 17) - (72, 36)
+  IL_0029: (73, 17) - (73, 36)
+  IL_0030: (74, 17) - (74, 36)
+  IL_0037: (75, 17) - (75, 36)
+  IL_003E: (76, 13) - (76, 20)
+  IL_0059: (77, 13) - (77, 36)
+  IL_0065: (78, 13) - (78, 36)
+  IL_0071: (79, 13) - (79, 36)
+  IL_007D: (80, 13) - (80, 36)
+  IL_0089: (81, 9) - (81, 21)
+}
+20: nil
+21: nil
+22: nil
+23: nil
+24: nil
+
+LocalScope (index: 0x32, size: 192): 
 ===========================================================================================================================
    Method                  ImportScope               Variables              Constants              StartOffset  Length  
 ===========================================================================================================================
@@ -864,9 +916,12 @@ LocalScope (index: 0x32, size: 144):
 4: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  0x33000002-0x33000002  nil                    001B         8       
 5: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  0x33000003-0x33000003  nil                    004C         22      
 6: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  0x33000004-0x33000004  nil                    0053         8       
-7: 0x06000007 (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0000         8       
-8: 0x0600000a (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0000         379     
-9: 0x06000011 (MethodDef)  0x35000002 (ImportScope)  nil                    0x34000001-0x34000003  0000         2       
+7: 0x06000009 (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0000         17      
+8: 0x0600000a (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0000         17      
+9: 0x0600000d (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0000         379     
+a: 0x06000014 (MethodDef)  0x35000002 (ImportScope)  nil                    0x34000001-0x34000003  0000         2       
+b: 0x06000017 (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0000         82      
+c: 0x0600001f (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0000         139     
 
 LocalVariable (index: 0x33, size: 24): 
 ============================
@@ -886,22 +941,30 @@ LocalConstant (index: 0x34, size: 12):
 3: 'DT'  00-80-30-05-6D-F3-D1-08 [0x01000010 (TypeRef)]                 
 
 ImportScope (index: 0x35, size: 8): 
-==============================================================================================================================================================================================================================
-   Parent                    Imports                                                                                                                                                                                           
-==============================================================================================================================================================================================================================
-1: nil (ImportScope)         <'prjlevel1' = 'http://NewNamespace'>, 'A1' = 'System.Collections.Generic', 'A2' = 0x01000014 (TypeRef), 'System', 'Microsoft.VisualBasic', 'System.Linq', 'System.Xml.Linq', 'System.Threading'  
-2: 0x35000001 (ImportScope)  <'file1' = 'http://stuff/fromFile'>, <nil = 'http://stuff/fromFile1'>, 'AliasE' = 0x02000008 (TypeDef), 'System', 'System.Collections.Generic'                                                    
+============================================================================================================================================================================
+   Parent                    Imports                                                                                                                                         
+============================================================================================================================================================================
+1: nil (ImportScope)         <'prjlevel1' = 'http://NewNamespace'>, 'A1' = 'System.Collections.Generic', 'A2' = 0x01000014 (TypeRef), 'System.Threading'                     
+2: 0x35000001 (ImportScope)  <'file1' = 'http://stuff/fromFile'>, <nil = 'http://stuff/fromFile1'>, 'AliasE' = 0x02000009 (TypeDef), 'System', 'System.Collections.Generic'  
 
-CustomDebugInformation (index: 0x37, size: 36): 
-====================================================================================================================
-   Parent                      Kind                 Value                                                           
-====================================================================================================================
-1: 0x00000001 (Module)         Default Namespace    nil                                                             
-2: 0x06000002 (MethodDef)      EnC Local Slot Map   01-05-07-3F-09-3F-01-3F-07-80-A4-09-80-A4-01-80-A4              
-3: 0x33000002 (LocalVariable)  Tuple Element Names  78-00-00-7A-00                                                  
-4: 0x33000004 (LocalVariable)  Tuple Element Names  75-00-00                                                        
-5: 0x06000005 (MethodDef)      EnC Local Slot Map   07-01-09-01-01-01-01-2A-02-01-07-77-09-77-01-77-01-80-A0-02-77  
-6: 0x0600000a (MethodDef)      EnC Local Slot Map   15-00-1C-00-02-3F-02-80-A4");
+CustomDebugInformation (index: 0x37, size: 78):
+============================================================================================================================================================================================================================================
+   Parent                      Kind                                Value                                                                                                                                                                    
+============================================================================================================================================================================================================================================
+1: 0x00000001 (Module)         Default Namespace                   nil                                                                                                                                                                      
+2: 0x06000002 (MethodDef)      EnC Local Slot Map                  01-05-07-3F-09-3F-01-48-07-80-AF-09-80-AF-01-80-B8                                                                                                                       
+3: 0x33000002 (LocalVariable)  Tuple Element Names                 78-00-00-7A-00                                                                                                                                                           
+4: 0x33000004 (LocalVariable)  Tuple Element Names                 75-00-00                                                                                                                                                                 
+5: 0x06000005 (MethodDef)      EnC Local Slot Map                  07-01-09-01-01-0A-01-35-02-01-07-80-82-09-80-82-01-80-8B-01-80-B6-02-80-82                                                                                               
+6: 0x06000009 (MethodDef)      EnC Local Slot Map                  01-05                                                                                                                                                                    
+7: 0x0600000a (MethodDef)      EnC Local Slot Map                  01-05-01-2A-01-4F-01-74                                                                                                                                                  
+8: 0x0600000d (MethodDef)      EnC Local Slot Map                  15-00-1C-00-02-3F-02-80-AF                                                                                                                                               
+9: 0x0600000d (MethodDef)      State Machine Hoisted Local Scopes  41-00-00-00-3A-01-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-6D-00-00-00-62-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-03-01-00-00-62-00-00-00  
+a: 0x06000017 (MethodDef)      EnC Local Slot Map                  15-00-1C-00                                                                                                                                                              
+b: 0x06000017 (MethodDef)      State Machine Hoisted Local Scopes  21-00-00-00-31-00-00-00                                                                                                                                                  
+c: 0x0600001f (MethodDef)      EnC Local Slot Map                  15-00-1C-00                                                                                                                                                              
+d: 0x0600001f (MethodDef)      State Machine Hoisted Local Scopes  21-00-00-00-6A-00-00-00-21-00-00-00-6A-00-00-00-21-00-00-00-6A-00-00-00-21-00-00-00-6A-00-00-00
+");
         }
 
         [Fact]

@@ -212,6 +212,11 @@
         <target state="new">Invalid embedded source associated with document '{0}'</target>
         <note />
       </trans-unit>
+      <trans-unit id="InconsistentStateMachineMethodMapping">
+        <source>Inconsistent state machine method mapping -- MoveNext method is associated with two distinct kickoff methods: 0x{0:X8} and 0x{1:X8}</source>
+        <target state="new">Inconsistent state machine method mapping -- MoveNext method is associated with two distinct kickoff methods: 0x{0:X8} and 0x{1:X8}</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -33,6 +33,7 @@ namespace Microsoft.DiaSymReader.Tools
         InvalidSourceServerData = 25,
         BothSourceLinkDataAndSourceServerData = 26,
         InvalidEmbeddedSource = 27,
+        InconsistentStateMachineMethodMapping = 28,
     }
 
     internal static class PdbDiagnosticIdExtensions
@@ -71,6 +72,7 @@ namespace Microsoft.DiaSymReader.Tools
                 case PdbDiagnosticId.InvalidSourceServerData: return ConverterResources.InvalidSourceServerData;
                 case PdbDiagnosticId.BothSourceLinkDataAndSourceServerData: return ConverterResources.BothSourceLinkDataAndSourceServerData;
                 case PdbDiagnosticId.InvalidEmbeddedSource: return ConverterResources.InvalidEmbeddedSource;
+                case PdbDiagnosticId.InconsistentStateMachineMethodMapping: return ConverterResources.InconsistentStateMachineMethodMapping;
 
                 default:
                     throw ExceptionUtilities.UnexpectedValue(id);
