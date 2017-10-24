@@ -105,7 +105,7 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="InvalidDataException">The PDB doesn't match the CodeView Debug Directory record in the PE image.</exception>
         /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
         /// <exception cref="ObjectDisposedException">Stream has been disposed while reading/writing.</exception>
-        public void ConvertPortableToWindows(Stream peStream, Stream sourcePdbStream, Stream targetPdbStream, PdbConversionOptions options = default(PdbConversionOptions))
+        public void ConvertPortableToWindows(Stream peStream, Stream sourcePdbStream, Stream targetPdbStream, PdbConversionOptions options = default)
         {
             StreamUtilities.ValidateStream(peStream, nameof(peStream), readRequired: true, seekRequired: true);
             using (var peReader = new PEReader(peStream, PEStreamOptions.LeaveOpen))
@@ -128,7 +128,7 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="InvalidDataException">The PDB doesn't match the CodeView Debug Directory record in the PE image.</exception>
         /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
         /// <exception cref="ObjectDisposedException">Stream has been disposed while reading/writing.</exception>
-        public void ConvertPortableToWindows(PEReader peReader, Stream sourcePdbStream, Stream targetPdbStream, PdbConversionOptions options = default(PdbConversionOptions))
+        public void ConvertPortableToWindows(PEReader peReader, Stream sourcePdbStream, Stream targetPdbStream, PdbConversionOptions options = default)
         {
             StreamUtilities.ValidateStream(sourcePdbStream, nameof(sourcePdbStream), readRequired: true);
 
@@ -151,7 +151,7 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="InvalidDataException">The PDB doesn't match the CodeView Debug Directory record in the PE image.</exception>
         /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
         /// <exception cref="ObjectDisposedException">Stream has been disposed while reading/writing.</exception>
-        public void ConvertPortableToWindows(PEReader peReader, MetadataReader pdbReader, Stream targetPdbStream, PdbConversionOptions options = default(PdbConversionOptions))
+        public void ConvertPortableToWindows(PEReader peReader, MetadataReader pdbReader, Stream targetPdbStream, PdbConversionOptions options = default)
         {
             if (pdbReader == null)
             {
