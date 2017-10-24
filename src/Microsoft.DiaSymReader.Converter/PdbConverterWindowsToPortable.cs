@@ -41,14 +41,27 @@ namespace Microsoft.DiaSymReader.Tools
                 throw new InvalidDataException(ConverterResources.SpecifiedPEFileHasNoAssociatedPdb);
             }
 
-            var symReader = SymReaderHelpers.CreateWindowsPdbReader(sourcePdbStream, peReader);
-
-            Marshal.ThrowExceptionForHR(symReader.MatchesModule(pdbId.Guid, pdbId.Stamp, age, out bool isMatching));
-            if (!isMatching)
+            ISymUnmanagedReader5 symReader = null;
+            try
             {
-                throw new InvalidDataException(ConverterResources.PdbNotMatchingDebugDirectory);
-            }
+                symReader = SymReaderHelpers.CreateWindowsPdbReader(sourcePdbStream, peReader);
 
+                Marshal.ThrowExceptionForHR(symReader.MatchesModule(pdbId.Guid, pdbId.Stamp, age, out bool isMatching));
+                if (!isMatching)
+                {
+                    throw new InvalidDataException(ConverterResources.PdbNotMatchingDebugDirectory);
+                }
+
+                Convert(symReader, peReader, targetPdbStream, pdbId);
+            }
+            finally
+            {
+                ((ISymUnmanagedDispose)symReader)?.Destroy();
+            }
+        }
+
+        private void Convert(ISymUnmanagedReader5 symReader, PEReader peReader, Stream targetPdbStream, BlobContentId pdbId)
+        {
             var metadataBuilder = new MetadataBuilder();
             var documents = symReader.GetDocuments();
             bool vbSemantics = documents.Any(d => d.GetLanguage() == SymReaderHelpers.VisualBasicLanguageGuid);
@@ -81,7 +94,7 @@ namespace Microsoft.DiaSymReader.Tools
             var importScopes = new List<ImportScopeInfo>();
 
             // reserve slot for module import scope:
-            importScopes.Add(default(ImportScopeInfo));
+            importScopes.Add(default);
 
             var externAliasImports = new List<ImportInfo>();
             var externAliasStringSet = new HashSet<string>(StringComparer.Ordinal);
@@ -104,7 +117,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                     if (importStrings.IsEmpty)
                     {
-                        importGroups = default(ImmutableArray<ImmutableArray<ImportInfo>>);
+                        importGroups = default;
                     }
                     else
                     {
@@ -167,7 +180,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                     if (importStringGroups.IsDefault)
                     {
-                        importGroups = default(ImmutableArray<ImmutableArray<ImportInfo>>);
+                        importGroups = default;
                     }
                     else
                     {
@@ -177,7 +190,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                 if (importGroups.IsDefault)
                 {
-                    importScopesByMethod.Add(default(ImportScopeHandle));
+                    importScopesByMethod.Add(default);
                 }
                 else
                 {
@@ -193,7 +206,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             // import scopes:
             metadataBuilder.AddImportScope(
-                parentScope: default(ImportScopeHandle),
+                parentScope: default,
                 imports: SerializeModuleImportScope(metadataBuilder, externAliasImports, vbProjectLevelImports, vbDefaultNamespace, metadataModel));
 
             for (int i = 1; i < importScopes.Count; i++)
@@ -224,7 +237,7 @@ namespace Microsoft.DiaSymReader.Tools
                 var symMethod = symReader.GetMethod(methodToken);
                 if (symMethod == null)
                 {
-                    metadataBuilder.AddMethodDebugInformation(default(DocumentHandle), sequencePoints: default(BlobHandle));
+                    metadataBuilder.AddMethodDebugInformation(default, sequencePoints: default);
                     continue;
                 }
 
@@ -249,9 +262,9 @@ namespace Microsoft.DiaSymReader.Tools
                 {
                     documentIndex.Add(string.Empty, metadataBuilder.AddDocument(
                         name: metadataBuilder.GetOrAddDocumentName(string.Empty),
-                        hashAlgorithm: default(GuidHandle),
-                        hash: default(BlobHandle),
-                        language: default(GuidHandle)));
+                        hashAlgorithm: default,
+                        hash: default,
+                        language: default));
                 }
 
                 BlobHandle sequencePointsBlob = SerializeSequencePoints(metadataBuilder, localSignatureRowId, symSequencePoints, documentIndex, methodToken, out var singleDocumentHandle);
@@ -489,7 +502,7 @@ namespace Microsoft.DiaSymReader.Tools
             string name = document.GetName();
             Guid language = document.GetLanguage();
             var hashAlgorithm = document.GetHashAlgorithm();
-            var checksumHandle = (hashAlgorithm != default(Guid)) ? metadataBuilder.GetOrAddBlob(document.GetChecksum()) : default(BlobHandle);
+            var checksumHandle = (hashAlgorithm != default) ? metadataBuilder.GetOrAddBlob(document.GetChecksum()) : default;
 
             var documentHandle = metadataBuilder.AddDocument(
                 name: metadataBuilder.GetOrAddDocumentName(name),
@@ -636,7 +649,7 @@ namespace Microsoft.DiaSymReader.Tools
                 return true;
             }
 
-            import = default(ImportInfo);
+            import = default;
             return false;
         }
 
@@ -657,13 +670,13 @@ namespace Microsoft.DiaSymReader.Tools
             var handle = MetadataTokens.EntityHandle(symReader.GetUserEntryPoint());
             if (handle.IsNil)
             {
-                return default(MethodDefinitionHandle);
+                return default;
             }
 
             if (handle.Kind != HandleKind.MethodDefinition)
             {
                 ReportDiagnostic(PdbDiagnosticId.InvalidEntryPointToken, 0, MetadataTokens.GetToken(handle));
-                return default(MethodDefinitionHandle);
+                return default;
             }
 
             return (MethodDefinitionHandle)handle;
@@ -998,7 +1011,7 @@ namespace Microsoft.DiaSymReader.Tools
                     return true;
                 }
 
-                info = default(DynamicLocalInfo);
+                info = default;
                 return false;
             }
 
@@ -1131,8 +1144,8 @@ namespace Microsoft.DiaSymReader.Tools
         {
             if (sequencePoints.Length == 0)
             {
-                singleDocumentHandle = default(DocumentHandle);
-                return default(BlobHandle);
+                singleDocumentHandle = default;
+                return default;
             }
 
             var writer = new BlobBuilder();
@@ -1250,7 +1263,7 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 if (GetDocumentHandle(sequencePoints[i].Document, documentIndex, methodToken) != singleDocument)
                 {
-                    return default(DocumentHandle);
+                    return default;
                 }
             }
 
@@ -1267,7 +1280,7 @@ namespace Microsoft.DiaSymReader.Tools
             catch (Exception)
             {
                 ReportDiagnostic(PdbDiagnosticId.InvalidSequencePointDocument, methodToken);
-                return default(DocumentHandle);
+                return default;
             }
 
             if (documentIndex.TryGetValue(name, out var handle))
@@ -1276,7 +1289,7 @@ namespace Microsoft.DiaSymReader.Tools
             }
 
             ReportDiagnostic(PdbDiagnosticId.InvalidSequencePointDocument, methodToken, name);
-            return default(DocumentHandle);
+            return default;
         }
 
         private static void SerializeDeltaLinesAndColumns(BlobBuilder writer, SymUnmanagedSequencePoint sequencePoint)
