@@ -50,8 +50,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             try
             {
-                Convert(parsedArgs);
-                return 0;
+                return Convert(parsedArgs) ? 0 : -1;
             }
             catch (Exception e)
             {
@@ -151,9 +150,14 @@ namespace Microsoft.DiaSymReader.Tools
         }
 
         // internal for testing
-        internal static void Convert(Args args)
+        internal static bool Convert(Args args)
         {
-            var reporter = args.Verbose ? new Action<PdbDiagnostic>(d => Console.Error.WriteLine(d.ToString(CultureInfo.CurrentCulture))) : null;
+            bool success = true;
+            var reporter = args.Verbose ? new Action<PdbDiagnostic>(d => 
+            {
+                Console.Error.WriteLine(d.ToString(CultureInfo.CurrentCulture));
+                success = false;
+            }) : null;
 
             var converter = new PdbConverter(reporter);
 
@@ -234,6 +238,8 @@ namespace Microsoft.DiaSymReader.Tools
                     }
                 }
             }
+
+            return success;
         }
 
         private static string GetPdbPathFromCodeViewEntry(PEReader peReader, string peFilePath, bool portable)

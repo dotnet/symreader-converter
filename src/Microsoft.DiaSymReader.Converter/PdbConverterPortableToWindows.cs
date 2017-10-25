@@ -966,7 +966,13 @@ namespace Microsoft.DiaSymReader.Tools
         {
             var builder = new StringBuilder();
 
-            var map = SourceLinkMap.Parse(sourceLink);
+            var map = SourceLinkMap.Parse(sourceLink, errorMessage => ReportDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, errorMessage));
+            if (map == null)
+            {
+                // error already reported
+                return;
+            }
+
             var mapping = new List<(string name, string uri)>();
 
             string commonScheme = null;

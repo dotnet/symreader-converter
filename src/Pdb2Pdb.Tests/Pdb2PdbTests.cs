@@ -81,13 +81,13 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             var pdb = dir.CreateFile("SourceLink.x.pdb").WriteAllBytes(TestResources.SourceLink.PortablePdb);
             var outPdbPath = Path.Combine(dir.Path, "SourceLink.pdb2");
 
-            Pdb2Pdb.Convert(new Pdb2Pdb.Args(
+            Assert.True(Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
                 pdbFilePathOpt: pdb.Path,
                 outPdbFilePathOpt: outPdbPath,
                 options: PdbConversionOptions.Default,
                 extract: false,
-                verbose: false));
+                verbose: false)));
 
             using (var peStream = File.OpenRead(pe.Path))
             using (var pdbStream = File.OpenRead(outPdbPath))
@@ -128,13 +128,13 @@ SRCSRV: end ------------------------------------------------", actual);
             dir.CreateFile("SourceLink.pdb").WriteAllBytes(TestResources.SourceLink.PortablePdb);
             var outPdb = dir.CreateFile("SourceLink.converted.pdb").WriteAllText("dummy");
 
-            Pdb2Pdb.Convert(new Pdb2Pdb.Args(
+            Assert.True(Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
                 pdbFilePathOpt: null,
                 outPdbFilePathOpt: outPdb.Path,
                 options: PdbConversionOptions.SuppressSourceLinkConversion,
                 extract: false,
-                verbose: false));
+                verbose: false)));
 
             using (var peStream = File.OpenRead(pe.Path))
             using (var pdbStream = File.OpenRead(outPdb.Path))
@@ -152,13 +152,13 @@ SRCSRV: end ------------------------------------------------", actual);
             var pe = dir.CreateFile("SourceLink.Embedded.dll").WriteAllBytes(TestResources.SourceLink.EmbeddedDll);
             var outPdb = dir.CreateFile("SourceLink.converted.pdb").WriteAllText("dummy");
 
-            Pdb2Pdb.Convert(new Pdb2Pdb.Args(
+            Assert.True(Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
                 pdbFilePathOpt: null,
                 outPdbFilePathOpt: outPdb.Path,
                 options: PdbConversionOptions.SuppressSourceLinkConversion,
                 extract: false,
-                verbose: false));
+                verbose: false)));
 
             using (var peStream = File.OpenRead(pe.Path))
             using (var pdbStream = File.OpenRead(outPdb.Path))
@@ -176,13 +176,13 @@ SRCSRV: end ------------------------------------------------", actual);
             var pe = dir.CreateFile("SourceLink.Embedded.dll").WriteAllBytes(TestResources.SourceLink.EmbeddedDll);
             var outPdb = dir.CreateFile("SourceLink.Embedded.pdb").WriteAllText("dummy");
 
-            Pdb2Pdb.Convert(new Pdb2Pdb.Args(
+            Assert.True(Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
                 pdbFilePathOpt: null,
                 outPdbFilePathOpt: null,
                 options: PdbConversionOptions.Default,
                 extract: true,
-                verbose: false));
+                verbose: false)));
 
             AssertEx.Equal(TestResources.SourceLink.PortablePdb, File.ReadAllBytes(outPdb.Path));
         }
@@ -194,13 +194,13 @@ SRCSRV: end ------------------------------------------------", actual);
             var pe = dir.CreateFile("SourceLink.Embedded.dll").WriteAllBytes(TestResources.SourceLink.EmbeddedDll);
             var outPdb = dir.CreateFile("SourceLink.extracted.pdb").WriteAllText("dummy");
 
-            Pdb2Pdb.Convert(new Pdb2Pdb.Args(
+            Assert.True(Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
                 pdbFilePathOpt: null,
                 outPdbFilePathOpt: outPdb.Path,
                 options: PdbConversionOptions.Default,
                 extract: true,
-                verbose: false));
+                verbose: false)));
 
             AssertEx.Equal(TestResources.SourceLink.PortablePdb, File.ReadAllBytes(outPdb.Path));
         }
@@ -233,13 +233,13 @@ SRCSRV: end ------------------------------------------------", actual);
             dir.CreateFile("SourceData.pdb").WriteAllBytes(TestResources.SourceData.WindowsPdb);
             var outPdb = dir.CreateFile("SourceLink.pdb").WriteAllText("dummy");
 
-            Pdb2Pdb.Convert(new Pdb2Pdb.Args(
+            Assert.True(Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
                 pdbFilePathOpt: null,
                 outPdbFilePathOpt: outPdb.Path,
                 options: PdbConversionOptions.Default,
                 extract: false,
-                verbose: false));
+                verbose: false)));
 
             using (var provider = MetadataReaderProvider.FromPortablePdbStream(File.OpenRead(outPdb.Path)))
             {
