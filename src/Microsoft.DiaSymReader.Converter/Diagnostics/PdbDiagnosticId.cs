@@ -6,6 +6,7 @@ namespace Microsoft.DiaSymReader.Tools
 {
     public enum PdbDiagnosticId
     {
+        None = 0,
         MethodAssociatedWithLocalScopeHasNoBody = 1,
         LocalConstantNameTooLong = 2,
         LocalVariableNameTooLong = 3,
@@ -34,6 +35,7 @@ namespace Microsoft.DiaSymReader.Tools
         BothSourceLinkDataAndSourceServerData = 26,
         InvalidEmbeddedSource = 27,
         InconsistentStateMachineMethodMapping = 28,
+        InvalidSourceLink = 29,
     }
 
     internal static class PdbDiagnosticIdExtensions
@@ -42,7 +44,7 @@ namespace Microsoft.DiaSymReader.Tools
         {
             switch (id)
             {
-                case default(PdbDiagnosticId):
+                case PdbDiagnosticId.None:
                     return null;
 
                 case PdbDiagnosticId.MethodAssociatedWithLocalScopeHasNoBody: return ConverterResources.MethodAssociatedWithLocalScopeHasNoBody;
@@ -73,6 +75,7 @@ namespace Microsoft.DiaSymReader.Tools
                 case PdbDiagnosticId.BothSourceLinkDataAndSourceServerData: return ConverterResources.BothSourceLinkDataAndSourceServerData;
                 case PdbDiagnosticId.InvalidEmbeddedSource: return ConverterResources.InvalidEmbeddedSource;
                 case PdbDiagnosticId.InconsistentStateMachineMethodMapping: return ConverterResources.InconsistentStateMachineMethodMapping;
+                case PdbDiagnosticId.InvalidSourceLink: return ConverterResources.InvalidSourceLink;
 
                 default:
                     throw ExceptionUtilities.UnexpectedValue(id);

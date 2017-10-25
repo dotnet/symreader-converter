@@ -217,6 +217,16 @@
         <target state="new">Inconsistent state machine method mapping -- MoveNext method is associated with two distinct kickoff methods: 0x{0:X8} and 0x{1:X8}</target>
         <note />
       </trans-unit>
+      <trans-unit id="InvalidJsonDataFormat">
+        <source>The JSON format is invalid</source>
+        <target state="new">The JSON format is invalid</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidSourceLink">
+        <source>Invalid Source Link: {0}</source>
+        <target state="new">Invalid Source Link: {0}</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

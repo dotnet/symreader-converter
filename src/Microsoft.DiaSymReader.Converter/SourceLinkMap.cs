@@ -47,18 +47,20 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        internal static SourceLinkMap Parse(string json)
+        internal static SourceLinkMap Parse(string json, Action<string> reportDiagnostic)
         {
             var list = new List<(FilePath key, Uri value)>();
             try
             {
-                var root = JObject.Parse(json);
+                // trim BOM if present:
+                var root = JObject.Parse(json.TrimStart('\uFEFF'));
+
                 foreach (var token in root["documents"])
                 {
                     if (!(token is JProperty property))
                     {
-                        // TODO: report error
                         // Bad source link format
+                        reportDiagnostic(ConverterResources.InvalidJsonDataFormat);
                         continue;
                     }
 
@@ -69,8 +71,8 @@ namespace Microsoft.DiaSymReader.Tools
                     }
                     catch (FormatException)
                     {
-                        // TODO: report error
                         // Bad source link format
+                        reportDiagnostic(ConverterResources.InvalidJsonDataFormat);
                         continue;
                     }
 
@@ -80,15 +82,15 @@ namespace Microsoft.DiaSymReader.Tools
                     }
                     else
                     {
-                        // TODO: report error
                         // Bad source link format
+                        reportDiagnostic(ConverterResources.InvalidJsonDataFormat);
                         continue;
                     }
                 }
             }
-            catch (JsonReaderException)
+            catch (JsonReaderException e)
             {
-                // TODO: report error
+                reportDiagnostic(e.Message);
                 return null;
             }
 

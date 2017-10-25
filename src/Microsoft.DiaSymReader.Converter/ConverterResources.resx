@@ -234,6 +234,9 @@
   <data name="InvalidSourceLinkData" xml:space="preserve">
     <value>Invalid Source Link data</value>
   </data>
+  <data name="InvalidSourceLink" xml:space="preserve">
+    <value>Invalid Source Link: {0}</value>
+  </data>
   <data name="InvalidSourceServerData" xml:space="preserve">
     <value>Invalid srcsrv data</value>
   </data>
@@ -245,5 +248,8 @@
   </data>
   <data name="InconsistentStateMachineMethodMapping" xml:space="preserve">
     <value>Inconsistent state machine method mapping -- MoveNext method is associated with two distinct kickoff methods: 0x{0:X8} and 0x{1:X8}</value>
+  </data>
+  <data name="InvalidJsonDataFormat" xml:space="preserve">
+    <value>The JSON format is invalid</value>
   </data>
 </root>
