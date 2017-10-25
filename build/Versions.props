@@ -9,7 +9,7 @@
 
     <!-- Toolset -->
     <DotNetCliVersion>15.5.0-preview-007044</DotNetCliVersion>
-    <RoslynToolsMicrosoftRepoToolsetVersion>1.0.0-alpha43</RoslynToolsMicrosoftRepoToolsetVersion>
+    <RoslynToolsMicrosoftRepoToolsetVersion>1.0.0-alpha47</RoslynToolsMicrosoftRepoToolsetVersion>
 
     <!-- libs -->
     <MicrosoftDiaSymReaderVersion>1.3.0-beta-62225-02</MicrosoftDiaSymReaderVersion>
