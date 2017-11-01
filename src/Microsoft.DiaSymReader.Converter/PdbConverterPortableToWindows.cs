@@ -964,6 +964,12 @@ namespace Microsoft.DiaSymReader.Tools
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void ConvertSourceServerData(string sourceLink, SymUnmanagedWriter pdbWriter, IReadOnlyCollection<string> documentNames)
         {
+            if (documentNames.Count == 0)
+            {
+                // no documents in the PDB
+                return;
+            }
+            
             var builder = new StringBuilder();
 
             var map = SourceLinkMap.Parse(sourceLink, errorMessage => ReportDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, errorMessage));
