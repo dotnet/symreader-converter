@@ -56,10 +56,20 @@ function Create-Directory([string[]] $path) {
   }
 }
 
+function GetVersion([string] $name) {
+  foreach ($propertyGroup in $VersionsXml.Project.PropertyGroup) {
+    if (Get-Member -inputObject $propertyGroup -name $name) {
+        return $propertyGroup.$name
+    }
+  }
+
+  throw "Failed to find $name in Versions.props"
+}
+
 function InstallDotNetCli {
   
   Create-Directory $DotNetRoot
-  $dotnetCliVersion = $VersionsXml.Project.PropertyGroup.DotNetCliVersion
+  $dotnetCliVersion = GetVersion("DotNetCliVersion")
 
   $installScript = "$DotNetRoot\dotnet-install.ps1"
   if (!(Test-Path $installScript)) { 
@@ -86,7 +96,7 @@ function Build {
     $logCmd = ""
   }
  
-  & $DotNetExe msbuild $ToolsetBuildProj /m /nologo /clp:Summary /warnaserror /v:$verbosity $logCmd /p:SolutionPath=$solution /p:Configuration=$configuration /p:SolutionPath=$solution /p:Restore=$restore /p:Build=$build /p:Rebuild=$rebuild /p:Test=$test /p:Sign=$sign /p:Pack=$pack /p:CIBuild=$ci /p:NuGetPackageRoot=$NuGetPackageRoot $properties
+  & $DotNetExe msbuild $ToolsetBuildProj /m /nologo /clp:Summary /warnaserror /v:$verbosity $logCmd /p:Configuration=$configuration /p:SolutionPath=$solution /p:Restore=$restore /p:Build=$build /p:Rebuild=$rebuild /p:Test=$test /p:Sign=$sign /p:Pack=$pack /p:CIBuild=$ci /p:NuGetPackageRoot=$NuGetPackageRoot $properties
 }
 
 function Stop-Processes() {
@@ -106,6 +116,7 @@ try {
   $ToolsetDir = Join-Path $ArtifactsDir "toolset"
   $LogDir = Join-Path (Join-Path $ArtifactsDir $configuration) "log"
   $TempDir = Join-Path (Join-Path $ArtifactsDir $configuration) "tmp"
+  [xml]$VersionsXml = Get-Content(Join-Path $PSScriptRoot "Versions.props")
 
   if ($solution -eq "") {
     $solution = @(gci(Join-Path $RepoRoot "*.sln"))[0]
@@ -117,11 +128,9 @@ try {
     $NuGetPackageRoot = Join-Path $env:UserProfile ".nuget\packages\"
   }
 
-  [xml]$VersionsXml = Get-Content(Join-Path $PSScriptRoot "Versions.props")
-
-  $ToolsetVersion = $VersionsXml.Project.PropertyGroup.RoslynToolsMicrosoftRepoToolsetVersion
+  $ToolsetVersion = GetVersion("RoslynToolsMicrosoftRepoToolsetVersion")
   $ToolsetBuildProj = Join-Path $NuGetPackageRoot "RoslynTools.Microsoft.RepoToolset\$ToolsetVersion\tools\Build.proj"
-    
+
   if ($ci) {
     Create-Directory $TempDir
     $env:TEMP = $TempDir
