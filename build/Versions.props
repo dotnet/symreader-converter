@@ -22,7 +22,7 @@
     <SystemValueTupleVersion>4.3.0</SystemValueTupleVersion>
   </PropertyGroup>
 
-  <ItemGroup>
+  <PropertyGroup>
     <RestoreSources>
       $(RestoreSources);
       https://dotnet.myget.org/F/symreader/api/v3/index.json;
@@ -30,5 +30,5 @@
       https://dotnet.myget.org/F/symreader-portable/api/v3/index.json;
       https://dotnet.myget.org/F/metadata-tools/api/v3/index.json
     </RestoreSources>
-  </ItemGroup>
+  </PropertyGroup>
 </Project>
