@@ -10,7 +10,7 @@
     <DotNetCliVersion>15.5.0-preview-007044</DotNetCliVersion>
     
     <!-- libs -->
-    <MicrosoftDiaSymReaderVersion>1.3.0-beta-62225-02</MicrosoftDiaSymReaderVersion>
+    <MicrosoftDiaSymReaderVersion>1.3.0-beta-62309-01</MicrosoftDiaSymReaderVersion>
     <MicrosoftDiaSymReaderNativeVersion>1.7.0-beta-25631</MicrosoftDiaSymReaderNativeVersion>
     <MicrosoftDiaSymReaderPortablePdbVersion>1.4.0</MicrosoftDiaSymReaderPortablePdbVersion>
     <MicrosoftMetadataVisualizerVersion>1.0.0-beta1-61530-02</MicrosoftMetadataVisualizerVersion>
