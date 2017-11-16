@@ -22,5 +22,32 @@
         "packages/*.nupkg"
       ]
     }
+  ],
+  "exclude": [
+    "Newtonsoft.Json.dll",
+    "Microsoft.DiaSymReader.dll",
+    "Microsoft.DiaSymReader.Native.amd64.dll",
+    "Microsoft.DiaSymReader.Native.x86.dll",
+    "Microsoft.DiaSymReader.PortablePdb.dll",
+    "Microsoft.Win32.Primitives.dll",
+    "System.AppContext.dll",
+    "System.Collections.Immutable.dll",
+    "System.Console.dll",
+    "System.Diagnostics.DiagnosticSource.dll",
+    "System.Globalization.Calendars.dll",
+    "System.IO.Compression.dll",
+    "System.IO.Compression.ZipFile.dll",
+    "System.IO.FileSystem.dll",
+    "System.IO.FileSystem.Primitives.dll",
+    "System.Net.Http.dll",
+    "System.Net.Sockets.dll",
+    "System.Reflection.Metadata.dll",
+    "System.Runtime.InteropServices.RuntimeInformation.dll",
+    "System.Security.Cryptography.Algorithms.dll",
+    "System.Security.Cryptography.Encoding.dll",
+    "System.Security.Cryptography.Primitives.dll",
+    "System.Security.Cryptography.X509Certificates.dll",
+    "System.ValueTuple.dll",
+    "System.Xml.ReaderWriter.dll"
   ]
 }
