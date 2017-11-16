@@ -14,6 +14,13 @@
         "bin/Pdb2Pdb/net46/*/Pdb2Pdb.resources.dll",
         "bin/Pdb2Xml/net46/Pdb2Xml.exe"
       ]
+    },
+    {
+      "certificate": null,
+      "strongName": null,
+      "values": [
+        "packages/*.nupkg"
+      ]
     }
   ]
 }
