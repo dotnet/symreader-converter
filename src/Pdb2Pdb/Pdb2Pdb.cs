@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -18,12 +19,14 @@ namespace Microsoft.DiaSymReader.Tools
             public readonly string PEFilePath;
             public readonly string PdbFilePathOpt;
             public readonly string OutPdbFilePathOpt;
-            public readonly PdbConversionOptions Options;
+            public readonly PortablePdbConversionOptions Options;
             public readonly bool Extract;
             public readonly bool Verbose;
 
-            public Args(string peFilePath, string pdbFilePathOpt, string outPdbFilePathOpt, PdbConversionOptions options, bool extract, bool verbose)
+            public Args(string peFilePath, string pdbFilePathOpt, string outPdbFilePathOpt, PortablePdbConversionOptions options, bool extract, bool verbose)
             {
+                Debug.Assert(options != null);
+
                 PEFilePath = peFilePath;
                 PdbFilePathOpt = pdbFilePathOpt;
                 OutPdbFilePathOpt = outPdbFilePathOpt;
@@ -68,6 +71,7 @@ namespace Microsoft.DiaSymReader.Tools
             bool verbose = false;
             string inPdb = null;
             string outPdb = null;
+            var srcSvrVariables = new List<KeyValuePair<string, string>>();
 
             int i = 0;
             while (i < args.Length)
@@ -96,6 +100,11 @@ namespace Microsoft.DiaSymReader.Tools
 
                     case "/out":
                         outPdb = ReadValue();
+                        break;
+
+                    case "/srcsvrvar":
+                    case "/srcsvrvariable":
+                        srcSvrVariables.Add(ParseSrcSvrVariable(ReadValue()));
                         break;
 
                     default:
@@ -140,13 +149,35 @@ namespace Microsoft.DiaSymReader.Tools
                 throw new InvalidDataException(Resources.CantSpecifyBothExtractAndPdbOptions);
             }
 
-            var options = default(PdbConversionOptions);
-            if (sourceLink)
+            if (sourceLink && srcSvrVariables.Count > 0)
             {
-                options |= PdbConversionOptions.SuppressSourceLinkConversion;
+                throw new InvalidDataException(Resources.CantSpecifyBothSrcSvrVariableAndSourcelinkOptions);
+            }
+
+            PortablePdbConversionOptions options;
+            try
+            {
+                options = new PortablePdbConversionOptions(
+                    suppressSourceLinkConversion: sourceLink,
+                    srcSvrVariables: srcSvrVariables);
+            }
+            catch (ArgumentException e)
+            {
+                throw new InvalidDataException(e.Message);
             }
 
             return new Args(peFile, inPdb, outPdb, options, extract, verbose);
+        }
+
+        private static KeyValuePair<string, string> ParseSrcSvrVariable(string value)
+        {
+            int eq = value.IndexOf('=');
+            if (eq < 0)
+            {
+                return default;
+            }
+
+            return new KeyValuePair<string, string>(value.Substring(0, eq), value.Substring(eq + 1));
         }
 
         // internal for testing

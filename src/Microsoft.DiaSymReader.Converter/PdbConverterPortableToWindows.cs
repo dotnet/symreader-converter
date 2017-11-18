@@ -77,8 +77,13 @@ namespace Microsoft.DiaSymReader.Tools
             public bool IsHoistedScope => HoistedVariableStartIndex < HoistedVariableEndIndex;
         }
 
-        internal void Convert(PEReader peReader, MetadataReader pdbReader, SymUnmanagedWriter pdbWriter, PdbConversionOptions options)
+        internal void Convert(PEReader peReader, MetadataReader pdbReader, SymUnmanagedWriter pdbWriter, PortablePdbConversionOptions options)
         {
+            Debug.Assert(peReader != null);
+            Debug.Assert(pdbReader != null);
+            Debug.Assert(pdbWriter != null);
+            Debug.Assert(options != null);
+
             if (!SymReaderHelpers.TryReadPdbId(peReader, out var pePdbId, out int peAge))
             {
                 throw new InvalidDataException(ConverterResources.SpecifiedPEFileHasNoAssociatedPdb);
@@ -572,13 +577,13 @@ namespace Microsoft.DiaSymReader.Tools
             var sourceLinkHandle = pdbReader.GetCustomDebugInformation(EntityHandle.ModuleDefinition, PortableCustomDebugInfoKinds.SourceLink);
             if (!sourceLinkHandle.IsNil)
             {
-                if ((options & PdbConversionOptions.SuppressSourceLinkConversion) == 0)
+                if (options.SuppressSourceLinkConversion)
                 {
-                    ConvertSourceServerData(pdbReader.GetStringUTF8(sourceLinkHandle), pdbWriter, documentNames);
+                    pdbWriter.SetSourceLinkData(pdbReader.GetBlobBytes(sourceLinkHandle));
                 }
                 else
                 {
-                    pdbWriter.SetSourceLinkData(pdbReader.GetBlobBytes(sourceLinkHandle));
+                    ConvertSourceServerData(pdbReader.GetStringUTF8(sourceLinkHandle), pdbWriter, documentNames, options);
                 }
             }
 
@@ -960,9 +965,13 @@ namespace Microsoft.DiaSymReader.Tools
             symSequencePointsWriter.Flush();
         }
 
+        private const string SrcSvr_RAWURL = "RAWURL";
+        private const string SrcSvr_SRCSRVVERCTRL = "SRCSRVVERCTRL";
+        private const string SrcSvr_SRCSRVTRG = "SRCSRVTRG";
+
         // Avoid loading JSON dependency if not needed.
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private void ConvertSourceServerData(string sourceLink, SymUnmanagedWriter pdbWriter, IReadOnlyCollection<string> documentNames)
+        private void ConvertSourceServerData(string sourceLink, SymUnmanagedWriter pdbWriter, IReadOnlyCollection<string> documentNames, PortablePdbConversionOptions options)
         {
             if (documentNames.Count == 0)
             {
@@ -1029,13 +1038,22 @@ namespace Microsoft.DiaSymReader.Tools
             builder.Append("SRCSRV: ini ------------------------------------------------\r\n");
             builder.Append("VERSION=2\r\n");
             builder.Append("SRCSRV: variables ------------------------------------------\r\n");
-            builder.Append("RAWURL=");
+            builder.Append(SrcSvr_RAWURL + "=");
             builder.Append(commonPrefix);
             builder.Append("%var2%\r\n");
-            builder.Append("SRCSRVVERCTRL=");
+            builder.Append(SrcSvr_SRCSRVVERCTRL + "=");
             builder.Append(commonScheme);
             builder.Append("\r\n");
-            builder.Append("SRCSRVTRG=%RAWURL%\r\n");
+            builder.Append(SrcSvr_SRCSRVTRG + "=%RAWURL%\r\n");
+
+            foreach (var variable in options.SrcSvrVariables)
+            {
+                builder.Append(variable.Key);
+                builder.Append('=');
+                builder.Append(variable.Value);
+                builder.Append("\r\n");
+            }
+
             builder.Append("SRCSRV: source files ---------------------------------------\r\n");
 
             foreach (var (name, uri) in mapping)
@@ -1049,6 +1067,40 @@ namespace Microsoft.DiaSymReader.Tools
             builder.Append("SRCSRV: end ------------------------------------------------");
 
             pdbWriter.SetSourceServerData(Encoding.UTF8.GetBytes(builder.ToString()));
+        }
+
+        private static bool IsIdentifierStartChar(char c)
+            => c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c == '_';
+
+        private static bool IsIdentifierChar(char c)
+            => IsIdentifierStartChar(c) || c >= '0' && c <= '9';
+
+        internal static void ValidateSrcSvrVariables(ImmutableArray<KeyValuePair<string, string>> variables, string parameterName)
+        {
+            foreach (var variable in variables)
+            {
+                ValidateSrcSvrVariable(variable.Key, variable.Value, parameterName);
+            }
+        }
+
+        internal static void ValidateSrcSvrVariable(string name, string value, string parameterName)
+        {
+            if (string.IsNullOrEmpty(name) || !IsIdentifierStartChar(name[0]) || !name.All(IsIdentifierChar))
+            {
+                throw new ArgumentException(parameterName, string.Format(ConverterResources.InvalidSrcSvrVariableName, name));
+            }
+
+            if (value == null || value.Any(c => c == '\0' || c == '\r' || c == '\n'))
+            {
+                throw new ArgumentException(parameterName, string.Format(ConverterResources.InvalidSrcSvrVariableValue, name));
+            }
+
+            if (name.Equals(SrcSvr_RAWURL, StringComparison.OrdinalIgnoreCase) ||
+                name.Equals(SrcSvr_SRCSRVTRG, StringComparison.OrdinalIgnoreCase) ||
+                name.Equals(SrcSvr_SRCSRVVERCTRL, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException(parameterName, string.Format(ConverterResources.ReservedSrcSvrVariableName, name));
+            }
         }
     }
 }

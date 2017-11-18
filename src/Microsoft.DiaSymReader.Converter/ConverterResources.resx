@@ -252,4 +252,13 @@
   <data name="InvalidJsonDataFormat" xml:space="preserve">
     <value>The JSON format is invalid</value>
   </data>
+  <data name="InvalidSrcSvrVariableName" xml:space="preserve">
+    <value>Invalid srcsvr variable name: '{0}'</value>
+  </data>
+  <data name="ReservedSrcSvrVariableName" xml:space="preserve">
+    <value>Variable '{0}' can't be set explicitly</value>
+  </data>
+  <data name="InvalidSrcSvrVariableValue" xml:space="preserve">
+    <value>Value of srcsvr variable '{0}' contains invalid characters</value>
+  </data>
 </root>
