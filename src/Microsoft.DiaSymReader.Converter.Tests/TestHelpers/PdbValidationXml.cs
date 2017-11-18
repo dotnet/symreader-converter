@@ -16,10 +16,10 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
     {
         private const PdbToXmlOptions Options = PdbToXmlOptions.IncludeSourceServerInformation | PdbToXmlOptions.IncludeEmbeddedSources | PdbToXmlOptions.ResolveTokens;
 
-        public static void VerifyWindowsPdb(TestResource portable, TestResource windows, string expectedXml, PdbDiagnostic[] expectedDiagnostics = null)
+        public static void VerifyWindowsPdb(TestResource portable, TestResource windows, string expectedXml, PdbDiagnostic[] expectedDiagnostics = null, PortablePdbConversionOptions options = null)
         {
             VerifyWindowsMatchesExpected(windows, expectedXml);
-            VerifyWindowsConvertedFromPortableMatchesExpected(portable, expectedXml, expectedDiagnostics);
+            VerifyWindowsConvertedFromPortableMatchesExpected(portable, expectedXml, expectedDiagnostics, options);
         }
 
         private static void VerifyWindowsMatchesExpected(TestResource windows, string expectedXml)
@@ -34,7 +34,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             AssertEx.AssertLinesEqual(adjustedExpectedXml, adjustedActualXml, "Comparing Windows PDB with expected XML");
         }
 
-        private static void VerifyWindowsConvertedFromPortableMatchesExpected(TestResource portable, string expectedXml, PdbDiagnostic[] expectedDiagnostics)
+        public static void VerifyWindowsConvertedFromPortableMatchesExpected(TestResource portable, string expectedXml, PdbDiagnostic[] expectedDiagnostics, PortablePdbConversionOptions options)
         {
             var portablePEStream = new MemoryStream(portable.PE);
             var portablePdbStream = new MemoryStream(portable.Pdb);
@@ -42,7 +42,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             var actualDiagnostics = new List<PdbDiagnostic>();
 
             var converter = new PdbConverter(actualDiagnostics.Add);
-            converter.ConvertPortableToWindows(portablePEStream, portablePdbStream, convertedWindowsPdbStream);
+            converter.ConvertPortableToWindows(portablePEStream, portablePdbStream, convertedWindowsPdbStream, options);
 
             AssertEx.Equal(expectedDiagnostics ?? Array.Empty<PdbDiagnostic>(), actualDiagnostics, itemInspector: InspectDiagnostic);
 

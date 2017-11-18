@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -27,6 +28,9 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             Assert.Throws<InvalidDataException>(() => Pdb2Pdb.ParseArgs(new[] { "a.dll", "/extract", "/sourcelink" }));
             Assert.Throws<InvalidDataException>(() => Pdb2Pdb.ParseArgs(new[] { "a.dll", "/extract", "/pdb", "a.pdb" }));            
             Assert.Throws<InvalidDataException>(() => Pdb2Pdb.ParseArgs(new[] { ">:<.dll" }));
+            Assert.Throws<InvalidDataException>(() => Pdb2Pdb.ParseArgs(new[] { "a.dll", "/sorucelink", "/srcsvrvar", "x=y" }));
+            Assert.Throws<InvalidDataException>(() => Pdb2Pdb.ParseArgs(new[] { "a.dll", "/srcsvrvar" }));
+            Assert.Throws<InvalidDataException>(() => Pdb2Pdb.ParseArgs(new[] { "a.dll", "/srcsvrvar", "0=y" }));
         }
 
         [Fact]
@@ -38,7 +42,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             Assert.Equal("a.pdb2", args.OutPdbFilePathOpt);
             Assert.False(args.Extract);
             Assert.False(args.Verbose);
-            Assert.Equal(PdbConversionOptions.Default, args.Options);
+            Assert.False(args.Options.SuppressSourceLinkConversion);
+            Assert.Empty(args.Options.SrcSvrVariables);
 
             args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/extract" });
             Assert.Equal("a.dll", args.PEFilePath);
@@ -46,7 +51,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             Assert.Null(args.OutPdbFilePathOpt);
             Assert.True(args.Extract);
             Assert.False(args.Verbose);
-            Assert.Equal(PdbConversionOptions.Default, args.Options);
+            Assert.False(args.Options.SuppressSourceLinkConversion);
+            Assert.Empty(args.Options.SrcSvrVariables);
 
             args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/extract", "/out", "b.pdb" });
             Assert.Equal("a.dll", args.PEFilePath);
@@ -54,7 +60,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             Assert.Equal("b.pdb", args.OutPdbFilePathOpt);
             Assert.True(args.Extract);
             Assert.False(args.Verbose);
-            Assert.Equal(PdbConversionOptions.Default, args.Options);
+            Assert.False(args.Options.SuppressSourceLinkConversion);
+            Assert.Empty(args.Options.SrcSvrVariables);
 
             args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/sourcelink", "/pdb", "b.pdb", "/out", "c.pdb" });
             Assert.Equal("a.dll", args.PEFilePath);
@@ -62,7 +69,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             Assert.Equal("c.pdb", args.OutPdbFilePathOpt);
             Assert.False(args.Extract);
             Assert.False(args.Verbose);
-            Assert.Equal(PdbConversionOptions.SuppressSourceLinkConversion, args.Options);
+            Assert.True(args.Options.SuppressSourceLinkConversion);
+            Assert.Empty(args.Options.SrcSvrVariables);
 
             args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/out", "c.pdb", "/verbose" });
             Assert.Equal("a.dll", args.PEFilePath);
@@ -70,7 +78,17 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             Assert.Equal("c.pdb", args.OutPdbFilePathOpt);
             Assert.False(args.Extract);
             Assert.True(args.Verbose);
-            Assert.Equal(PdbConversionOptions.Default, args.Options);
+            Assert.False(args.Options.SuppressSourceLinkConversion);
+            Assert.Empty(args.Options.SrcSvrVariables);
+
+            args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/out", "c.pdb", "/verbose", "/srcsvrvar", "a=b", "/srcsvrvar", "c=d" });
+            Assert.Equal("a.dll", args.PEFilePath);
+            Assert.Null(args.PdbFilePathOpt);
+            Assert.Equal("c.pdb", args.OutPdbFilePathOpt);
+            Assert.False(args.Extract);
+            Assert.True(args.Verbose);
+            Assert.False(args.Options.SuppressSourceLinkConversion);
+            Assert.Equal(new[] { new KeyValuePair<string, string>("a", "b"), new KeyValuePair<string, string>("c", "d") }, args.Options.SrcSvrVariables);
         }
 
         [Fact]
@@ -85,7 +103,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
                 peFilePath: pe.Path,
                 pdbFilePathOpt: pdb.Path,
                 outPdbFilePathOpt: outPdbPath,
-                options: PdbConversionOptions.Default,
+                options: PortablePdbConversionOptions.Default,
                 extract: false,
                 verbose: false)));
 
@@ -132,7 +150,7 @@ SRCSRV: end ------------------------------------------------", actual);
                 peFilePath: pe.Path,
                 pdbFilePathOpt: null,
                 outPdbFilePathOpt: outPdb.Path,
-                options: PdbConversionOptions.SuppressSourceLinkConversion,
+                options: new PortablePdbConversionOptions(suppressSourceLinkConversion: true),
                 extract: false,
                 verbose: false)));
 
@@ -156,7 +174,7 @@ SRCSRV: end ------------------------------------------------", actual);
                 peFilePath: pe.Path,
                 pdbFilePathOpt: null,
                 outPdbFilePathOpt: outPdb.Path,
-                options: PdbConversionOptions.SuppressSourceLinkConversion,
+                options: new PortablePdbConversionOptions(suppressSourceLinkConversion: true),
                 extract: false,
                 verbose: false)));
 
@@ -180,7 +198,7 @@ SRCSRV: end ------------------------------------------------", actual);
                 peFilePath: pe.Path,
                 pdbFilePathOpt: null,
                 outPdbFilePathOpt: null,
-                options: PdbConversionOptions.Default,
+                options: PortablePdbConversionOptions.Default,
                 extract: true,
                 verbose: false)));
 
@@ -198,7 +216,7 @@ SRCSRV: end ------------------------------------------------", actual);
                 peFilePath: pe.Path,
                 pdbFilePathOpt: null,
                 outPdbFilePathOpt: outPdb.Path,
-                options: PdbConversionOptions.Default,
+                options: PortablePdbConversionOptions.Default,
                 extract: true,
                 verbose: false)));
 
@@ -218,7 +236,7 @@ SRCSRV: end ------------------------------------------------", actual);
                     peFilePath: pe.Path,
                     pdbFilePathOpt: null,
                     outPdbFilePathOpt: outPdb.Path,
-                    options: PdbConversionOptions.Default,
+                    options: PortablePdbConversionOptions.Default,
                     extract: true,
                     verbose: false)));
 
@@ -237,7 +255,7 @@ SRCSRV: end ------------------------------------------------", actual);
                 peFilePath: pe.Path,
                 pdbFilePathOpt: null,
                 outPdbFilePathOpt: outPdb.Path,
-                options: PdbConversionOptions.Default,
+                options: PortablePdbConversionOptions.Default,
                 extract: false,
                 verbose: false)));
 

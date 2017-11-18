@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 using Xunit;
+using Roslyn.Test.Utilities;
 
 namespace Microsoft.DiaSymReader.Tools.UnitTests
 {
-    using Roslyn.Test.Utilities;
     using static PdbValidationMetadata;
 
     public class WindowsToPortableTests
