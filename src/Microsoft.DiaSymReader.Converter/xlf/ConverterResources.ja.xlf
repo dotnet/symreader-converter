@@ -4,242 +4,227 @@
     <body>
       <trans-unit id="InvalidPdbFormat">
         <source>Invalid PDB format: {0}</source>
-        <target state="new">Invalid PDB format: {0}</target>
+        <target state="translated">PDB 形式は無効です: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidUserEntryPointInSourcePdb">
         <source>Invalid user entry point in the source PDB</source>
-        <target state="new">Invalid user entry point in the source PDB</target>
+        <target state="translated">ソース PDB のユーザー エントリ ポイントが無効です</target>
         <note />
       </trans-unit>
       <trans-unit id="MetadataNotAvailable">
         <source>Metadata not available</source>
-        <target state="new">Metadata not available</target>
+        <target state="translated">メタデータを利用できません</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedPEBuiltWithPortablePdb">
         <source>Specified PE was built with Portable PDB</source>
-        <target state="new">Specified PE was built with Portable PDB</target>
+        <target state="translated">指定された PE は、ポータブル PDB でビルドされました</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedPEFileHasNoAssociatedPdb">
         <source>Specified PE file doesn't have any PDB associated with it</source>
-        <target state="new">Specified PE file doesn't have any PDB associated with it</target>
+        <target state="translated">指定された PE ファイルには、PDB が関連付けられていません</target>
         <note />
       </trans-unit>
       <trans-unit id="StreamMustBeReadable">
         <source>Stream must be readable</source>
-        <target state="new">Stream must be readable</target>
+        <target state="translated">ストリームは読み取り可能である必要があります</target>
         <note />
       </trans-unit>
       <trans-unit id="StreamMustBeSeakable">
         <source>Stream must be seakable</source>
-        <target state="new">Stream must be seakable</target>
+        <target state="translated">ストリームはシーク可能である必要があります</target>
         <note />
       </trans-unit>
       <trans-unit id="StreamMustBeWritable">
         <source>Stream must be writable</source>
-        <target state="new">Stream must be writable</target>
+        <target state="translated">ストリームは書き込み可能である必要があります</target>
         <note />
       </trans-unit>
       <trans-unit id="MethodAssociatedWithLocalScopeHasNoBody">
         <source>Method associated with local scope has no body</source>
-        <target state="new">Method associated with local scope has no body</target>
+        <target state="translated">ローカル スコープに関連付けられたメソッドに本文がありません</target>
         <note />
       </trans-unit>
       <trans-unit id="MethodContainingLocalVariablesHasNoLocalSignature">
         <source>Method containing local variables has no local signature</source>
-        <target state="new">Method containing local variables has no local signature</target>
+        <target state="translated">ローカル変数を含むメソッドにローカル シグネチャがありません</target>
         <note />
       </trans-unit>
       <trans-unit id="LocalConstantNameTooLong">
         <source>Local constant name too long</source>
-        <target state="new">Local constant name too long</target>
+        <target state="translated">ローカル定数名が長すぎます</target>
         <note />
       </trans-unit>
       <trans-unit id="LocalVariableNameTooLong">
         <source>Local constant name too long</source>
-        <target state="new">Local constant name too long</target>
+        <target state="translated">ローカル定数名が長すぎます</target>
         <note />
       </trans-unit>
       <trans-unit id="ImportStringTooLong">
         <source>Import string is too long. Ignoring the import: '{0}'</source>
-        <target state="new">Import string is too long. Ignoring the import: '{0}'</target>
+        <target state="translated">インポート文字列が長すぎます。インポートを無視しています: '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="LocalScopeRangesNestingIsInvalid">
         <source>Local scope ranges nesting is invalid</source>
-        <target state="new">Local scope ranges nesting is invalid</target>
+        <target state="translated">ローカル スコープの範囲の入れ子が無効です</target>
         <note />
       </trans-unit>
       <trans-unit id="UnsupportedImportType">
         <source>The type of import is not supported (type token {0:X8})</source>
-        <target state="new">The type of import is not supported (type token {0:X8})</target>
+        <target state="translated">インポートの種類がサポートされていません (型トークン {0:X8})</target>
         <note />
       </trans-unit>
       <trans-unit id="UndefinedAssemblyReferenceAlias">
         <source>An extern alias was not defined for assembly reference {0:X8}</source>
-        <target state="new">An extern alias was not defined for assembly reference {0:X8}</target>
+        <target state="translated">extern エイリアスは、アセンブリ参照 {0:X8} に対して定義されませんでした</target>
         <note />
       </trans-unit>
       <trans-unit id="UnknownImportDefinitionKind">
         <source>Unknown import definition kind: {0}</source>
-        <target state="new">Unknown import definition kind: {0}</target>
+        <target state="translated">インポート定義の種類が不明です: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="DiagnosticLocation">
         <source>token 0x{0:X8}</source>
-        <target state="new">token 0x{0:X8}</target>
+        <target state="translated">トークン 0x{0:X8}</target>
         <note />
       </trans-unit>
       <trans-unit id="ForwardedToUndefinedMethod">
         <source>ForwardMethodInfo custom debug information forwards to non-existent method: 0x{0:X8}</source>
-        <target state="new">ForwardMethodInfo custom debug information forwards to non-existent method: 0x{0:X8}</target>
+        <target state="translated">ForwardMethodInfo カスタム デバッグ情報は、存在しないメソッドに転送されます: 0x{0:X8}</target>
         <note />
       </trans-unit>
       <trans-unit id="ForwardedToMethodWithNoScope">
         <source>ForwardMethodInfo custom debug information forwards to a method with no scope: 0x{0:X8}</source>
-        <target state="new">ForwardMethodInfo custom debug information forwards to a method with no scope: 0x{0:X8}</target>
+        <target state="translated">ForwardMethodInfo カスタム デバッグ情報は、スコープなしのメソッドに転送されます: 0x{0:X8}</target>
         <note />
       </trans-unit>
       <trans-unit id="BothForwardMethodInfoAndImportsSpecified">
         <source>Both ForwardMethodInfo custom debug information and imports are specified</source>
-        <target state="new">Both ForwardMethodInfo custom debug information and imports are specified</target>
+        <target state="translated">ForwardMethodInfo カスタム デバッグ情報とインポートの両方が指定されています</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidStateMachineTypeName">
         <source>Invalid type name specified in StateMachineTypeName custom debug information: {0}</source>
-        <target state="new">Invalid type name specified in StateMachineTypeName custom debug information: {0}</target>
+        <target state="translated">StateMachineTypeName カスタム デバッグ情報で指定された型名が無効です: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="BothStateMachineTypeNameAndImportsSpecified">
         <source>Both StateMachineTypeName custom debug information and imports are specified</source>
-        <target state="new">Both StateMachineTypeName custom debug information and imports are specified</target>
+        <target state="translated">StateMachineTypeName カスタム デバッグ情報とインポートの両方が指定されています</target>
         <note />
       </trans-unit>
       <trans-unit id="DuplicateDynamicLocals">
         <source>Multiple DynamicLocals custom debug information records specified for the same local variable slot: {0}</source>
-        <target state="new">Multiple DynamicLocals custom debug information records specified for the same local variable slot: {0}</target>
+        <target state="translated">同じローカル変数スロットに複数の DynamicLocals カスタム デバッグ情報レコードが指定されました: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="DuplicateTupleElementNamesForSlot">
         <source>Multiple TupleElementNames custom debug information records specified for the same local variable slot: {0}</source>
-        <target state="new">Multiple TupleElementNames custom debug information records specified for the same local variable slot: {0}</target>
+        <target state="translated">同じローカル変数スロットに複数の TupleElementNames カスタム デバッグ情報レコードが指定されました: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="DuplicateTupleElementNamesForConstant">
         <source>Multiple TupleElementNames custom debug information records specified for the same local constant: '{0}' [{1}, {2})</source>
-        <target state="new">Multiple TupleElementNames custom debug information records specified for the same local constant: '{0}' [{1}, {2})</target>
+        <target state="translated">同じローカル定数に複数の TupleElementNames カスタム デバッグ情報レコードが指定されました: {0} [{1}, {2})</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidImportStringFormat">
         <source>The format of import string is invalid: '{0}'</source>
-        <target state="new">The format of import string is invalid: '{0}'</target>
+        <target state="translated">インポート文字列の形式が無効です: '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidEntryPointToken">
         <source>The format of import string is invalid: '{0}'</source>
-        <target state="new">The format of import string is invalid: '{0}'</target>
+        <target state="translated">インポート文字列の形式が無効です: '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidScopeILOffsetRange">
         <source>Invalid scope IL offset range: [{0}, {1})</source>
-        <target state="new">Invalid scope IL offset range: [{0}, {1})</target>
+        <target state="translated">スコープの IL オフセットの範囲が無効です: [{0}, {1})</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalVariableData">
         <source>Invalid local variable data</source>
-        <target state="new">Invalid local variable data</target>
+        <target state="translated">ローカル変数データが無効です</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalConstantData">
         <source>Invalid local constant data</source>
-        <target state="new">Invalid local constant data</target>
+        <target state="translated">ローカル定数データが無効です</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalConstantSignature">
         <source>Invalid local constant signature: '{0}'</source>
-        <target state="new">Invalid local constant signature: '{0}'</target>
+        <target state="translated">ローカル定数シグネチャが無効です: '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalScope">
         <source>Invalid local scope</source>
-        <target state="new">Invalid local scope</target>
+        <target state="translated">ローカル スコープが無効です</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSequencePointDocument">
         <source>Invalid sequence point document name: '{0}'</source>
-        <target state="new">Invalid sequence point document name: '{0}'</target>
+        <target state="translated">シーケンス ポイントのドキュメント名が無効です: '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="UnmappedDocumentName">
         <source>Document name doesn't match any pattern in Source Link: '{0}'</source>
-        <target state="new">Document name doesn't match any pattern in Source Link: '{0}'</target>
+        <target state="translated">ドキュメント名は、ソース リンク内のどのパターンとも一致しません: '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="UriSchemeIsNotHttp">
         <source>The scheme of URI specified in Source Link is not http/https: '{0}'</source>
-        <target state="new">The scheme of URI specified in Source Link is not http/https: '{0}'</target>
+        <target state="translated">ソース リンクで指定された URI のスキームが http/https ではありません: '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="NoSupportedUrisFoundInSourceLink">
         <source>No supported URIs found in Source Link</source>
-        <target state="new">No supported URIs found in Source Link</target>
+        <target state="translated">サポートされている URI がソース リンクで見つかりませんでした</target>
         <note />
       </trans-unit>
       <trans-unit id="PdbNotMatchingDebugDirectory">
         <source>The PDB doesn't match debug directory record in the PE file</source>
-        <target state="new">The PDB doesn't match debug directory record in the PE file</target>
+        <target state="translated">PDB は、PE ファイル内のデバッグ ディレクトリ レコードと一致しません</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSourceLinkData">
         <source>Invalid Source Link data</source>
-        <target state="new">Invalid Source Link data</target>
+        <target state="translated">ソース リンク データが無効です</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSourceServerData">
         <source>Invalid srcsrv data</source>
-        <target state="new">Invalid srcsrv data</target>
+        <target state="translated">srcsrv データが無効です</target>
         <note />
       </trans-unit>
       <trans-unit id="BothSourceLinkDataAndSourceServerData">
         <source>PDB contains both Source Link and srcsrv data</source>
-        <target state="new">PDB contains both Source Link and srcsrv data</target>
+        <target state="translated">PDB には、ソース リンクと srcsrv データの両方が含まれています</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidEmbeddedSource">
         <source>Invalid embedded source associated with document '{0}'</source>
-        <target state="new">Invalid embedded source associated with document '{0}'</target>
+        <target state="translated">ドキュメント '{0}' に関連付けられた埋め込みソースが無効です</target>
         <note />
       </trans-unit>
       <trans-unit id="InconsistentStateMachineMethodMapping">
         <source>Inconsistent state machine method mapping -- MoveNext method is associated with two distinct kickoff methods: 0x{0:X8} and 0x{1:X8}</source>
-        <target state="new">Inconsistent state machine method mapping -- MoveNext method is associated with two distinct kickoff methods: 0x{0:X8} and 0x{1:X8}</target>
+        <target state="translated">ステート マシン メソッド マッピングに一貫性がありません -- MoveNext メソッドは、2 つの異なる開始メソッドに関連付けられています: 0x{0:X8} および 0x{1:X8}</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidJsonDataFormat">
         <source>The JSON format is invalid</source>
-        <target state="new">The JSON format is invalid</target>
+        <target state="translated">JSON 形式が無効です</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSourceLink">
         <source>Invalid Source Link: {0}</source>
-        <target state="new">Invalid Source Link: {0}</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidSrcSvrVariableName">
-        <source>Invalid srcsvr variable name: '{0}'</source>
-        <target state="new">Invalid srcsvr variable name: '{0}'</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="ReservedSrcSvrVariableName">
-        <source>Variable '{0}' can't be set explicitly</source>
-        <target state="new">Variable '{0}' can't be set explicitly</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidSrcSvrVariableValue">
-        <source>Value of srcsvr variable '{0}' contains invalid characters</source>
-        <target state="new">Value of srcsvr variable '{0}' contains invalid characters</target>
+        <target state="translated">無効なソース リンク: {0}</target>
         <note />
       </trans-unit>
     </body>

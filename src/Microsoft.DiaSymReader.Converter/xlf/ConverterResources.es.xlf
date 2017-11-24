@@ -4,242 +4,227 @@
     <body>
       <trans-unit id="InvalidPdbFormat">
         <source>Invalid PDB format: {0}</source>
-        <target state="new">Invalid PDB format: {0}</target>
+        <target state="translated">Formato PDB no válido: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidUserEntryPointInSourcePdb">
         <source>Invalid user entry point in the source PDB</source>
-        <target state="new">Invalid user entry point in the source PDB</target>
+        <target state="translated">Punto de entrada de usuario no válido en el PDB de origen.</target>
         <note />
       </trans-unit>
       <trans-unit id="MetadataNotAvailable">
         <source>Metadata not available</source>
-        <target state="new">Metadata not available</target>
+        <target state="translated">Los metadatos no están disponibles.</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedPEBuiltWithPortablePdb">
         <source>Specified PE was built with Portable PDB</source>
-        <target state="new">Specified PE was built with Portable PDB</target>
+        <target state="translated">El archivo PE especificado se creó con un PDB portátil.</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedPEFileHasNoAssociatedPdb">
         <source>Specified PE file doesn't have any PDB associated with it</source>
-        <target state="new">Specified PE file doesn't have any PDB associated with it</target>
+        <target state="translated">El archivo PE especificado no tiene ningún PDB asociado.</target>
         <note />
       </trans-unit>
       <trans-unit id="StreamMustBeReadable">
         <source>Stream must be readable</source>
-        <target state="new">Stream must be readable</target>
+        <target state="translated">La secuencia debe poderse leer.</target>
         <note />
       </trans-unit>
       <trans-unit id="StreamMustBeSeakable">
         <source>Stream must be seakable</source>
-        <target state="new">Stream must be seakable</target>
+        <target state="translated">La secuencia debe poderse buscar.</target>
         <note />
       </trans-unit>
       <trans-unit id="StreamMustBeWritable">
         <source>Stream must be writable</source>
-        <target state="new">Stream must be writable</target>
+        <target state="translated">La secuencia debe poderse escribir.</target>
         <note />
       </trans-unit>
       <trans-unit id="MethodAssociatedWithLocalScopeHasNoBody">
         <source>Method associated with local scope has no body</source>
-        <target state="new">Method associated with local scope has no body</target>
+        <target state="translated">El método asociado al ámbito local no tiene cuerpo.</target>
         <note />
       </trans-unit>
       <trans-unit id="MethodContainingLocalVariablesHasNoLocalSignature">
         <source>Method containing local variables has no local signature</source>
-        <target state="new">Method containing local variables has no local signature</target>
+        <target state="translated">El método que contiene variables locales no tiene una signatura local.</target>
         <note />
       </trans-unit>
       <trans-unit id="LocalConstantNameTooLong">
         <source>Local constant name too long</source>
-        <target state="new">Local constant name too long</target>
+        <target state="translated">El nombre de la constante local es demasiado largo.</target>
         <note />
       </trans-unit>
       <trans-unit id="LocalVariableNameTooLong">
         <source>Local constant name too long</source>
-        <target state="new">Local constant name too long</target>
+        <target state="translated">El nombre de la constante local es demasiado largo.</target>
         <note />
       </trans-unit>
       <trans-unit id="ImportStringTooLong">
         <source>Import string is too long. Ignoring the import: '{0}'</source>
-        <target state="new">Import string is too long. Ignoring the import: '{0}'</target>
+        <target state="translated">La cadena de importación es demasiado larga. Omitiendo la importación: “{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="LocalScopeRangesNestingIsInvalid">
         <source>Local scope ranges nesting is invalid</source>
-        <target state="new">Local scope ranges nesting is invalid</target>
+        <target state="translated">El anidamiento de intervalos de ámbito local no es válido.</target>
         <note />
       </trans-unit>
       <trans-unit id="UnsupportedImportType">
         <source>The type of import is not supported (type token {0:X8})</source>
-        <target state="new">The type of import is not supported (type token {0:X8})</target>
+        <target state="translated">No se admite el tipo de importación (token de tipo {0:X8}).</target>
         <note />
       </trans-unit>
       <trans-unit id="UndefinedAssemblyReferenceAlias">
         <source>An extern alias was not defined for assembly reference {0:X8}</source>
-        <target state="new">An extern alias was not defined for assembly reference {0:X8}</target>
+        <target state="translated">No se definió un alias externo para una referencia de ensamblado {0:X8}.</target>
         <note />
       </trans-unit>
       <trans-unit id="UnknownImportDefinitionKind">
         <source>Unknown import definition kind: {0}</source>
-        <target state="new">Unknown import definition kind: {0}</target>
+        <target state="translated">Tipo de definición de importación desconocido: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="DiagnosticLocation">
         <source>token 0x{0:X8}</source>
-        <target state="new">token 0x{0:X8}</target>
+        <target state="translated">token 0x{0:X8}</target>
         <note />
       </trans-unit>
       <trans-unit id="ForwardedToUndefinedMethod">
         <source>ForwardMethodInfo custom debug information forwards to non-existent method: 0x{0:X8}</source>
-        <target state="new">ForwardMethodInfo custom debug information forwards to non-existent method: 0x{0:X8}</target>
+        <target state="translated">La información de depuración personalizada de ForwardMethodInfo se reenvía a un método no existente: 0x{0:X8}</target>
         <note />
       </trans-unit>
       <trans-unit id="ForwardedToMethodWithNoScope">
         <source>ForwardMethodInfo custom debug information forwards to a method with no scope: 0x{0:X8}</source>
-        <target state="new">ForwardMethodInfo custom debug information forwards to a method with no scope: 0x{0:X8}</target>
+        <target state="translated">La información de depuración personalizada de ForwardMethodInfo se reenvía a un método sin ámbito: 0x{0:X8}</target>
         <note />
       </trans-unit>
       <trans-unit id="BothForwardMethodInfoAndImportsSpecified">
         <source>Both ForwardMethodInfo custom debug information and imports are specified</source>
-        <target state="new">Both ForwardMethodInfo custom debug information and imports are specified</target>
+        <target state="translated">Se especifican tanto las importaciones como la información de depuración personalizada ForwardMethodInfo.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidStateMachineTypeName">
         <source>Invalid type name specified in StateMachineTypeName custom debug information: {0}</source>
-        <target state="new">Invalid type name specified in StateMachineTypeName custom debug information: {0}</target>
+        <target state="translated">Se especificó un nombre de tipo no válido en la información de depuración personalizada de StateMachineTypeName: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="BothStateMachineTypeNameAndImportsSpecified">
         <source>Both StateMachineTypeName custom debug information and imports are specified</source>
-        <target state="new">Both StateMachineTypeName custom debug information and imports are specified</target>
+        <target state="translated">Se especifican tanto las importaciones como la información de depuración personalizada de StateMachineTypeName.</target>
         <note />
       </trans-unit>
       <trans-unit id="DuplicateDynamicLocals">
         <source>Multiple DynamicLocals custom debug information records specified for the same local variable slot: {0}</source>
-        <target state="new">Multiple DynamicLocals custom debug information records specified for the same local variable slot: {0}</target>
+        <target state="translated">Se especificaron varios registros de información de depuración personalizada de DynamicLocals para el mismo espacio de variables locales: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="DuplicateTupleElementNamesForSlot">
         <source>Multiple TupleElementNames custom debug information records specified for the same local variable slot: {0}</source>
-        <target state="new">Multiple TupleElementNames custom debug information records specified for the same local variable slot: {0}</target>
+        <target state="translated">Se especificaron varios registros de información de depuración personalizada de TupleElementNames para el mismo espacio de variables locales: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="DuplicateTupleElementNamesForConstant">
         <source>Multiple TupleElementNames custom debug information records specified for the same local constant: '{0}' [{1}, {2})</source>
-        <target state="new">Multiple TupleElementNames custom debug information records specified for the same local constant: '{0}' [{1}, {2})</target>
+        <target state="translated">Se especificaron varios registros de información de depuración personalizada de TupleElementNames para la misma constante local: “{0}” [{1}, {2})</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidImportStringFormat">
         <source>The format of import string is invalid: '{0}'</source>
-        <target state="new">The format of import string is invalid: '{0}'</target>
+        <target state="translated">El formato de la cadena de importación no es válido: “{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidEntryPointToken">
         <source>The format of import string is invalid: '{0}'</source>
-        <target state="new">The format of import string is invalid: '{0}'</target>
+        <target state="translated">El formato de la cadena de importación no es válido: “{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidScopeILOffsetRange">
         <source>Invalid scope IL offset range: [{0}, {1})</source>
-        <target state="new">Invalid scope IL offset range: [{0}, {1})</target>
+        <target state="translated">Intervalo de desplazamiento IL de ámbito no válido: [{0}, {1})</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalVariableData">
         <source>Invalid local variable data</source>
-        <target state="new">Invalid local variable data</target>
+        <target state="translated">Los datos de la variable local no son válidos.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalConstantData">
         <source>Invalid local constant data</source>
-        <target state="new">Invalid local constant data</target>
+        <target state="translated">Los datos de la constante local no son válidos.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalConstantSignature">
         <source>Invalid local constant signature: '{0}'</source>
-        <target state="new">Invalid local constant signature: '{0}'</target>
+        <target state="translated">La signatura de la constante local no es válida: “{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalScope">
         <source>Invalid local scope</source>
-        <target state="new">Invalid local scope</target>
+        <target state="translated">El ámbito local no es válido.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSequencePointDocument">
         <source>Invalid sequence point document name: '{0}'</source>
-        <target state="new">Invalid sequence point document name: '{0}'</target>
+        <target state="translated">El nombre del documento de puntos de secuencia no es válido: “{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="UnmappedDocumentName">
         <source>Document name doesn't match any pattern in Source Link: '{0}'</source>
-        <target state="new">Document name doesn't match any pattern in Source Link: '{0}'</target>
+        <target state="translated">El nombre del documento no coincide con ningún patrón del vínculo de origen: “{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="UriSchemeIsNotHttp">
         <source>The scheme of URI specified in Source Link is not http/https: '{0}'</source>
-        <target state="new">The scheme of URI specified in Source Link is not http/https: '{0}'</target>
+        <target state="translated">El esquema de URI especificado en el vínculo de origen no es http/https: “{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="NoSupportedUrisFoundInSourceLink">
         <source>No supported URIs found in Source Link</source>
-        <target state="new">No supported URIs found in Source Link</target>
+        <target state="translated">No se encontró ningún URI admitido en el vínculo de origen.</target>
         <note />
       </trans-unit>
       <trans-unit id="PdbNotMatchingDebugDirectory">
         <source>The PDB doesn't match debug directory record in the PE file</source>
-        <target state="new">The PDB doesn't match debug directory record in the PE file</target>
+        <target state="translated">El PDB no coincide con el registro del directorio de depuración del archivo PE.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSourceLinkData">
         <source>Invalid Source Link data</source>
-        <target state="new">Invalid Source Link data</target>
+        <target state="translated">Los datos del vínculo de origen no son válidos.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSourceServerData">
         <source>Invalid srcsrv data</source>
-        <target state="new">Invalid srcsrv data</target>
+        <target state="translated">Los datos srcsrv no son válidos.</target>
         <note />
       </trans-unit>
       <trans-unit id="BothSourceLinkDataAndSourceServerData">
         <source>PDB contains both Source Link and srcsrv data</source>
-        <target state="new">PDB contains both Source Link and srcsrv data</target>
+        <target state="translated">El PDB contiene tanto un vínculo de origen como datos srcsrv.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidEmbeddedSource">
         <source>Invalid embedded source associated with document '{0}'</source>
-        <target state="new">Invalid embedded source associated with document '{0}'</target>
+        <target state="translated">El documento “{0}” tiene asociado un origen incrustado no válido.</target>
         <note />
       </trans-unit>
       <trans-unit id="InconsistentStateMachineMethodMapping">
         <source>Inconsistent state machine method mapping -- MoveNext method is associated with two distinct kickoff methods: 0x{0:X8} and 0x{1:X8}</source>
-        <target state="new">Inconsistent state machine method mapping -- MoveNext method is associated with two distinct kickoff methods: 0x{0:X8} and 0x{1:X8}</target>
+        <target state="translated">La asignación de métodos de la máquina de estados no es coherente: el método MoveNext está asociado a dos métodos distintos de puesta en marcha: 0x{0:X8} y 0x{1:X8}</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidJsonDataFormat">
         <source>The JSON format is invalid</source>
-        <target state="new">The JSON format is invalid</target>
+        <target state="translated">El formato JSON no es válido.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSourceLink">
         <source>Invalid Source Link: {0}</source>
-        <target state="new">Invalid Source Link: {0}</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidSrcSvrVariableName">
-        <source>Invalid srcsvr variable name: '{0}'</source>
-        <target state="new">Invalid srcsvr variable name: '{0}'</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="ReservedSrcSvrVariableName">
-        <source>Variable '{0}' can't be set explicitly</source>
-        <target state="new">Variable '{0}' can't be set explicitly</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidSrcSvrVariableValue">
-        <source>Value of srcsvr variable '{0}' contains invalid characters</source>
-        <target state="new">Value of srcsvr variable '{0}' contains invalid characters</target>
+        <target state="translated">Vínculo de origen no válido: {0}</target>
         <note />
       </trans-unit>
     </body>
