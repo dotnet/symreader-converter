@@ -4,7 +4,7 @@
     <body>
       <trans-unit id="UnexpectedTokenKind">
         <source>unexpected token kind: {0}</source>
-        <target state="new">unexpected token kind: {0}</target>
+        <target state="translated">tipo de token inesperado: {0}</target>
         <note />
       </trans-unit>
     </body>
