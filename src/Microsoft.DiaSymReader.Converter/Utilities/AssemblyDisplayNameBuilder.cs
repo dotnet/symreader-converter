@@ -6,8 +6,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Text;
-using Microsoft.CodeAnalysis.Collections;
-using Roslyn.Utilities;
+using Microsoft.CodeAnalysis.PooledObjects;
 
 namespace Roslyn.Utilities
 {

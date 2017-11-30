@@ -11,8 +11,8 @@ using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using System.Text;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Debugging;
+using Microsoft.CodeAnalysis.PooledObjects;
 using Microsoft.DiaSymReader.PortablePdb;
 using Roslyn.Utilities;
 

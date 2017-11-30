@@ -12,12 +12,10 @@ using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Collections;
 using Microsoft.CodeAnalysis.Debugging;
+using Microsoft.CodeAnalysis.PooledObjects;
 using Microsoft.DiaSymReader.PortablePdb;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Roslyn.Utilities;
 
 namespace Microsoft.DiaSymReader.Tools
@@ -251,9 +249,12 @@ namespace Microsoft.DiaSymReader.Tools
 
                     if (c >= 0 && nextHoistedScope != null)
                     {
+                        bool ScopeEquals(StateMachineHoistedLocalScope left, StateMachineHoistedLocalScope right)
+                            => left.StartOffset == right.StartOffset && left.EndOffset == right.EndOffset;
+
                         // determine all hoisted variables that have equal scopes:
                         int i = nextHoistedScopeIndex + 1;
-                        while (i < vbHoistedScopes.Length && nextHoistedScope.Value == vbHoistedScopes[i].Scope)
+                        while (i < vbHoistedScopes.Length && ScopeEquals(nextHoistedScope.Value, vbHoistedScopes[i].Scope))
                         {
                             i++;
                         }
