@@ -15,9 +15,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using Microsoft.CodeAnalysis.Debugging;
+using Microsoft.CodeAnalysis.PooledObjects;
 using Microsoft.DiaSymReader;
 using Roslyn.Utilities;
-using PooledStringBuilder = Microsoft.CodeAnalysis.Collections.PooledStringBuilder;
 
 namespace Microsoft.DiaSymReader.Tools
 {

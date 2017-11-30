@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
-using System;
 using System.Diagnostics;
 
 namespace Microsoft.CodeAnalysis.Debugging
 {
-    internal struct StateMachineHoistedLocalScope : IEquatable<StateMachineHoistedLocalScope>
+    internal struct StateMachineHoistedLocalScope
     {
         /// <summary>
         /// The offset of the first operation in the scope.
@@ -29,20 +28,5 @@ namespace Microsoft.CodeAnalysis.Debugging
 
         public int Length => EndOffset - StartOffset;
         public bool IsDefault => StartOffset == 0 && EndOffset == 0;
-
-        public override bool Equals(object obj) 
-            => obj is StateMachineHoistedLocalScope && Equals((StateMachineHoistedLocalScope)obj);
-
-        public bool Equals(StateMachineHoistedLocalScope other)
-            => StartOffset == other.StartOffset && EndOffset == other.EndOffset;
-
-        public override int GetHashCode()
-            => StartOffset ^ EndOffset;
-
-        public static bool operator ==(StateMachineHoistedLocalScope scope1, StateMachineHoistedLocalScope scope2)
-            => scope1.Equals(scope2);
-
-        public static bool operator !=(StateMachineHoistedLocalScope scope1, StateMachineHoistedLocalScope scope2)
-            => !scope1.Equals(scope2);
     }
 }

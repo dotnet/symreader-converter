@@ -4,7 +4,7 @@ using System;
 using System.Collections.Immutable;
 using System.Reflection.Metadata;
 using System.Text;
-using Microsoft.CodeAnalysis.Collections;
+using Microsoft.CodeAnalysis.PooledObjects;
 
 namespace Microsoft.DiaSymReader.Tools
 {
