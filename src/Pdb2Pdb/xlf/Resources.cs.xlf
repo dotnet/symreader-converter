@@ -55,15 +55,20 @@
       <trans-unit id="Pdb2PdbUsage">
         <source>Usage: Pdb2Pdb &lt;dll/exe path&gt; [/pdb &lt;path&gt;] [/out &lt;path&gt;] [/extract]
 
-/pdb &lt;path&gt;    Path to the PDB to convert. If not specified explicitly, the PDB referenced by or embedded in the DLL/EXE is used.
-/out &lt;path&gt;    Output PDB path.
-/extract       Extract PDB embedded in the DLL/EXE. 
-/sourcelink    Preserve Source Link when converting from Portable PDB to Windows PDB, instead of converting to srcsrv format.
-/verbose       Print detailed diagnostics.
+/pdb &lt;path&gt;                Path to the PDB to convert. If not specified explicitly, 
+                           the PDB referenced by or embedded in the DLL/EXE is used.
+/out &lt;path&gt;                Output PDB path.
+/extract                   Extract PDB embedded in the DLL/EXE. 
+/sourcelink                Preserve Source Link when converting from Portable PDB to 
+                           Windows PDB, instead of converting to srcsrv format.
+/verbose                   Print detailed diagnostics.
+/srcsvrvar &lt;name&gt;=&lt;value&gt;  Add specified variable to srcsvr stream. Only applicable 
+                           when converting to Windows PDB and /sourcelink is not
+                           specified.
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="translated">Použití: Pdb2Pdb &lt;cesta k souboru dll/exe&gt; [/pdb &lt;cesta&gt;] [/out &lt;cesta&gt;] [/extract]
+        <target state="needs-review-translation">Použití: Pdb2Pdb &lt;cesta k souboru dll/exe&gt; [/pdb &lt;cesta&gt;] [/out &lt;cesta&gt;] [/extract]
 
 /pdb &lt;cesta&gt;    Cesta k souboru PDB, který se má převést. Pokud není zadaný explicitně, použije se soubor PDB, na který odkazuje soubor DLL/EXE nebo který je v něm vložený.
 /out &lt;cesta&gt;    Cesta k výstupnímu souboru PDB
@@ -78,6 +83,11 @@ Parametry /extract a /pdb se vzájemně vylučují.
       <trans-unit id="InvalidPdbPathInDebugDirectory">
         <source>Invalid PDB path in Debug Directory (file '{0}').</source>
         <target state="translated">Cesta k souboru PDB v adresáři ladění (soubor {0}) je neplatná.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="CantSpecifyBothSrcSvrVariableAndSourcelinkOptions">
+        <source>Can't specify both /srcsvrvar and /sourcelink options.</source>
+        <target state="new">Can't specify both /srcsvrvar and /sourcelink options.</target>
         <note />
       </trans-unit>
     </body>

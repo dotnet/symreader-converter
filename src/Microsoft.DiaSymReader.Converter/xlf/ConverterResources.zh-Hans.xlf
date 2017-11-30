@@ -227,6 +227,21 @@
         <target state="translated">源链接无效: {0}</target>
         <note />
       </trans-unit>
+      <trans-unit id="InvalidSrcSvrVariableName">
+        <source>Invalid srcsvr variable name: '{0}'</source>
+        <target state="new">Invalid srcsvr variable name: '{0}'</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ReservedSrcSvrVariableName">
+        <source>Variable '{0}' can't be set explicitly</source>
+        <target state="new">Variable '{0}' can't be set explicitly</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidSrcSvrVariableValue">
+        <source>Value of srcsvr variable '{0}' contains invalid characters</source>
+        <target state="new">Value of srcsvr variable '{0}' contains invalid characters</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -55,15 +55,20 @@
       <trans-unit id="Pdb2PdbUsage">
         <source>Usage: Pdb2Pdb &lt;dll/exe path&gt; [/pdb &lt;path&gt;] [/out &lt;path&gt;] [/extract]
 
-/pdb &lt;path&gt;    Path to the PDB to convert. If not specified explicitly, the PDB referenced by or embedded in the DLL/EXE is used.
-/out &lt;path&gt;    Output PDB path.
-/extract       Extract PDB embedded in the DLL/EXE. 
-/sourcelink    Preserve Source Link when converting from Portable PDB to Windows PDB, instead of converting to srcsrv format.
-/verbose       Print detailed diagnostics.
+/pdb &lt;path&gt;                Path to the PDB to convert. If not specified explicitly, 
+                           the PDB referenced by or embedded in the DLL/EXE is used.
+/out &lt;path&gt;                Output PDB path.
+/extract                   Extract PDB embedded in the DLL/EXE. 
+/sourcelink                Preserve Source Link when converting from Portable PDB to 
+                           Windows PDB, instead of converting to srcsrv format.
+/verbose                   Print detailed diagnostics.
+/srcsvrvar &lt;name&gt;=&lt;value&gt;  Add specified variable to srcsvr stream. Only applicable 
+                           when converting to Windows PDB and /sourcelink is not
+                           specified.
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="translated">사용법: Pdb2Pdb &lt;dll/exe 경로&gt; [/pdb &lt;경로&gt;] [/out &lt;경로&gt;] [/extract]
+        <target state="needs-review-translation">사용법: Pdb2Pdb &lt;dll/exe 경로&gt; [/pdb &lt;경로&gt;] [/out &lt;경로&gt;] [/extract]
 
 /pdb &lt;경로&gt;    변환할 PDB 경로입니다. 명시적으로 지정되지 않은 경우 DLL/EXE에서 참조되거나 포함된 PDB가 사용됩니다.
 /out &lt;경로&gt;    PDB 경로를 출력합니다.
@@ -78,6 +83,11 @@
       <trans-unit id="InvalidPdbPathInDebugDirectory">
         <source>Invalid PDB path in Debug Directory (file '{0}').</source>
         <target state="translated">디버그 디렉터리('{0}' 파일)의 PDB 경로가 잘못되었습니다.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="CantSpecifyBothSrcSvrVariableAndSourcelinkOptions">
+        <source>Can't specify both /srcsvrvar and /sourcelink options.</source>
+        <target state="new">Can't specify both /srcsvrvar and /sourcelink options.</target>
         <note />
       </trans-unit>
     </body>
