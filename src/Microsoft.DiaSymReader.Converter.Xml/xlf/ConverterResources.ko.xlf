@@ -4,22 +4,22 @@
     <body>
       <trans-unit id="MetadataNotAvailable">
         <source>Metadata not available</source>
-        <target state="new">Metadata not available</target>
+        <target state="translated">메타데이터를 사용할 수 없음</target>
         <note />
       </trans-unit>
       <trans-unit id="StreamMustBeReadable">
         <source>Stream must be readable</source>
-        <target state="new">Stream must be readable</target>
+        <target state="translated">스트림은 읽기 가능한 상태여야 합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="StreamMustBeSeakable">
         <source>Stream must be seakable</source>
-        <target state="new">Stream must be seakable</target>
+        <target state="translated">스트림은 검색 가능한 상태여야 합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="StreamMustBeWritable">
         <source>Stream must be writable</source>
-        <target state="new">Stream must be writable</target>
+        <target state="translated">스트림은 쓰기 가능한 상태여야 합니다.</target>
         <note />
       </trans-unit>
     </body>

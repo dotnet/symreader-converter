@@ -4,52 +4,52 @@
     <body>
       <trans-unit id="CantSpecifyBothExtractAndPdbOptions">
         <source>Can't specify both /extract and /pdb options.</source>
-        <target state="new">Can't specify both /extract and /pdb options.</target>
+        <target state="translated">Impossible de spécifier à la fois les options /extract et /pdb.</target>
         <note />
       </trans-unit>
       <trans-unit id="CantSpecifyBothExtractAndSourcelinkOptions">
         <source>Can't specify both /extract and /sourcelink options.</source>
-        <target state="new">Can't specify both /extract and /sourcelink options.</target>
+        <target state="translated">Impossible de spécifier à la fois les options /extract et /sourcelink.</target>
         <note />
       </trans-unit>
       <trans-unit id="FileDoesntContainEmbeddedPdb">
         <source>File '{0}' doesn't contain an embedded PDB.</source>
-        <target state="new">File '{0}' doesn't contain an embedded PDB.</target>
+        <target state="translated">Le fichier '{0}' ne contient pas de fichier PDB incorporé.</target>
         <note />
       </trans-unit>
       <trans-unit id="FileNotFound">
         <source>File not found: '{0}'</source>
-        <target state="new">File not found: '{0}'</target>
+        <target state="translated">Fichier introuvable : '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="MissingValueForOption">
         <source>Missing value for option '{0}'</source>
-        <target state="new">Missing value for option '{0}'</target>
+        <target state="translated">Valeur manquante pour l'option '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="OnlyOneDllExeCanBeSpecified">
         <source>Only one dll/exe can be specified</source>
-        <target state="new">Only one dll/exe can be specified</target>
+        <target state="translated">Un seul fichier dll/exe peut être spécifié</target>
         <note />
       </trans-unit>
       <trans-unit id="UnrecognizedOption">
         <source>Unrecognized option: '{0}'</source>
-        <target state="new">Unrecognized option: '{0}'</target>
+        <target state="translated">Option non reconnue : '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="MissingDllExePath">
         <source>Missing dll/exe path.</source>
-        <target state="new">Missing dll/exe path.</target>
+        <target state="translated">Chemin du fichier dll/exe manquant.</target>
         <note />
       </trans-unit>
       <trans-unit id="MatchingPdbNotFound">
         <source>File '{0}' not found or doesn't match '{1}'.</source>
-        <target state="new">File '{0}' not found or doesn't match '{1}'.</target>
+        <target state="translated">Le fichier '{0}' est introuvable ou ne correspond pas à '{1}'.</target>
         <note />
       </trans-unit>
       <trans-unit id="NoAssociatedOrEmbeddedPdb">
         <source>File '{0}' is neither associated with PDB nor does it embed PDB.</source>
-        <target state="new">File '{0}' is neither associated with PDB nor does it embed PDB.</target>
+        <target state="translated">Le fichier '{0}' n'est pas associé à un fichier PDB et n'incorpore pas de fichier PDB.</target>
         <note />
       </trans-unit>
       <trans-unit id="Pdb2PdbUsage">
@@ -68,26 +68,21 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="new">Usage: Pdb2Pdb &lt;dll/exe path&gt; [/pdb &lt;path&gt;] [/out &lt;path&gt;] [/extract]
+        <target state="needs-review-translation">Utilisation : Pdb2Pdb &lt;chemin du fichier dll/exe&gt; [/pdb &lt;chemin&gt;] [/out &lt;chemin&gt;] [/extract]
 
-/pdb &lt;path&gt;                Path to the PDB to convert. If not specified explicitly, 
-                           the PDB referenced by or embedded in the DLL/EXE is used.
-/out &lt;path&gt;                Output PDB path.
-/extract                   Extract PDB embedded in the DLL/EXE. 
-/sourcelink                Preserve Source Link when converting from Portable PDB to 
-                           Windows PDB, instead of converting to srcsrv format.
-/verbose                   Print detailed diagnostics.
-/srcsvrvar &lt;name&gt;=&lt;value&gt;  Add specified variable to srcsvr stream. Only applicable 
-                           when converting to Windows PDB and /sourcelink is not
-                           specified.
+/pdb &lt;chemin&gt;  Chemin du fichier PDB à convertir. S'il n'est pas spécifié explicitement, le fichier PDB référencé ou incorporé dans le fichier DLL/EXE est utilisé.
+/out &lt;chemin&gt;  Chemin de sortie du fichier PDB.
+/extract       Extrayez le fichier PDB incorporé dans le fichier DLL/EXE. 
+/sourcelink    Préservez le lien source durant la conversion du fichier PDB portable en fichier PDB Windows, au lieu d'effectuer la conversion au format srcsrv.
+/verbose       Affichez les diagnostics détaillés.
 
-/extract and /pdb are mutually exclusive.
+/extract et /pdb s'excluent mutuellement.
 </target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidPdbPathInDebugDirectory">
         <source>Invalid PDB path in Debug Directory (file '{0}').</source>
-        <target state="new">Invalid PDB path in Debug Directory (file '{0}').</target>
+        <target state="translated">Chemin PDB non valide dans le répertoire de débogage (fichier '{0}').</target>
         <note />
       </trans-unit>
       <trans-unit id="CantSpecifyBothSrcSvrVariableAndSourcelinkOptions">

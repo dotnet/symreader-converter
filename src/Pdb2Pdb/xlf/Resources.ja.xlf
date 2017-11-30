@@ -4,52 +4,52 @@
     <body>
       <trans-unit id="CantSpecifyBothExtractAndPdbOptions">
         <source>Can't specify both /extract and /pdb options.</source>
-        <target state="new">Can't specify both /extract and /pdb options.</target>
+        <target state="translated">/extract オプションと /pdb オプションの両方を指定することはできません。</target>
         <note />
       </trans-unit>
       <trans-unit id="CantSpecifyBothExtractAndSourcelinkOptions">
         <source>Can't specify both /extract and /sourcelink options.</source>
-        <target state="new">Can't specify both /extract and /sourcelink options.</target>
+        <target state="translated">/extract オプションと /sourcelink オプションの両方を指定することはできません。</target>
         <note />
       </trans-unit>
       <trans-unit id="FileDoesntContainEmbeddedPdb">
         <source>File '{0}' doesn't contain an embedded PDB.</source>
-        <target state="new">File '{0}' doesn't contain an embedded PDB.</target>
+        <target state="translated">ファイル '{0}' には、埋め込み PDB が含まれていません。</target>
         <note />
       </trans-unit>
       <trans-unit id="FileNotFound">
         <source>File not found: '{0}'</source>
-        <target state="new">File not found: '{0}'</target>
+        <target state="translated">ファイルが見つかりません: '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="MissingValueForOption">
         <source>Missing value for option '{0}'</source>
-        <target state="new">Missing value for option '{0}'</target>
+        <target state="translated">オプション '{0}' の値がありません</target>
         <note />
       </trans-unit>
       <trans-unit id="OnlyOneDllExeCanBeSpecified">
         <source>Only one dll/exe can be specified</source>
-        <target state="new">Only one dll/exe can be specified</target>
+        <target state="translated">指定できるのは dll/exe 1 つだけです</target>
         <note />
       </trans-unit>
       <trans-unit id="UnrecognizedOption">
         <source>Unrecognized option: '{0}'</source>
-        <target state="new">Unrecognized option: '{0}'</target>
+        <target state="translated">認識されないオプション:'{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="MissingDllExePath">
         <source>Missing dll/exe path.</source>
-        <target state="new">Missing dll/exe path.</target>
+        <target state="translated">dll/exe のパスが見つかりせん。</target>
         <note />
       </trans-unit>
       <trans-unit id="MatchingPdbNotFound">
         <source>File '{0}' not found or doesn't match '{1}'.</source>
-        <target state="new">File '{0}' not found or doesn't match '{1}'.</target>
+        <target state="translated">ファイル '{0}' が見つからないか、'{1}' と一致しません。</target>
         <note />
       </trans-unit>
       <trans-unit id="NoAssociatedOrEmbeddedPdb">
         <source>File '{0}' is neither associated with PDB nor does it embed PDB.</source>
-        <target state="new">File '{0}' is neither associated with PDB nor does it embed PDB.</target>
+        <target state="translated">ファイル '{0}' が PDB に関連付けられていないか、このファイルに PDB が埋め込まれていません。</target>
         <note />
       </trans-unit>
       <trans-unit id="Pdb2PdbUsage">
@@ -68,26 +68,21 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="new">Usage: Pdb2Pdb &lt;dll/exe path&gt; [/pdb &lt;path&gt;] [/out &lt;path&gt;] [/extract]
+        <target state="needs-review-translation">使い方: Pdb2Pdb &lt;dll/exe のパス&gt; [/pdb &lt;パス&gt;] [/out &lt;パス&gt;] [/extract]
 
-/pdb &lt;path&gt;                Path to the PDB to convert. If not specified explicitly, 
-                           the PDB referenced by or embedded in the DLL/EXE is used.
-/out &lt;path&gt;                Output PDB path.
-/extract                   Extract PDB embedded in the DLL/EXE. 
-/sourcelink                Preserve Source Link when converting from Portable PDB to 
-                           Windows PDB, instead of converting to srcsrv format.
-/verbose                   Print detailed diagnostics.
-/srcsvrvar &lt;name&gt;=&lt;value&gt;  Add specified variable to srcsvr stream. Only applicable 
-                           when converting to Windows PDB and /sourcelink is not
-                           specified.
+/pdb &lt;パス&gt;    変換する PDB のパス。明示的に指定されていない場合は、DLL/EXE で参照される PDB または DLL/EXE に埋め込まれている PDB が使用されます。
+/out &lt;パス&gt;    出力先の PDB のパス。
+/extract       DLL/EXE に埋め込まれている PDB を抽出します。
+/sourcelink    ポータブル PDB から srcsrv 形式ではなく Windows PDB に変換する際にソース リンクを保持します。
+/verbose       詳細な診断を出力します。
 
-/extract and /pdb are mutually exclusive.
+/extract と /pdb を同時に指定することはできません。
 </target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidPdbPathInDebugDirectory">
         <source>Invalid PDB path in Debug Directory (file '{0}').</source>
-        <target state="new">Invalid PDB path in Debug Directory (file '{0}').</target>
+        <target state="translated">デバッグ ディレクトリ (ファイル '{0}') の PDB パスが無効です。</target>
         <note />
       </trans-unit>
       <trans-unit id="CantSpecifyBothSrcSvrVariableAndSourcelinkOptions">

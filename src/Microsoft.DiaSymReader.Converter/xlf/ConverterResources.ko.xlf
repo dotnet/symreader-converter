@@ -4,227 +4,227 @@
     <body>
       <trans-unit id="InvalidPdbFormat">
         <source>Invalid PDB format: {0}</source>
-        <target state="new">Invalid PDB format: {0}</target>
+        <target state="translated">잘못된 PDB 형식: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidUserEntryPointInSourcePdb">
         <source>Invalid user entry point in the source PDB</source>
-        <target state="new">Invalid user entry point in the source PDB</target>
+        <target state="translated">소스 PDB의 잘못된 사용자 진입점</target>
         <note />
       </trans-unit>
       <trans-unit id="MetadataNotAvailable">
         <source>Metadata not available</source>
-        <target state="new">Metadata not available</target>
+        <target state="translated">메타데이터를 사용할 수 없음</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedPEBuiltWithPortablePdb">
         <source>Specified PE was built with Portable PDB</source>
-        <target state="new">Specified PE was built with Portable PDB</target>
+        <target state="translated">지정된 PE는 이식 가능한 PDB로 만들어졌습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedPEFileHasNoAssociatedPdb">
         <source>Specified PE file doesn't have any PDB associated with it</source>
-        <target state="new">Specified PE file doesn't have any PDB associated with it</target>
+        <target state="translated">지정된 PE 파일에 이와 연결된 PDB가 없습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="StreamMustBeReadable">
         <source>Stream must be readable</source>
-        <target state="new">Stream must be readable</target>
+        <target state="translated">스트림은 읽기 가능한 상태여야 합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="StreamMustBeSeakable">
         <source>Stream must be seakable</source>
-        <target state="new">Stream must be seakable</target>
+        <target state="translated">스트림은 검색 가능한 상태여야 합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="StreamMustBeWritable">
         <source>Stream must be writable</source>
-        <target state="new">Stream must be writable</target>
+        <target state="translated">스트림은 쓰기 가능한 상태여야 합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="MethodAssociatedWithLocalScopeHasNoBody">
         <source>Method associated with local scope has no body</source>
-        <target state="new">Method associated with local scope has no body</target>
+        <target state="translated">로컬 범위에 연결된 메서드에 본문이 없습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="MethodContainingLocalVariablesHasNoLocalSignature">
         <source>Method containing local variables has no local signature</source>
-        <target state="new">Method containing local variables has no local signature</target>
+        <target state="translated">지역 변수가 포함된 메서드에 지역 시그니처가 없습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="LocalConstantNameTooLong">
         <source>Local constant name too long</source>
-        <target state="new">Local constant name too long</target>
+        <target state="translated">지역 상수 이름이 너무 깁니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="LocalVariableNameTooLong">
         <source>Local constant name too long</source>
-        <target state="new">Local constant name too long</target>
+        <target state="translated">지역 상수 이름이 너무 깁니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="ImportStringTooLong">
         <source>Import string is too long. Ignoring the import: '{0}'</source>
-        <target state="new">Import string is too long. Ignoring the import: '{0}'</target>
+        <target state="translated">가져오기 문자열이 너무 깁니다. 가져오기 무시: '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="LocalScopeRangesNestingIsInvalid">
         <source>Local scope ranges nesting is invalid</source>
-        <target state="new">Local scope ranges nesting is invalid</target>
+        <target state="translated">로컬 범위 중첩이 잘못되었습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="UnsupportedImportType">
         <source>The type of import is not supported (type token {0:X8})</source>
-        <target state="new">The type of import is not supported (type token {0:X8})</target>
+        <target state="translated">가져오기 형식이 지원되지 않습니다(형식 토큰 {0:X8}).</target>
         <note />
       </trans-unit>
       <trans-unit id="UndefinedAssemblyReferenceAlias">
         <source>An extern alias was not defined for assembly reference {0:X8}</source>
-        <target state="new">An extern alias was not defined for assembly reference {0:X8}</target>
+        <target state="translated">어셈블리 참조 {0:X8}에 별칭이 정의되지 않았습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="UnknownImportDefinitionKind">
         <source>Unknown import definition kind: {0}</source>
-        <target state="new">Unknown import definition kind: {0}</target>
+        <target state="translated">알 수 없는 가져오기 정의 종류: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="DiagnosticLocation">
         <source>token 0x{0:X8}</source>
-        <target state="new">token 0x{0:X8}</target>
+        <target state="translated">토큰 0x{0:X8}</target>
         <note />
       </trans-unit>
       <trans-unit id="ForwardedToUndefinedMethod">
         <source>ForwardMethodInfo custom debug information forwards to non-existent method: 0x{0:X8}</source>
-        <target state="new">ForwardMethodInfo custom debug information forwards to non-existent method: 0x{0:X8}</target>
+        <target state="translated">ForwardMethodInfo 사용자 지정 디버그 정보가 존재하지 않는 메서드로 전달됩니다. 0x{0:X8}</target>
         <note />
       </trans-unit>
       <trans-unit id="ForwardedToMethodWithNoScope">
         <source>ForwardMethodInfo custom debug information forwards to a method with no scope: 0x{0:X8}</source>
-        <target state="new">ForwardMethodInfo custom debug information forwards to a method with no scope: 0x{0:X8}</target>
+        <target state="translated">ForwardMethodInfo 사용자 지정 디버그 정보가 범위가 없는 메서드로 전달됩니다. 0x{0:X8}</target>
         <note />
       </trans-unit>
       <trans-unit id="BothForwardMethodInfoAndImportsSpecified">
         <source>Both ForwardMethodInfo custom debug information and imports are specified</source>
-        <target state="new">Both ForwardMethodInfo custom debug information and imports are specified</target>
+        <target state="translated">ForwardMethodInfo 사용자 지정 디버그 정보와 가져오기가 모두 지정되었습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidStateMachineTypeName">
         <source>Invalid type name specified in StateMachineTypeName custom debug information: {0}</source>
-        <target state="new">Invalid type name specified in StateMachineTypeName custom debug information: {0}</target>
+        <target state="translated">StateMachineTypeName 사용자 지정 디버그 정보에서 지정된 잘못된 형식 이름: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="BothStateMachineTypeNameAndImportsSpecified">
         <source>Both StateMachineTypeName custom debug information and imports are specified</source>
-        <target state="new">Both StateMachineTypeName custom debug information and imports are specified</target>
+        <target state="translated">StateMachineTypeName 사용자 지정 디버그 정보와 가져오기가 모두 지정되었습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="DuplicateDynamicLocals">
         <source>Multiple DynamicLocals custom debug information records specified for the same local variable slot: {0}</source>
-        <target state="new">Multiple DynamicLocals custom debug information records specified for the same local variable slot: {0}</target>
+        <target state="translated">동일한 지역 변수 슬롯에 대해 지정된 여러 DynamicLocals 사용자 지정 디버그 정보 레코드: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="DuplicateTupleElementNamesForSlot">
         <source>Multiple TupleElementNames custom debug information records specified for the same local variable slot: {0}</source>
-        <target state="new">Multiple TupleElementNames custom debug information records specified for the same local variable slot: {0}</target>
+        <target state="translated">동일한 지역 변수 슬롯에 대해 지정된 여러 TupleElementNames 사용자 지정 디버그 정보 레코드: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="DuplicateTupleElementNamesForConstant">
         <source>Multiple TupleElementNames custom debug information records specified for the same local constant: '{0}' [{1}, {2})</source>
-        <target state="new">Multiple TupleElementNames custom debug information records specified for the same local constant: '{0}' [{1}, {2})</target>
+        <target state="translated">동일한 지역 상수 슬롯에 대해 지정된 여러 TupleElementNames 사용자 지정 디버그 정보 레코드: '{0}' [{1}, {2})</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidImportStringFormat">
         <source>The format of import string is invalid: '{0}'</source>
-        <target state="new">The format of import string is invalid: '{0}'</target>
+        <target state="translated">가져오기 문자열 형식이 잘못되었습니다. '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidEntryPointToken">
         <source>The format of import string is invalid: '{0}'</source>
-        <target state="new">The format of import string is invalid: '{0}'</target>
+        <target state="translated">가져오기 문자열 형식이 잘못되었습니다. '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidScopeILOffsetRange">
         <source>Invalid scope IL offset range: [{0}, {1})</source>
-        <target state="new">Invalid scope IL offset range: [{0}, {1})</target>
+        <target state="translated">잘못된 범위 IL 오프셋 범위: [{0}, {1})</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalVariableData">
         <source>Invalid local variable data</source>
-        <target state="new">Invalid local variable data</target>
+        <target state="translated">잘못된 지역 변수 데이터</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalConstantData">
         <source>Invalid local constant data</source>
-        <target state="new">Invalid local constant data</target>
+        <target state="translated">잘못된 지역 상수 데이터</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalConstantSignature">
         <source>Invalid local constant signature: '{0}'</source>
-        <target state="new">Invalid local constant signature: '{0}'</target>
+        <target state="translated">잘못된 지역 상수 시그니처: '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalScope">
         <source>Invalid local scope</source>
-        <target state="new">Invalid local scope</target>
+        <target state="translated">잘못된 로컬 범위</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSequencePointDocument">
         <source>Invalid sequence point document name: '{0}'</source>
-        <target state="new">Invalid sequence point document name: '{0}'</target>
+        <target state="translated">잘못된 시퀀스 점 문서 이름: '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="UnmappedDocumentName">
         <source>Document name doesn't match any pattern in Source Link: '{0}'</source>
-        <target state="new">Document name doesn't match any pattern in Source Link: '{0}'</target>
+        <target state="translated">문서 이름과 일치하는 소스 링크 패턴이 없습니다. '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="UriSchemeIsNotHttp">
         <source>The scheme of URI specified in Source Link is not http/https: '{0}'</source>
-        <target state="new">The scheme of URI specified in Source Link is not http/https: '{0}'</target>
+        <target state="translated">소스 링크에서 구성된 이 URI 구성표가 http/https가 아닙니다. '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="NoSupportedUrisFoundInSourceLink">
         <source>No supported URIs found in Source Link</source>
-        <target state="new">No supported URIs found in Source Link</target>
+        <target state="translated">소스 링크에 지원되는 URI가 없습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="PdbNotMatchingDebugDirectory">
         <source>The PDB doesn't match debug directory record in the PE file</source>
-        <target state="new">The PDB doesn't match debug directory record in the PE file</target>
+        <target state="translated">PDB가 PE 파일의 디버그 디렉터리 레코드와 일치하지 않습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSourceLinkData">
         <source>Invalid Source Link data</source>
-        <target state="new">Invalid Source Link data</target>
+        <target state="translated">잘못된 소스 링크 데이터</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSourceServerData">
         <source>Invalid srcsrv data</source>
-        <target state="new">Invalid srcsrv data</target>
+        <target state="translated">잘못된 srcsrv 데이터</target>
         <note />
       </trans-unit>
       <trans-unit id="BothSourceLinkDataAndSourceServerData">
         <source>PDB contains both Source Link and srcsrv data</source>
-        <target state="new">PDB contains both Source Link and srcsrv data</target>
+        <target state="translated">PDB는 소스 링크와 srcsrv 데이터를 모두 포함합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidEmbeddedSource">
         <source>Invalid embedded source associated with document '{0}'</source>
-        <target state="new">Invalid embedded source associated with document '{0}'</target>
+        <target state="translated">'{0}' 문서에 연결된 잘못된 포함 소스</target>
         <note />
       </trans-unit>
       <trans-unit id="InconsistentStateMachineMethodMapping">
         <source>Inconsistent state machine method mapping -- MoveNext method is associated with two distinct kickoff methods: 0x{0:X8} and 0x{1:X8}</source>
-        <target state="new">Inconsistent state machine method mapping -- MoveNext method is associated with two distinct kickoff methods: 0x{0:X8} and 0x{1:X8}</target>
+        <target state="translated">일관되지 않은 상태의 컴퓨터 메서드 매핑 -- MoveNext 메서드가 2가지 고유 킥오프 메서드인 0x{0:X8} 및 0x{1:X8}에 연결되었습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidJsonDataFormat">
         <source>The JSON format is invalid</source>
-        <target state="new">The JSON format is invalid</target>
+        <target state="translated">JSON 형식이 잘못되었습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSourceLink">
         <source>Invalid Source Link: {0}</source>
-        <target state="new">Invalid Source Link: {0}</target>
+        <target state="translated">잘못된 소스 링크: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSrcSvrVariableName">

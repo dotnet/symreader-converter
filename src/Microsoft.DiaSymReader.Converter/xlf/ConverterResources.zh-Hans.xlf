@@ -4,227 +4,227 @@
     <body>
       <trans-unit id="InvalidPdbFormat">
         <source>Invalid PDB format: {0}</source>
-        <target state="new">Invalid PDB format: {0}</target>
+        <target state="translated">PDB 格式无效: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidUserEntryPointInSourcePdb">
         <source>Invalid user entry point in the source PDB</source>
-        <target state="new">Invalid user entry point in the source PDB</target>
+        <target state="translated">源 PDB 中的用户入口点无效</target>
         <note />
       </trans-unit>
       <trans-unit id="MetadataNotAvailable">
         <source>Metadata not available</source>
-        <target state="new">Metadata not available</target>
+        <target state="translated">元数据不可用</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedPEBuiltWithPortablePdb">
         <source>Specified PE was built with Portable PDB</source>
-        <target state="new">Specified PE was built with Portable PDB</target>
+        <target state="translated">指定的 PE 由可移植 PDB 构建</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedPEFileHasNoAssociatedPdb">
         <source>Specified PE file doesn't have any PDB associated with it</source>
-        <target state="new">Specified PE file doesn't have any PDB associated with it</target>
+        <target state="translated">指定的 PE 文件未关联有任何 PDB</target>
         <note />
       </trans-unit>
       <trans-unit id="StreamMustBeReadable">
         <source>Stream must be readable</source>
-        <target state="new">Stream must be readable</target>
+        <target state="translated">流必须可读</target>
         <note />
       </trans-unit>
       <trans-unit id="StreamMustBeSeakable">
         <source>Stream must be seakable</source>
-        <target state="new">Stream must be seakable</target>
+        <target state="translated">流必须可查找</target>
         <note />
       </trans-unit>
       <trans-unit id="StreamMustBeWritable">
         <source>Stream must be writable</source>
-        <target state="new">Stream must be writable</target>
+        <target state="translated">流必须可写</target>
         <note />
       </trans-unit>
       <trans-unit id="MethodAssociatedWithLocalScopeHasNoBody">
         <source>Method associated with local scope has no body</source>
-        <target state="new">Method associated with local scope has no body</target>
+        <target state="translated">与本地范围关联的方法没有主体</target>
         <note />
       </trans-unit>
       <trans-unit id="MethodContainingLocalVariablesHasNoLocalSignature">
         <source>Method containing local variables has no local signature</source>
-        <target state="new">Method containing local variables has no local signature</target>
+        <target state="translated">包含局部变量的方法没有局部签名</target>
         <note />
       </trans-unit>
       <trans-unit id="LocalConstantNameTooLong">
         <source>Local constant name too long</source>
-        <target state="new">Local constant name too long</target>
+        <target state="translated">局部常量名称太长</target>
         <note />
       </trans-unit>
       <trans-unit id="LocalVariableNameTooLong">
         <source>Local constant name too long</source>
-        <target state="new">Local constant name too long</target>
+        <target state="translated">局部常量名称太长</target>
         <note />
       </trans-unit>
       <trans-unit id="ImportStringTooLong">
         <source>Import string is too long. Ignoring the import: '{0}'</source>
-        <target state="new">Import string is too long. Ignoring the import: '{0}'</target>
+        <target state="translated">输入字符串太长。正在忽略导入:“{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="LocalScopeRangesNestingIsInvalid">
         <source>Local scope ranges nesting is invalid</source>
-        <target state="new">Local scope ranges nesting is invalid</target>
+        <target state="translated">本地范围的范围嵌套无效</target>
         <note />
       </trans-unit>
       <trans-unit id="UnsupportedImportType">
         <source>The type of import is not supported (type token {0:X8})</source>
-        <target state="new">The type of import is not supported (type token {0:X8})</target>
+        <target state="translated">导入类型不受支持(类型标记 {0:X8})</target>
         <note />
       </trans-unit>
       <trans-unit id="UndefinedAssemblyReferenceAlias">
         <source>An extern alias was not defined for assembly reference {0:X8}</source>
-        <target state="new">An extern alias was not defined for assembly reference {0:X8}</target>
+        <target state="translated">未为程序集引用 {0:X8} 定义外部别名</target>
         <note />
       </trans-unit>
       <trans-unit id="UnknownImportDefinitionKind">
         <source>Unknown import definition kind: {0}</source>
-        <target state="new">Unknown import definition kind: {0}</target>
+        <target state="translated">导入定义类型未知: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="DiagnosticLocation">
         <source>token 0x{0:X8}</source>
-        <target state="new">token 0x{0:X8}</target>
+        <target state="translated">标记 0x{0:X8}</target>
         <note />
       </trans-unit>
       <trans-unit id="ForwardedToUndefinedMethod">
         <source>ForwardMethodInfo custom debug information forwards to non-existent method: 0x{0:X8}</source>
-        <target state="new">ForwardMethodInfo custom debug information forwards to non-existent method: 0x{0:X8}</target>
+        <target state="translated">ForwardMethodInfo 自定义调试信息转发到不存在的方法: 0x{0:X8}</target>
         <note />
       </trans-unit>
       <trans-unit id="ForwardedToMethodWithNoScope">
         <source>ForwardMethodInfo custom debug information forwards to a method with no scope: 0x{0:X8}</source>
-        <target state="new">ForwardMethodInfo custom debug information forwards to a method with no scope: 0x{0:X8}</target>
+        <target state="translated">ForwardMethodInfo 自定义调试信息转发到没有范围的方法: 0x{0:X8}</target>
         <note />
       </trans-unit>
       <trans-unit id="BothForwardMethodInfoAndImportsSpecified">
         <source>Both ForwardMethodInfo custom debug information and imports are specified</source>
-        <target state="new">Both ForwardMethodInfo custom debug information and imports are specified</target>
+        <target state="translated">ForwardMethodInfo 自定义调试信息和导入均已指定</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidStateMachineTypeName">
         <source>Invalid type name specified in StateMachineTypeName custom debug information: {0}</source>
-        <target state="new">Invalid type name specified in StateMachineTypeName custom debug information: {0}</target>
+        <target state="translated">在 StateMachineTypeName 自定义调试信息中指定的类型名称无效: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="BothStateMachineTypeNameAndImportsSpecified">
         <source>Both StateMachineTypeName custom debug information and imports are specified</source>
-        <target state="new">Both StateMachineTypeName custom debug information and imports are specified</target>
+        <target state="translated">StateMachineTypeName 自定义调试信息和导入均已指定</target>
         <note />
       </trans-unit>
       <trans-unit id="DuplicateDynamicLocals">
         <source>Multiple DynamicLocals custom debug information records specified for the same local variable slot: {0}</source>
-        <target state="new">Multiple DynamicLocals custom debug information records specified for the same local variable slot: {0}</target>
+        <target state="translated">为同一局部变量槽指定了多个 DynamicLocals 自定义调试信息记录: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="DuplicateTupleElementNamesForSlot">
         <source>Multiple TupleElementNames custom debug information records specified for the same local variable slot: {0}</source>
-        <target state="new">Multiple TupleElementNames custom debug information records specified for the same local variable slot: {0}</target>
+        <target state="translated">为同一局部变量槽指定了多个 TupleElementNames 自定义调试信息记录: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="DuplicateTupleElementNamesForConstant">
         <source>Multiple TupleElementNames custom debug information records specified for the same local constant: '{0}' [{1}, {2})</source>
-        <target state="new">Multiple TupleElementNames custom debug information records specified for the same local constant: '{0}' [{1}, {2})</target>
+        <target state="translated">为同一局部常量指定了多个 TupleElementNames 自定义调试信息记录:“{0}” [{1}, {2})</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidImportStringFormat">
         <source>The format of import string is invalid: '{0}'</source>
-        <target state="new">The format of import string is invalid: '{0}'</target>
+        <target state="translated">导入字符串的格式无效:“{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidEntryPointToken">
         <source>The format of import string is invalid: '{0}'</source>
-        <target state="new">The format of import string is invalid: '{0}'</target>
+        <target state="translated">导入字符串的格式无效:“{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidScopeILOffsetRange">
         <source>Invalid scope IL offset range: [{0}, {1})</source>
-        <target state="new">Invalid scope IL offset range: [{0}, {1})</target>
+        <target state="translated">范围 IL 的偏移量范围无效: [{0}, {1})</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalVariableData">
         <source>Invalid local variable data</source>
-        <target state="new">Invalid local variable data</target>
+        <target state="translated">局部变量数据无效</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalConstantData">
         <source>Invalid local constant data</source>
-        <target state="new">Invalid local constant data</target>
+        <target state="translated">局部常量数据无效</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalConstantSignature">
         <source>Invalid local constant signature: '{0}'</source>
-        <target state="new">Invalid local constant signature: '{0}'</target>
+        <target state="translated">局部常量签名无效:“{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidLocalScope">
         <source>Invalid local scope</source>
-        <target state="new">Invalid local scope</target>
+        <target state="translated">本地范围无效</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSequencePointDocument">
         <source>Invalid sequence point document name: '{0}'</source>
-        <target state="new">Invalid sequence point document name: '{0}'</target>
+        <target state="translated">序列点文档名无效:“{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="UnmappedDocumentName">
         <source>Document name doesn't match any pattern in Source Link: '{0}'</source>
-        <target state="new">Document name doesn't match any pattern in Source Link: '{0}'</target>
+        <target state="translated">文档名称与源链接中的任何模式均不匹配:“{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="UriSchemeIsNotHttp">
         <source>The scheme of URI specified in Source Link is not http/https: '{0}'</source>
-        <target state="new">The scheme of URI specified in Source Link is not http/https: '{0}'</target>
+        <target state="translated">源链接中指定的 URI 方案不是 http/https:“{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="NoSupportedUrisFoundInSourceLink">
         <source>No supported URIs found in Source Link</source>
-        <target state="new">No supported URIs found in Source Link</target>
+        <target state="translated">未在源链接中找到受支持的 URI</target>
         <note />
       </trans-unit>
       <trans-unit id="PdbNotMatchingDebugDirectory">
         <source>The PDB doesn't match debug directory record in the PE file</source>
-        <target state="new">The PDB doesn't match debug directory record in the PE file</target>
+        <target state="translated">PDB 与 PE 文件中的调试目录记录不匹配</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSourceLinkData">
         <source>Invalid Source Link data</source>
-        <target state="new">Invalid Source Link data</target>
+        <target state="translated">源链接数据无效</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSourceServerData">
         <source>Invalid srcsrv data</source>
-        <target state="new">Invalid srcsrv data</target>
+        <target state="translated">srcsrv 数据无效</target>
         <note />
       </trans-unit>
       <trans-unit id="BothSourceLinkDataAndSourceServerData">
         <source>PDB contains both Source Link and srcsrv data</source>
-        <target state="new">PDB contains both Source Link and srcsrv data</target>
+        <target state="translated">PDB 包含源链接和 srcsrv 数据</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidEmbeddedSource">
         <source>Invalid embedded source associated with document '{0}'</source>
-        <target state="new">Invalid embedded source associated with document '{0}'</target>
+        <target state="translated">与文档“{0}”关联的嵌入源无效</target>
         <note />
       </trans-unit>
       <trans-unit id="InconsistentStateMachineMethodMapping">
         <source>Inconsistent state machine method mapping -- MoveNext method is associated with two distinct kickoff methods: 0x{0:X8} and 0x{1:X8}</source>
-        <target state="new">Inconsistent state machine method mapping -- MoveNext method is associated with two distinct kickoff methods: 0x{0:X8} and 0x{1:X8}</target>
+        <target state="translated">状态机方法映射不一致 -- MoveNext 方法与两种不同的开始方法: 0x{0:X8} 和 0x{1:X8} 相关联</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidJsonDataFormat">
         <source>The JSON format is invalid</source>
-        <target state="new">The JSON format is invalid</target>
+        <target state="translated">JSON 格式无效</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSourceLink">
         <source>Invalid Source Link: {0}</source>
-        <target state="new">Invalid Source Link: {0}</target>
+        <target state="translated">源链接无效: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSrcSvrVariableName">
