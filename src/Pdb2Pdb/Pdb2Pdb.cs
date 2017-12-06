@@ -277,7 +277,7 @@ namespace Microsoft.DiaSymReader.Tools
         {
             var directory = peReader.ReadDebugDirectory();
 
-            var codeViewEntry = directory.FirstOrDefault(entry => entry.Type == DebugDirectoryEntryType.CodeView && entry.IsPortableCodeView == portable);
+            var codeViewEntry = directory.LastOrDefault(entry => entry.Type == DebugDirectoryEntryType.CodeView && entry.IsPortableCodeView == portable);
             if (codeViewEntry.DataSize == 0)
             {
                 return null;
