@@ -83,7 +83,7 @@ namespace Microsoft.DiaSymReader.Tools
 
         public static bool TryReadPdbId(PEReader peReader, out BlobContentId id, out int age)
         {
-            var codeViewEntry = peReader.ReadDebugDirectory().FirstOrDefault(entry => entry.Type == DebugDirectoryEntryType.CodeView);
+            var codeViewEntry = peReader.ReadDebugDirectory().LastOrDefault(entry => entry.Type == DebugDirectoryEntryType.CodeView);
             if (codeViewEntry.DataSize == 0)
             {
                 id = default(BlobContentId);
