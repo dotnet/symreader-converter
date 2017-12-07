@@ -8,7 +8,7 @@ namespace TestResources
 {
     internal static class ResourceLoader
     {
-        private static Stream GetResourceStream(string name)
+        internal static Stream GetResourceStream(string name)
         {
             var assembly = typeof(ResourceLoader).GetTypeInfo().Assembly;
 

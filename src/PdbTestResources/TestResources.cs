@@ -1,6 +1,8 @@
 ﻿ // Copyright(c) Microsoft.All Rights Reserved.Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
  using Microsoft.DiaSymReader.Tools.UnitTests;
+using System;
+using System.IO;
 
 namespace TestResources
 {
@@ -240,5 +242,16 @@ namespace TestResources
         public static TestResource PortableDllAndPdb => new TestResource(PortableDll, PortablePdb);
         public static TestResource WindowsDllAndPdb => new TestResource(WindowsDll, WindowsPdb);
         public static TestResource DllAndPdb(bool portable) => portable ? PortableDllAndPdb : WindowsDllAndPdb;
+    }
+
+    public static class CrossGen
+    {
+        public static Stream PortableDll => ResourceLoader.GetResourceStream(nameof(CrossGen) + ".dllx");
+
+        public static Guid PortableDllDebugDirectoryEntryGuid => new Guid("3FE3F61A-BC73-4489-A785-F180214B76D1");
+
+        public static Stream WindowsDll => ResourceLoader.GetResourceStream(nameof(CrossGen) + ".dll");
+
+        public static Guid WindowsDllDebugDirectoryEntryGuid => new Guid("4448E80E-2F97-40AF-BBCE-86A3D66A1A20");
     }
 }
