@@ -167,5 +167,11 @@
     <EmbeddedResource Include="Resources\Misc.pdbx">
       <LogicalName>Misc.pdbx</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Resources\CrossGen.ni.dll">
+      <LogicalName>CrossGen.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\CrossGen.ni.dllx">
+      <LogicalName>CrossGen.dllx</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>
