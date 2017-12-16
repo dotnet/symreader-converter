@@ -160,7 +160,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             StreamUtilities.ValidateStream(targetPdbStream, nameof(targetPdbStream), writeRequired: true);
 
-            using (var pdbWriter = SymUnmanagedWriterFactory.CreateWriter(new SymMetadataProvider(peReader.GetMetadataReader())))
+            using (var pdbWriter = SymUnmanagedWriterFactory.CreateWriter(new SymMetadataProvider(peReader.GetMetadataReader()), SymUnmanagedWriterCreationOptions.Deterministic))
             {
                 ConvertPortableToWindows(peReader, pdbReader, pdbWriter, options);
                 pdbWriter.WriteTo(targetPdbStream);

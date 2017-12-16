@@ -29,21 +29,28 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         {
             var windowsPEStream = new MemoryStream(windows.PE);
             var windowsPdbStream = new MemoryStream(windows.Pdb);
-            var convertedPortablePdbStream = new MemoryStream();
+            var convertedPortablePdbStream1 = new MemoryStream();
+            var convertedPortablePdbStream2 = new MemoryStream();
 
             var converter = new PdbConverter(d => Assert.False(true, d.ToString()));
-            converter.ConvertWindowsToPortable(windowsPEStream, windowsPdbStream, convertedPortablePdbStream);
+            converter.ConvertWindowsToPortable(windowsPEStream, windowsPdbStream, convertedPortablePdbStream1);
 
-            convertedPortablePdbStream.Position = 0;
+            convertedPortablePdbStream1.Position = 0;
             VerifyPortablePdb(
-                convertedPortablePdbStream,
+                convertedPortablePdbStream1,
                 SelectAlternative(expectedMetadata, leftAlternative: false), 
                 "Comparing Portable PDB converted from Windows PDB with expected metadata");
+
+            // validate determinism:
+            windowsPEStream.Position = 0;
+            windowsPdbStream.Position = 0;
+            converter.ConvertWindowsToPortable(windowsPEStream, windowsPdbStream, convertedPortablePdbStream2);
+            AssertEx.Equal(convertedPortablePdbStream1.ToArray(), convertedPortablePdbStream2.ToArray());
         }
 
         private static void VerifyPortablePdb(Stream pdbStream, string expectedMetadata, string message)
         {
-            using (var provider = MetadataReaderProvider.FromPortablePdbStream(pdbStream))
+            using (var provider = MetadataReaderProvider.FromPortablePdbStream(pdbStream, MetadataStreamOptions.LeaveOpen))
             {
                 var mdReader = provider.GetMetadataReader();
                 var writer = new StringWriter();

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Xml.Linq;
 using Roslyn.Test.Utilities;
 using Xunit;
@@ -19,7 +20,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         public static void VerifyWindowsPdb(TestResource portable, TestResource windows, string expectedXml, PdbDiagnostic[] expectedDiagnostics = null, PortablePdbConversionOptions options = null)
         {
             VerifyWindowsMatchesExpected(windows, expectedXml);
-            VerifyWindowsConvertedFromPortableMatchesExpected(portable, expectedXml, expectedDiagnostics, options);
+            VerifyWindowsConvertedFromPortableMatchesExpected(portable, expectedXml, expectedDiagnostics, options, validateTimeIndifference: false);
         }
 
         private static void VerifyWindowsMatchesExpected(TestResource windows, string expectedXml)
@@ -34,23 +35,35 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             AssertEx.AssertLinesEqual(adjustedExpectedXml, adjustedActualXml, "Comparing Windows PDB with expected XML");
         }
 
-        public static void VerifyWindowsConvertedFromPortableMatchesExpected(TestResource portable, string expectedXml, PdbDiagnostic[] expectedDiagnostics, PortablePdbConversionOptions options)
+        public static void VerifyWindowsConvertedFromPortableMatchesExpected(TestResource portable, string expectedXml, PdbDiagnostic[] expectedDiagnostics, PortablePdbConversionOptions options, bool validateTimeIndifference)
         {
             var portablePEStream = new MemoryStream(portable.PE);
             var portablePdbStream = new MemoryStream(portable.Pdb);
-            var convertedWindowsPdbStream = new MemoryStream();
+            var portablePdbStream2 = new MemoryStream(portable.Pdb);
+            var convertedWindowsPdbStream1 = new MemoryStream();
+            var convertedWindowsPdbStream2 = new MemoryStream();
             var actualDiagnostics = new List<PdbDiagnostic>();
 
             var converter = new PdbConverter(actualDiagnostics.Add);
-            converter.ConvertPortableToWindows(portablePEStream, portablePdbStream, convertedWindowsPdbStream, options);
-
+            converter.ConvertPortableToWindows(portablePEStream, portablePdbStream, convertedWindowsPdbStream1, options);
             AssertEx.Equal(expectedDiagnostics ?? Array.Empty<PdbDiagnostic>(), actualDiagnostics, itemInspector: InspectDiagnostic);
 
-            VerifyPdb(convertedWindowsPdbStream, portablePEStream, expectedXml, "Comparing Windows PDB converted from Portable PDB with expected XML");
+            VerifyPdb(convertedWindowsPdbStream1, portablePEStream, expectedXml, "Comparing Windows PDB converted from Portable PDB with expected XML");
 
             portablePdbStream.Position = 0;
-            convertedWindowsPdbStream.Position = 0;
-            VerifyMatchingSignatures(portablePdbStream, convertedWindowsPdbStream);
+            convertedWindowsPdbStream1.Position = 0;
+            VerifyMatchingSignatures(portablePdbStream, convertedWindowsPdbStream1);
+
+            // validate determinism:
+            if (validateTimeIndifference)
+            {
+                Thread.Sleep(1000);
+            }
+
+            portablePEStream.Position = 0;
+            portablePdbStream.Position = 0;
+            converter.ConvertPortableToWindows(portablePEStream, portablePdbStream, convertedWindowsPdbStream2, options);
+            AssertEx.Equal(convertedWindowsPdbStream1.ToArray(), convertedWindowsPdbStream2.ToArray());
         }
 
         private static string InspectDiagnostic(PdbDiagnostic diagnostic)
@@ -65,7 +78,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             Guid guid;
             uint stamp;
             int age;
-            using (var provider = MetadataReaderProvider.FromPortablePdbStream(portablePdbStream))
+            using (var provider = MetadataReaderProvider.FromPortablePdbStream(portablePdbStream, MetadataStreamOptions.LeaveOpen))
             {
                 SymReaderHelpers.GetWindowsPdbSignature(provider.GetMetadataReader().DebugMetadataHeader.Id, out guid, out stamp, out age);
             }
