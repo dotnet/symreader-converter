@@ -1228,7 +1228,8 @@ new PortablePdbConversionOptions(srcSvrVariables: new[]
 {
     new KeyValuePair<string, string>("ABC", "*"),
     new KeyValuePair<string, string>("XYZ", "123")
-}));
+}),
+    validateTimeIndifference: true);
         }
 
         [Fact]
