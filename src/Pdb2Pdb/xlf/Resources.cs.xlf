@@ -68,13 +68,18 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">Použití: Pdb2Pdb &lt;cesta k souboru dll/exe&gt; [/pdb &lt;cesta&gt;] [/out &lt;cesta&gt;] [/extract]
+        <target state="translated">Použití: Pdb2Pdb &lt;cesta k souboru dll/exe&gt; [/pdb &lt;cesta&gt;] [/out &lt;cesta&gt;] [/extract]
 
-/pdb &lt;cesta&gt;    Cesta k souboru PDB, který se má převést. Pokud není zadaný explicitně, použije se soubor PDB, na který odkazuje soubor DLL/EXE nebo který je v něm vložený.
-/out &lt;cesta&gt;    Cesta k výstupnímu souboru PDB
-/extract       Extrahuje soubor PDB vložený v souboru DLL/EXE. 
-/sourcelink    Při převodu z formátu Portable PDB na Windows PDB zachová odkaz na zdroj místo převodu na formát srcsrv.
-/verbose       Vypíše podrobnou diagnostiku.
+/pdb &lt;cesta&gt;                Cesta k souboru PDB, který se má převést. Pokud není zadaný explicitně, 
+                           použije se soubor PDB, na který odkazuje soubor DLL/EXE nebo který je v něm vnořený.
+/out &lt;cesta&gt;                Cesta k výstupnímu souboru PDB
+/extract                   Extrahuje soubor PDB vnořený v souboru DLL/EXE. 
+/sourcelink                Při převodu z formátu Portable PDB na Windows PDB 
+                           zachová odkaz na zdroj místo převodu na formát srcsrv.
+/verbose                   Vypíše podrobnou diagnostiku.
+/srcsvrvar &lt;název&gt;=&lt;hodnota&gt;  Přidá zadanou proměnnou do streamu srcsvr. Dá se použít 
+                           jenom v případě, že převádíte do souboru Windows PDB
+                           a není zadaný parametr /sourcelink.
 
 Parametry /extract a /pdb se vzájemně vylučují.
 </target>
@@ -87,7 +92,7 @@ Parametry /extract a /pdb se vzájemně vylučují.
       </trans-unit>
       <trans-unit id="CantSpecifyBothSrcSvrVariableAndSourcelinkOptions">
         <source>Can't specify both /srcsvrvar and /sourcelink options.</source>
-        <target state="new">Can't specify both /srcsvrvar and /sourcelink options.</target>
+        <target state="translated">Nejde zadat jak parametr /srcsvrvar, tak parametr /sourcelink.</target>
         <note />
       </trans-unit>
     </body>

@@ -68,13 +68,18 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">使い方: Pdb2Pdb &lt;dll/exe のパス&gt; [/pdb &lt;パス&gt;] [/out &lt;パス&gt;] [/extract]
+        <target state="translated">使い方: Pdb2Pdb &lt;dll/exe のパス&gt; [/pdb &lt;パス&gt;] [/out &lt;パス&gt;] [/extract]
 
-/pdb &lt;パス&gt;    変換する PDB のパス。明示的に指定されていない場合は、DLL/EXE で参照される PDB または DLL/EXE に埋め込まれている PDB が使用されます。
-/out &lt;パス&gt;    出力先の PDB のパス。
-/extract       DLL/EXE に埋め込まれている PDB を抽出します。
-/sourcelink    ポータブル PDB から srcsrv 形式ではなく Windows PDB に変換する際にソース リンクを保持します。
-/verbose       詳細な診断を出力します。
+/pdb &lt;パス&gt;                変換する PDB へのパス。明示的に指定されない場合、DLL/EXE によって
+                           参照される、または DLL/EXE に組み込まれている PDB が使用されます。
+/out &lt;パス&gt;                出力 PDB パス。
+/extract                   DLL/EXE に組み込まれている PDB を抽出します。
+/sourcelink                ポータブル PDB から Windows PDB に変換するときに、
+                           srcsrv 形式に変換する代わりにソース リンクを保持します。
+/verbose                   詳しい診断を出力します。
+/srcsvrvar &lt;名前&gt;=&lt;値&gt;  指定された変数を srcsvr ストリームに追加します。
+                           変換先が Windows PDB であり、かつ /sourcelink が指定されない場合
+                           にのみ適用できます。
 
 /extract と /pdb を同時に指定することはできません。
 </target>
@@ -87,7 +92,7 @@
       </trans-unit>
       <trans-unit id="CantSpecifyBothSrcSvrVariableAndSourcelinkOptions">
         <source>Can't specify both /srcsvrvar and /sourcelink options.</source>
-        <target state="new">Can't specify both /srcsvrvar and /sourcelink options.</target>
+        <target state="translated">/srcsvrvar オプションと /sourcelink オプションの両方を指定することはできません。</target>
         <note />
       </trans-unit>
     </body>

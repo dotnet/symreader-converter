@@ -68,13 +68,18 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">Uso: Pdb2Pdb &lt;ruta de acceso dll/exe&gt; [/pdb &lt;ruta de acceso&gt;] [/out &lt;ruta de acceso&gt;] [/extract]
+        <target state="translated">Uso: Pdb2Pdb &lt;dll/exe path&gt; [/pdb &lt;ruta de acceso&gt;] [/out &lt;ruta de acceso&gt;] [/extract]
 
-/pdb &lt;path&gt;    Ruta de acceso al archivo PDB que se va a convertir. Si no se especifica explícitamente, se utiliza el archivo PDB al que se hace referencia o está insertado en DLL/EXE.
-/out &lt;path&gt;    Ruta de acceso de salida de PDB.
-/extract       Extraer el archivo PDB insertado en DLL/EXE. 
-/sourcelink    Preservar el vínculo a origen al convertir de PDB portátil a PDB de Windows, en vez de convertir a formato srcsrv.
-/verbose       Imprimir un diagnóstico detallado.
+/pdb &lt;ruta de acceso&gt;                Ruta de acceso al PDB para convertir. Si no se especifica explícitamente, 
+                           se utiliza el PDB al que se hace referencia o está insertado en DLL/EXE
+/out &lt;ruta de acceso&gt;                Ruta de acceso de PDB de salida.
+/extract                   Extraer el PDB insertado en DLL/EXE. 
+/sourcelink                Conservar el vínculo de origen al convertir del PDB portátil a
+                           Windows PDB, en lugar de convertir a formato srcsrv.
+/verbose                   Imprimir el diagnóstico detallado.
+/srcsvrvar &lt;name&gt;=&lt;value&gt;  Agregar la variable especificada al flujo srcsvr. Solo aplicable 
+                          al convertir a Windows PDB y no se especifica
+                           /sourcelink.
 
 /extract y /pdb se excluyen mutuamente.
 </target>
@@ -87,7 +92,7 @@
       </trans-unit>
       <trans-unit id="CantSpecifyBothSrcSvrVariableAndSourcelinkOptions">
         <source>Can't specify both /srcsvrvar and /sourcelink options.</source>
-        <target state="new">Can't specify both /srcsvrvar and /sourcelink options.</target>
+        <target state="translated">No se pueden especificar las opciones /srcsvrvar y /sourcelink simultáneamente.</target>
         <note />
       </trans-unit>
     </body>
