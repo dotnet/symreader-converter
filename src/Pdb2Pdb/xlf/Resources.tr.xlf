@@ -68,13 +68,18 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">Kullanım: Pdb2Pdb &lt;dll/exe path&gt; [/pdb &lt;path&gt;] [/out &lt;path&gt;] [/extract]
+        <target state="translated">Kullanım: Pdb2Pdb &lt;dll/exe yolu&gt; [/pdb &lt;yol&gt;] [/out &lt;yol&gt;] [/extract]
 
-/pdb &lt;path&gt;    Dönüştürülecek PDB’nin yolu. Açıkça belirtilmezse, DLL/EXE’de başvurulan veya eklenmiş PDB kullanılır.
-/out &lt;path&gt;    Çıkış PDB yolu.
-/extract       DLL/EXE’de eklenmiş PDB’yi ayıklar. 
-/sourcelink    Taşınabilir PDB’den Windows PDB’ye dönüştürürken, srcsrv biçimine dönüştürmek yerine Kaynak Bağlantıyı korur.
-/verbose       Ayrıntılı tanılamaları yazdırır.
+/pdb &lt;yol&gt;                Dönüştürülecek PDB’nin yolu. Açıkça belirtilmezse, 
+                           DLL/EXE tarafından başvurulan veya DLL/EXE’ye gömülü PDB kullanılır.
+/out &lt;yol&gt;                Çıkış PDB yolu.
+/extract                   DLL/EXE’ye gömülü PDB’yi ayıklayın. 
+/sourcelink                Taşınabilir PDB’den Windows PDB’ye 
+                           dönüştürürken, srcsrv biçimine dönüştürmek yerine Kaynak Bağlantıyı koruyun.
+/verbose                   Ayrıntılı tanılamayı yazdırın.
+/srcsvrvar &lt;ad&gt;=&lt;değer&gt;  Belirtilen değişkeni srcsvr akışına ekleyin. Yalnızca 
+                           Windows PDB’ye dönüştürürken ve /sourcelink belirtilmediğinde
+                           geçerlidir.
 
 /extract ve /pdb birbirini dışlar.
 </target>
@@ -87,7 +92,7 @@
       </trans-unit>
       <trans-unit id="CantSpecifyBothSrcSvrVariableAndSourcelinkOptions">
         <source>Can't specify both /srcsvrvar and /sourcelink options.</source>
-        <target state="new">Can't specify both /srcsvrvar and /sourcelink options.</target>
+        <target state="translated">/srcsvrvar ve /sourcelink seçenekleri birlikte belirtilemez.</target>
         <note />
       </trans-unit>
     </body>

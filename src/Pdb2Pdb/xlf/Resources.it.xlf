@@ -68,13 +68,18 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">Sintassi: Pdb2Pdb &lt;percorso DLL/EXE&gt; [/pdb &lt;percorso&gt;] [/out &lt;percorso&gt;] [/extract]
+        <target state="translated">Sintassi: Pdb2Pdb &lt;percorso DLL/EXE&gt; [/pdb &lt;percorso&gt;] [/out &lt;percorso&gt;] [/extract]
 
-/pdb &lt;percorso&gt;    Percorso del PDB da convertire. Se non è specificato esplicitamente, viene usato il PDB a cui viene fatto riferimento o incorporato nel file DLL/EXE.
-/out &lt;percorso&gt;    Percorso del PDB di output.
-/extract       Estrae il PDB incorporato nel file DLL/EXE. 
-/sourcelink    Mantiene il collegamento all'origine quando si esegue la conversione da PDB portatile a PDB Windows, invece di eseguire la conversione in formato srcsrv.
-/verbose       Stampa informazioni dettagliate sulla diagnostica.
+/pdb &lt;percorso&gt;                Percorso del PDB da convertire. Se non è specificato in modo esplicito, 
+                           viene usato il PDB a cui viene fatto riferimento o incorporato nel file DLL/EXE.
+/out &lt;percorso&gt;                Percorso del PDB di output.
+/extract                   Estrae il PDB incorporato nel file DLL/EXE. 
+/sourcelink                Mantiene il collegamento all'origine quando si esegue la conversione da PDB portatile 
+                            a PDB Windows, invece di eseguire la conversione in formato srcsrv.
+/verbose                   Stampa informazioni dettagliate sulla diagnostica.
+/srcsvrvar &lt;nome&gt;=&lt;valore&gt;  Aggiunge la variabile specificata al flusso srcsvr. Applicabile 
+                           solo durante la conversione in Windows PDB e l'opzione /sourcelink 
+                           non è specificata.
 
 Le opzioni /extract e /pdb si escludono a vicenda.
 </target>
@@ -87,7 +92,7 @@ Le opzioni /extract e /pdb si escludono a vicenda.
       </trans-unit>
       <trans-unit id="CantSpecifyBothSrcSvrVariableAndSourcelinkOptions">
         <source>Can't specify both /srcsvrvar and /sourcelink options.</source>
-        <target state="new">Can't specify both /srcsvrvar and /sourcelink options.</target>
+        <target state="translated">Non è possibile specificare entrambe le opzioni /srcsvrvar e /sourcelink.</target>
         <note />
       </trans-unit>
     </body>

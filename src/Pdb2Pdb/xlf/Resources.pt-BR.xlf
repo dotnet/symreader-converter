@@ -68,13 +68,14 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">Uso: Pdb2Pdb &lt;caminho do dll/exe&gt; [/pdb &lt;caminho&gt;] [/out &lt;caminho&gt;] [/extract]
+        <target state="translated">Uso: Pdb2Pdb &lt;caminho do dll/exe&gt; [/pdb &lt;caminho&gt;] [/out &lt;caminho&gt;] [/extract]
 
-/pdb &lt;caminho&gt;    Caminho para o PDB a ser convertido. Se não estiver especificado explicitamente, o PDB referenciado pelo DLL/EXE ou inserido nele será usado.
-/out &lt;caminho&gt;    Transmitir o caminho de PDB.
-/extract       Extrair o PDB inserido no DLL/EXE. 
-/sourcelink    Preservar Link de origem ao converter do PDB portátil para o PDB do Windows, em vez de converter no formato srcsrv.
-/verbose       Imprimir diagnóstico detalhado.
+/pdb &lt;caminho&gt;                Caminho do PDB a ser convertido. Se não for especificado explicitamente, o PDB referenciado pelo DLL/EXE ou inserido nele será usado.
+/out &lt;caminho&gt;                Caminho do PDB de saída.
+/extract                   Extrair o PDB inserido no DLL/EXE. 
+/sourcelink                Preservar o Link de origem ao converter de PDB portátil para PDB do Windows, em vez de converter para um formato srcsrv.
+/verbose                   Imprimir diagnósticos detalhados.
+/srcsvrvar &lt;nome&gt;=&lt;valor&gt;  Adicionar a variável especificada ao fluxo de srcsvr. Aplicável somente ao converter para o PDB do Windows sem que /sourcelink seja especificado.
 
 /extract e /pdb são mutuamente exclusivos.
 </target>
@@ -87,7 +88,7 @@
       </trans-unit>
       <trans-unit id="CantSpecifyBothSrcSvrVariableAndSourcelinkOptions">
         <source>Can't specify both /srcsvrvar and /sourcelink options.</source>
-        <target state="new">Can't specify both /srcsvrvar and /sourcelink options.</target>
+        <target state="translated">Não é possível especificar ambas as opções /srcsvrvar e /sourcelink.</target>
         <note />
       </trans-unit>
     </body>

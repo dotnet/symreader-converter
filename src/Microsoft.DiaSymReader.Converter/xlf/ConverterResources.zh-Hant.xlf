@@ -64,7 +64,7 @@
       </trans-unit>
       <trans-unit id="ImportStringTooLong">
         <source>Import string is too long. Ignoring the import: '{0}'</source>
-        <target state="translated">匯入字串太長。正在略過匯入: '{0}'</target>
+        <target state="translated">匯入字串太長。忽略匯入: '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="LocalScopeRangesNestingIsInvalid">
@@ -229,17 +229,17 @@
       </trans-unit>
       <trans-unit id="InvalidSrcSvrVariableName">
         <source>Invalid srcsvr variable name: '{0}'</source>
-        <target state="new">Invalid srcsvr variable name: '{0}'</target>
+        <target state="translated">srcsvr 變數名稱無效: '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="ReservedSrcSvrVariableName">
         <source>Variable '{0}' can't be set explicitly</source>
-        <target state="new">Variable '{0}' can't be set explicitly</target>
+        <target state="translated">無法明確設定變數 '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSrcSvrVariableValue">
         <source>Value of srcsvr variable '{0}' contains invalid characters</source>
-        <target state="new">Value of srcsvr variable '{0}' contains invalid characters</target>
+        <target state="translated">srcsvr 變數 '{0}' 的值包含無效字元</target>
         <note />
       </trans-unit>
     </body>

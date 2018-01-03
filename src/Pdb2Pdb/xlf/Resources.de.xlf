@@ -34,7 +34,7 @@
       </trans-unit>
       <trans-unit id="UnrecognizedOption">
         <source>Unrecognized option: '{0}'</source>
-        <target state="translated">Unbekannte Option: '{0}'</target>
+        <target state="translated">Unbekannte Option: "{0}"</target>
         <note />
       </trans-unit>
       <trans-unit id="MissingDllExePath">
@@ -68,13 +68,18 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">Syntax: Pdb2Pdb &lt;DLL-/EXE-Pfad&gt; [/pdb &lt;Pfad&gt;] [/out &lt;Pfad&gt;] [/extract]
+        <target state="translated">Syntax: Pdb2Pdb &lt;dll/exe path&gt; [/pdb &lt;path&gt;] [/out &lt;path&gt;] [/extract]
 
-/pdb &lt;Pfad&gt;    Pfad zur PDB, die konvertiert werden soll. Wenn sie nicht explizit angegeben wird, wird die PDB verwendet, die von der DLL/EXE referenziert wird oder darin eingebettet ist.
-/out &lt;Pfad&gt;    PDB-Ausgabepfad.
-/extract       Hiermit wird die in der DLL/EXE eingebettete PDB extrahiert. 
-/sourcelink    Hiermit wird der Quelllink beim Konvertieren einer portierbaren PDB in eine Windows-PDB beibehalten. Eine Konvertierung in das SRCSRV-Format erfolgt nicht.
-/verbose       Hiermit wird eine detaillierte Diagnose gedruckt.
+/pdb &lt;path&gt;                Pfad zur PDB, die konvertiert werden soll. Sofern nicht explizit angegeben, 
+                           wird die in der DLL/EXE referenzierte oder eingebettete PDB verwendet.
+/out &lt;path&gt;                Pfad für die Ausgabe-PDB.
+/extract                   In der DLL/EXE eingebettete PDB extrahieren. 
+/sourcelink                Quelllink beim Konvertieren von einer portablen PDB in eine 
+                           Windows-PDB beibehalten, statt in das srcsrv-Format zu konvertieren.
+/verbose                   Detaillierte Diagnose ausgeben.
+/srcsvrvar &lt;name&gt;=&lt;value&gt;  Angegebene Variable zu srcsvr-Stream hinzufügen. Gilt nur,
+                           wenn eine Konvertierung in eine Windows-PDB durchgeführt wird und /sourcelink nicht
+                           angegeben ist.
 
 /extract und /pdb schließen sich gegenseitig aus.
 </target>
@@ -87,7 +92,7 @@
       </trans-unit>
       <trans-unit id="CantSpecifyBothSrcSvrVariableAndSourcelinkOptions">
         <source>Can't specify both /srcsvrvar and /sourcelink options.</source>
-        <target state="new">Can't specify both /srcsvrvar and /sourcelink options.</target>
+        <target state="translated">Die Optionen "/srcsvrvar" und "/sourcelink" können nicht gleichzeitig angegeben werden.</target>
         <note />
       </trans-unit>
     </body>

@@ -68,15 +68,20 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">使用方式: Pdb2Pdb &lt;dll/exe 路徑&gt; [/pdb &lt;路徑&gt;] [/out &lt;路徑&gt;] [/extract]
+        <target state="translated">使用方式: Pdb2Pdb &lt;dll/exe 路徑&gt; [/pdb &lt;路徑&gt;] [/out &lt;路徑&gt;] [/extract]
 
-/pdb &lt;路徑&gt;    要轉換的 PDB 路徑。如果未明確指定，就會使用 DLL/EXE 參考或其中內嵌的 PDB。
-/out &lt;路徑&gt;    輸出 PDB 路徑。
-/extract       擷取 DLL/EXE 中內嵌的 PDB。
-/sourcelink    從可攜式 PDB 轉換為 Windows PDB 時 (而非轉換為 srcsrv 格式)，保留來源連結。
-/verbose       列印詳細的診斷。
+/pdb &lt;路徑&gt;                所要轉換之 PDB 的路徑。若未明確指定，
+                           會使用 DLL/EXE 所參考或內嵌的 PDB。
+/out &lt;路徑&gt;                輸出 PDB 路徑。
+/extract                   擷取內嵌於 DLL/EXE 的 PDB。 
+/sourcelink                從可攜式 PDB 轉換為 Windows PDB 時保留來源連結，
+                           而非於轉換為 srcsrv 格式時進行保留。
+/verbose                   列印詳細診斷。
+/srcsvrvar &lt;名稱&gt;=&lt;值&gt;  新增指定的變數到 srcsvr 資料流。僅於
+                           轉換為 Windows PDB 且 /sourcelink 未指定
+                           時適用。
 
-/extract 與 /pdb 彼此互斥。
+/extract 與 /pdb 互斥。
 </target>
         <note />
       </trans-unit>
@@ -87,7 +92,7 @@
       </trans-unit>
       <trans-unit id="CantSpecifyBothSrcSvrVariableAndSourcelinkOptions">
         <source>Can't specify both /srcsvrvar and /sourcelink options.</source>
-        <target state="new">Can't specify both /srcsvrvar and /sourcelink options.</target>
+        <target state="translated">無法同時指定 /srcsvrvar 及 /sourcelink 選項。</target>
         <note />
       </trans-unit>
     </body>

@@ -229,17 +229,17 @@
       </trans-unit>
       <trans-unit id="InvalidSrcSvrVariableName">
         <source>Invalid srcsvr variable name: '{0}'</source>
-        <target state="new">Invalid srcsvr variable name: '{0}'</target>
+        <target state="translated">Ungültiger Name der srcsvr-Variable: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="ReservedSrcSvrVariableName">
         <source>Variable '{0}' can't be set explicitly</source>
-        <target state="new">Variable '{0}' can't be set explicitly</target>
+        <target state="translated">Die Variable "{0}" kann nicht explizit festgelegt werden.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSrcSvrVariableValue">
         <source>Value of srcsvr variable '{0}' contains invalid characters</source>
-        <target state="new">Value of srcsvr variable '{0}' contains invalid characters</target>
+        <target state="translated">Der Wert der srcsvr-Variable "{0}" enthält ungültige Zeichen.</target>
         <note />
       </trans-unit>
     </body>

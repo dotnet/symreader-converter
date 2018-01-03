@@ -64,7 +64,7 @@
       </trans-unit>
       <trans-unit id="ImportStringTooLong">
         <source>Import string is too long. Ignoring the import: '{0}'</source>
-        <target state="translated">La cadena de importación es demasiado larga. Omitiendo la importación: “{0}”</target>
+        <target state="translated">La importación de la cadena es demasiado larga. Ignorando la importación: "{0}"</target>
         <note />
       </trans-unit>
       <trans-unit id="LocalScopeRangesNestingIsInvalid">
@@ -229,17 +229,17 @@
       </trans-unit>
       <trans-unit id="InvalidSrcSvrVariableName">
         <source>Invalid srcsvr variable name: '{0}'</source>
-        <target state="new">Invalid srcsvr variable name: '{0}'</target>
+        <target state="translated">Nombre de variable srcsvr no válida: "{0}"</target>
         <note />
       </trans-unit>
       <trans-unit id="ReservedSrcSvrVariableName">
         <source>Variable '{0}' can't be set explicitly</source>
-        <target state="new">Variable '{0}' can't be set explicitly</target>
+        <target state="translated">La variable "{0}" no se puede establecer explícitamente.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidSrcSvrVariableValue">
         <source>Value of srcsvr variable '{0}' contains invalid characters</source>
-        <target state="new">Value of srcsvr variable '{0}' contains invalid characters</target>
+        <target state="translated">El valor de la variable srcsvr de "{0}" contiene caracteres no válidos</target>
         <note />
       </trans-unit>
     </body>
