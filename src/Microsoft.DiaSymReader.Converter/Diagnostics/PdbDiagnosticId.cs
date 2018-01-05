@@ -32,10 +32,9 @@ namespace Microsoft.DiaSymReader.Tools
         NoSupportedUrisFoundInSourceLink = 23,
         InvalidSourceLinkData = 24,
         InvalidSourceServerData = 25,
-        BothSourceLinkDataAndSourceServerData = 26,
-        InvalidEmbeddedSource = 27,
-        InconsistentStateMachineMethodMapping = 28,
-        InvalidSourceLink = 29,
+        InvalidEmbeddedSource = 26,
+        InconsistentStateMachineMethodMapping = 27,
+        InvalidSourceLink = 28,
     }
 
     internal static class PdbDiagnosticIdExtensions
@@ -72,7 +71,6 @@ namespace Microsoft.DiaSymReader.Tools
                 case PdbDiagnosticId.NoSupportedUrisFoundInSourceLink: return ConverterResources.NoSupportedUrisFoundInSourceLink;
                 case PdbDiagnosticId.InvalidSourceLinkData: return ConverterResources.InvalidSourceLinkData;
                 case PdbDiagnosticId.InvalidSourceServerData: return ConverterResources.InvalidSourceServerData;
-                case PdbDiagnosticId.BothSourceLinkDataAndSourceServerData: return ConverterResources.BothSourceLinkDataAndSourceServerData;
                 case PdbDiagnosticId.InvalidEmbeddedSource: return ConverterResources.InvalidEmbeddedSource;
                 case PdbDiagnosticId.InconsistentStateMachineMethodMapping: return ConverterResources.InconsistentStateMachineMethodMapping;
                 case PdbDiagnosticId.InvalidSourceLink: return ConverterResources.InvalidSourceLink;

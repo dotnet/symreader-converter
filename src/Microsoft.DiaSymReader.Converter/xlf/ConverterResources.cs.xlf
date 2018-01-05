@@ -202,11 +202,6 @@
         <target state="translated">Neplatná data srcsrv</target>
         <note />
       </trans-unit>
-      <trans-unit id="BothSourceLinkDataAndSourceServerData">
-        <source>PDB contains both Source Link and srcsrv data</source>
-        <target state="translated">Soubor PDB obsahuje jak zdrojový odkaz, tak data srcsrv.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="InvalidEmbeddedSource">
         <source>Invalid embedded source associated with document '{0}'</source>
         <target state="translated">K dokumentu {0} je přidružený neplatný vložený zdroj.</target>

@@ -202,11 +202,6 @@
         <target state="translated">Недопустимые данные SRCSRV</target>
         <note />
       </trans-unit>
-      <trans-unit id="BothSourceLinkDataAndSourceServerData">
-        <source>PDB contains both Source Link and srcsrv data</source>
-        <target state="translated">PDB содержит как исходную ссылку, так и данные SRCSRV</target>
-        <note />
-      </trans-unit>
       <trans-unit id="InvalidEmbeddedSource">
         <source>Invalid embedded source associated with document '{0}'</source>
         <target state="translated">С документом "{0}" сопоставлен недопустимый внедренный источник</target>

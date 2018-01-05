@@ -201,6 +201,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             if ((_options & PdbToXmlOptions.IncludeSourceServerInformation) != 0)
             {
+                WriteSourceLinkInformation();
                 WriteSourceServerInformation();
             }
 
@@ -1754,52 +1755,51 @@ namespace Microsoft.DiaSymReader.Tools
             return "<" + string.Format(PdbToXmlResources.UnexpectedTokenKind, AsToken(metadataReader.GetToken(handle))) + ">";
         }
 
-        private unsafe void WriteSourceServerInformation()
+        private void WriteSourceServerInformation()
         {
-            var srcsvrModule = _symReader as ISymUnmanagedSourceServerModule;
-            if (srcsvrModule != null)
+            byte[] data = _symReader.GetRawSourceServerData();
+            if (data != null)
             {
-                int hr = srcsvrModule.GetSourceServerData(out int length, out byte* data);
-                if (hr != HResult.S_OK)
-                {
-                    return;
-                }
-
                 _writer.WriteStartElement("srcsvr");
+                WriteCData(data, Encoding.UTF8);
+                _writer.WriteEndElement();
+            }
+        }
 
-                try
-                {
-                    string str = Encoding.UTF8.GetString(data, length);
-
-                    try
-                    {
-                        _writer.WriteCData(str);
-                    }
-                    catch (ArgumentException)
-                    {
-                        try
-                        {
-                            _writer.WriteValue(str);
-                        }
-                        catch (ArgumentException)
-                        {
-                            _writer.WriteAttributeString("encoding", "base64");
-                            var bytes = new byte[length];
-                            Marshal.Copy((IntPtr)data, bytes, 0, bytes.Length);
-                            _writer.WriteBase64(bytes, 0, bytes.Length);
-                        }
-                    }
-                }
-                finally
-                {
-                    Marshal.FreeCoTaskMem((IntPtr)data);
-                }
-
+        private void WriteSourceLinkInformation()
+        {
+            byte[] data = (_symReader as ISymUnmanagedReader5)?.GetRawSourceLinkData();
+            if (data != null)
+            {
+                _writer.WriteStartElement("sourceLink");
+                WriteCData(data, Encoding.UTF8);
                 _writer.WriteEndElement();
             }
         }
 
         #region Utils
+
+        private void WriteCData(byte[] bytes, Encoding encoding)
+        {
+            string str = encoding.GetString(bytes, 0, bytes.Length);
+
+            try
+            {
+                _writer.WriteCData(str);
+            }
+            catch (ArgumentException)
+            {
+                try
+                {
+                    _writer.WriteValue(str);
+                }
+                catch (ArgumentException)
+                {
+                    _writer.WriteAttributeString("encoding", "base64");
+                    _writer.WriteBase64(bytes, 0, bytes.Length);
+                }
+            }
+        }
 
         private void WriteToken(int token)
         {

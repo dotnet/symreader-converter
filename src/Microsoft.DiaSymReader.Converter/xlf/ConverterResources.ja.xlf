@@ -202,11 +202,6 @@
         <target state="translated">srcsrv データが無効です</target>
         <note />
       </trans-unit>
-      <trans-unit id="BothSourceLinkDataAndSourceServerData">
-        <source>PDB contains both Source Link and srcsrv data</source>
-        <target state="translated">PDB には、ソース リンクと srcsrv データの両方が含まれています</target>
-        <note />
-      </trans-unit>
       <trans-unit id="InvalidEmbeddedSource">
         <source>Invalid embedded source associated with document '{0}'</source>
         <target state="translated">ドキュメント '{0}' に関連付けられた埋め込みソースが無効です</target>

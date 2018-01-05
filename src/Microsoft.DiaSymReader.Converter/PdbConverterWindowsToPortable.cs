@@ -454,6 +454,9 @@ namespace Microsoft.DiaSymReader.Tools
                 metadataBuilder.AddStateMachineMethod(entry.Key, entry.Value);
             }
 
+            // If the PDB has SourceLink take it as is.
+            // Otherwise if it has srcsvr data convert them to SourceLink.
+
             byte[] sourceLinkData;
             try
             {
@@ -465,25 +468,23 @@ namespace Microsoft.DiaSymReader.Tools
                 sourceLinkData = null;
             }
 
-            byte[] sourceServerData;
-            try
+            if (sourceLinkData == null)
             {
-                sourceServerData = symReader.GetRawSourceServerData();
-            }
-            catch (Exception)
-            {
-                ReportDiagnostic(PdbDiagnosticId.InvalidSourceLinkData, 0);
-                sourceServerData = null;
-            }
+                byte[] sourceServerData;
+                try
+                {
+                    sourceServerData = symReader.GetRawSourceServerData();
+                }
+                catch (Exception)
+                {
+                    ReportDiagnostic(PdbDiagnosticId.InvalidSourceLinkData, 0);
+                    sourceServerData = null;
+                }
 
-            if (sourceLinkData != null && sourceServerData != null)
-            {
-                ReportDiagnostic(PdbDiagnosticId.BothSourceLinkDataAndSourceServerData, 0);
-            }
-
-            if (sourceLinkData == null && sourceServerData != null)
-            {
-                sourceLinkData = ConvertSourceServerToSourceLinkData(sourceServerData);
+                if (sourceServerData != null)
+                {
+                    sourceLinkData = ConvertSourceServerToSourceLinkData(sourceServerData);
+                }
             }
 
             if (sourceLinkData != null)

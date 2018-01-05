@@ -23,7 +23,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             VerifyWindowsConvertedFromPortableMatchesExpected(portable, expectedXml, expectedDiagnostics, options, validateTimeIndifference: false);
         }
 
-        private static void VerifyWindowsMatchesExpected(TestResource windows, string expectedXml)
+        public static void VerifyWindowsMatchesExpected(TestResource windows, string expectedXml)
         {
             var windowsPEStream = new MemoryStream(windows.PE);
             var windowsPdbStream = new MemoryStream(windows.Pdb);

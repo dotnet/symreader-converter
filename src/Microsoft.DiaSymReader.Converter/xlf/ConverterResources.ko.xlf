@@ -202,11 +202,6 @@
         <target state="translated">잘못된 srcsrv 데이터</target>
         <note />
       </trans-unit>
-      <trans-unit id="BothSourceLinkDataAndSourceServerData">
-        <source>PDB contains both Source Link and srcsrv data</source>
-        <target state="translated">PDB는 소스 링크와 srcsrv 데이터를 모두 포함합니다.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="InvalidEmbeddedSource">
         <source>Invalid embedded source associated with document '{0}'</source>
         <target state="translated">'{0}' 문서에 연결된 잘못된 포함 소스</target>
