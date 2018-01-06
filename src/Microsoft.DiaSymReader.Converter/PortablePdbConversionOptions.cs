@@ -14,8 +14,7 @@ namespace Microsoft.DiaSymReader.Tools
         public static readonly PortablePdbConversionOptions Default = new PortablePdbConversionOptions();
 
         /// <summary>
-        /// When converting to Windows PDB include Source Link data as is, 
-        /// without converting to srcsrv.
+        /// When converting to Windows PDB do not convert Source Link to srcsrv.
         /// </summary>
         public bool SuppressSourceLinkConversion { get; }
 

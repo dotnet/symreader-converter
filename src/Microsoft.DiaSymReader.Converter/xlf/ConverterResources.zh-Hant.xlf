@@ -202,11 +202,6 @@
         <target state="translated">srcsrv 資料無效</target>
         <note />
       </trans-unit>
-      <trans-unit id="BothSourceLinkDataAndSourceServerData">
-        <source>PDB contains both Source Link and srcsrv data</source>
-        <target state="translated">PDB 同時包含來源連結與 srcsrv 資料</target>
-        <note />
-      </trans-unit>
       <trans-unit id="InvalidEmbeddedSource">
         <source>Invalid embedded source associated with document '{0}'</source>
         <target state="translated">與文件 '{0}' 相關聯的內嵌來源無效</target>

@@ -578,11 +578,10 @@ namespace Microsoft.DiaSymReader.Tools
             var sourceLinkHandle = pdbReader.GetCustomDebugInformation(EntityHandle.ModuleDefinition, PortableCustomDebugInfoKinds.SourceLink);
             if (!sourceLinkHandle.IsNil)
             {
-                if (options.SuppressSourceLinkConversion)
-                {
-                    pdbWriter.SetSourceLinkData(pdbReader.GetBlobBytes(sourceLinkHandle));
-                }
-                else
+                // always include Source Link
+                pdbWriter.SetSourceLinkData(pdbReader.GetBlobBytes(sourceLinkHandle));
+
+                if (!options.SuppressSourceLinkConversion)
                 {
                     ConvertSourceServerData(pdbReader.GetStringUTF8(sourceLinkHandle), pdbWriter, documentNames, options);
                 }

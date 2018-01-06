@@ -111,9 +111,19 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             using (var pdbStream = File.OpenRead(outPdbPath))
             {
                 var symReader = SymReaderHelpers.CreateWindowsPdbReader(pdbStream);
-                Assert.Null(symReader.GetSourceLinkData());
 
-                string actual = symReader.GetSourceServerData();
+                string sourceLink = symReader.GetSourceLinkData();
+                AssertEx.AssertLinesEqual(
+@"{
+  ""documents"": {
+    ""C:\\a*"": ""http://server/1/a*"",
+    ""C:\\A*"": ""http://server/2/A*"",
+    ""C:\\*"": ""http://server/3/*.g"",
+    ""*"": ""http://server/4/*""
+  }
+}", sourceLink);
+
+                string srcsvr = symReader.GetSourceServerData();
                 AssertEx.AssertLinesEqual(
 @"SRCSRV: ini ------------------------------------------------
 VERSION=2
@@ -134,7 +144,7 @@ C:\a\B\c\4.cs*1/a/B/c/4.cs
 :6.cs*4/:6.cs
 C:\a\b\X.cs*1/a/b/X.cs
 C:\a\B\x.cs*1/a/B/x.cs
-SRCSRV: end ------------------------------------------------", actual);
+SRCSRV: end ------------------------------------------------", srcsvr);
             }
         }
 

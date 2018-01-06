@@ -202,11 +202,6 @@
         <target state="translated">Données srcsrv non valides</target>
         <note />
       </trans-unit>
-      <trans-unit id="BothSourceLinkDataAndSourceServerData">
-        <source>PDB contains both Source Link and srcsrv data</source>
-        <target state="translated">Le fichier PDB contient les données de lien source et srcsrv</target>
-        <note />
-      </trans-unit>
       <trans-unit id="InvalidEmbeddedSource">
         <source>Invalid embedded source associated with document '{0}'</source>
         <target state="translated">Source incorporée non valide associée au document '{0}'</target>
