@@ -110,7 +110,7 @@ namespace Microsoft.DiaSymReader.Tools
             // 1. The only acceptable wildcard is one and only one '*', which if present will be replaced by a relative path
             // 2. If the filepath does not contain a *, the uri cannot contain a * and if the filepath contains a * the uri must contain a *
             // 3. If the filepath contains a *, it must be the final character
-            // 4. If the uri contains a *, it may be anwhere in the uri
+            // 4. If the uri contains a *, it may be anywhere in the uri
 
             int filePathStar = key.IndexOf('*');
             if (filePathStar == key.Length - 1)
