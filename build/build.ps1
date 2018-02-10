@@ -73,7 +73,7 @@ function InstallDotNetCli {
 
   $installScript = "$DotNetRoot\dotnet-install.ps1"
   if (!(Test-Path $installScript)) { 
-    Invoke-WebRequest "https://raw.githubusercontent.com/dotnet/cli/release/2.0.0/scripts/obtain/dotnet-install.ps1" -OutFile $installScript
+    Invoke-WebRequest "https://dot.net/v1/dotnet-install.ps1" -OutFile $installScript
   }
   
   & $installScript -Version $dotnetCliVersion -InstallDir $DotNetRoot
