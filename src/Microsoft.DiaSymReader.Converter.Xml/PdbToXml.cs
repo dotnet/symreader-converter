@@ -372,7 +372,7 @@ namespace Microsoft.DiaSymReader.Tools
         }
 
         // Order in Windows PDBs and Portable PDBs is different, but it doesn't matter. 
-        // To enable matching between XML of both forats use the Windows PDB order for both.
+        // To enable matching between XML of both formats use the Windows PDB order for both.
         private static IReadOnlyDictionary<Guid, int> s_cdiOrdering = new Dictionary<Guid, int>()
         {
             {PortableCustomDebugInfoKinds.StateMachineHoistedLocalScopes, 0},
