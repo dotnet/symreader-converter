@@ -5,10 +5,6 @@
     <VersionBase>1.1.0</VersionBase>
     <PreReleaseVersionLabel>beta1</PreReleaseVersionLabel>
 
-    <!-- Toolset -->
-    <RoslynToolsRepoToolsetVersion>1.0.0-beta-62601-02</RoslynToolsRepoToolsetVersion>
-    <DotNetCliVersion>2.1.300-preview2-008171</DotNetCliVersion>
-
     <!-- libs -->
     <MicrosoftCodeAnalysisPooledObjectsVersion>2.7.0-beta3-62511-04</MicrosoftCodeAnalysisPooledObjectsVersion>
     <MicrosoftCodeAnalysisDebuggingVersion>2.7.0-beta3-62511-04</MicrosoftCodeAnalysisDebuggingVersion>
