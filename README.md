@@ -150,6 +150,8 @@ namespace Microsoft.DiaSymReader.Tools
 
 ```
 
+## Repository status
+
 [//]: # (Begin current test results)
 
 |          |Windows Debug|Windows Release|
