@@ -4,11 +4,11 @@ Converts between Windows PDB and [Portable PDB](https://github.com/dotnet/core/b
 
 Pre-release builds are available on MyGet gallery: https://dotnet.myget.org/Gallery/symreader-converter.
 
-# Usage
+## Usage
 
 The converter is available as a command line tool as well as a library. Both are distributed as NuGet packages.
 
-## [Pdb2Pdb](https://dotnet.myget.org/feed/symreader-converter/package/nuget/Pdb2Pdb)
+### [Pdb2Pdb](https://dotnet.myget.org/feed/symreader-converter/package/nuget/Pdb2Pdb)
 
 `Pdb2Pdb.exe <dll/exe path> [/pdb <path>] [/out <path>] [/extract]`
 
@@ -23,7 +23,7 @@ The converter is available as a command line tool as well as a library. Both are
 
 `/extract` and `/pdb` are mutually exclusive.
 
-## [Microsoft.DiaSymReader.Converter](https://dotnet.myget.org/feed/symreader-converter/package/nuget/Microsoft.DiaSymReader.Converter)
+### [Microsoft.DiaSymReader.Converter](https://dotnet.myget.org/feed/symreader-converter/package/nuget/Microsoft.DiaSymReader.Converter)
 
 The package provides the following public APIs:
 
