@@ -10,7 +10,7 @@ The converter is available as a command line tool as well as a library. Both are
 
 ## Pdb2Pdb.exe 
 
-Usage: `Pdb2Pdb.exe <dll/exe path> [/pdb <path>] [/out <path>] [/extract]`
+`Pdb2Pdb.exe <dll/exe path> [/pdb <path>] [/out <path>] [/extract]`
 
 | Switch        | Description                                             |
 |:--------------|:--------------------------------------------------------|
