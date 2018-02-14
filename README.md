@@ -23,6 +23,16 @@ The converter is available as a command line tool as well as a library. Both are
 
 `/extract` and `/pdb` are mutually exclusive.
 
+Example: Create and build .NET Core Standard library and convert its Portable PDB to Windows PDB to be published to Symbol Store.
+
+```
+> dotnet new classlib
+> dotnet build
+> cd bin\Debug\netstandard2.0
+> mkdir SymStore
+> Pdb2Pdb MyProject.dll /out SymStore\MyProject.pdb
+```
+
 ### [Microsoft.DiaSymReader.Converter](https://dotnet.myget.org/feed/symreader-converter/package/nuget/Microsoft.DiaSymReader.Converter)
 
 The package provides the following public APIs:
