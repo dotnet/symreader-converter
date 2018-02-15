@@ -46,7 +46,7 @@ namespace Microsoft.DiaSymReader.Tools
         /// <summary>
         /// An instance of <see cref="PdbConverter"/> with no diagnostic reporting.
         /// </summary>
-        public static readonly PdbConverter Default;
+        public static PdbConverter Default { get; }
         
         /// <summary>
         /// Creates PDB converter with an optional callback invoked whenever a diagnostic is to be reported.
