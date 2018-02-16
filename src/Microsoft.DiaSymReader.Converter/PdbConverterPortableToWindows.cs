@@ -583,7 +583,13 @@ namespace Microsoft.DiaSymReader.Tools
 
                 if (!options.SuppressSourceLinkConversion)
                 {
-                    ConvertSourceServerData(pdbReader.GetStringUTF8(sourceLinkHandle), pdbWriter, documentNames, options);
+                    var srcsvrData = ConvertSourceServerData(pdbReader.GetStringUTF8(sourceLinkHandle), documentNames, options);
+
+                    // an error has been reported:
+                    if (srcsvrData != null)
+                    {
+                        pdbWriter.SetSourceServerData(Encoding.UTF8.GetBytes(srcsvrData));
+                    }
                 }
             }
 
@@ -970,13 +976,14 @@ namespace Microsoft.DiaSymReader.Tools
         private const string SrcSvr_SRCSRVTRG = "SRCSRVTRG";
 
         // Avoid loading JSON dependency if not needed.
+        // Internal for testing.
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private void ConvertSourceServerData(string sourceLink, SymUnmanagedWriter pdbWriter, IReadOnlyCollection<string> documentNames, PortablePdbConversionOptions options)
+        internal string ConvertSourceServerData(string sourceLink, IReadOnlyCollection<string> documentNames, PortablePdbConversionOptions options)
         {
             if (documentNames.Count == 0)
             {
                 // no documents in the PDB
-                return;
+                return null;
             }
             
             var builder = new StringBuilder();
@@ -985,7 +992,7 @@ namespace Microsoft.DiaSymReader.Tools
             if (map == null)
             {
                 // error already reported
-                return;
+                return null;
             }
 
             var mapping = new List<(string name, string uri)>();
@@ -993,10 +1000,16 @@ namespace Microsoft.DiaSymReader.Tools
             string commonScheme = null;
             foreach (string documentName in documentNames)
             {
-                string uri = map.GetUri(documentName);
+                string uri = map.GetUri(documentName, out string uriPattern);
                 if (uri == null)
                 {
                     ReportDiagnostic(PdbDiagnosticId.UnmappedDocumentName, 0, documentName);
+                    continue;
+                }
+
+                if (!Uri.IsWellFormedUriString(uri, UriKind.Absolute))
+                {
+                    ReportDiagnostic(PdbDiagnosticId.MalformedSourceLinkUrl, 0, uriPattern);
                     continue;
                 }
 
@@ -1011,7 +1024,7 @@ namespace Microsoft.DiaSymReader.Tools
                 }
                 else
                 {
-                    ReportDiagnostic(PdbDiagnosticId.UriSchemeIsNotHttp, 0, uri);
+                    ReportDiagnostic(PdbDiagnosticId.UrlSchemeIsNotHttp, 0, uri);
                     continue;
                 }
 
@@ -1029,8 +1042,8 @@ namespace Microsoft.DiaSymReader.Tools
 
             if (commonScheme == null)
             {
-                ReportDiagnostic(PdbDiagnosticId.NoSupportedUrisFoundInSourceLink, 0);
-                return;
+                ReportDiagnostic(PdbDiagnosticId.NoSupportedUrlsFoundInSourceLink, 0);
+                return null;
             }
 
             string commonPrefix = StringUtilities.GetLongestCommonPrefix(mapping.Select(p => p.uri));
@@ -1066,7 +1079,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             builder.Append("SRCSRV: end ------------------------------------------------");
 
-            pdbWriter.SetSourceServerData(Encoding.UTF8.GetBytes(builder.ToString()));
+            return builder.ToString();
         }
 
         private static bool IsIdentifierStartChar(char c)

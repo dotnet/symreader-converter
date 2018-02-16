@@ -1132,7 +1132,7 @@ C:\A\b\c\x.cs*1/a/b/c/x.cs
 C:\a\b\x.cs*1/a/b/x.cs
 C:\a\B\3.cs*1/a/B/3.cs
 C:\a\B\c\4.cs*1/a/B/c/4.cs
-:6.cs*4/:6.cs
+:6.cs*4/%3A6.cs
 C:\a\b\X.cs*1/a/b/X.cs
 C:\a\B\x.cs*1/a/B/x.cs
 SRCSRV: end ------------------------------------------------]]></srcsvr>
@@ -1212,7 +1212,7 @@ C:\A\b\c\x.cs*1/a/b/c/x.cs
 C:\a\b\x.cs*1/a/b/x.cs
 C:\a\B\3.cs*1/a/B/3.cs
 C:\a\B\c\4.cs*1/a/B/c/4.cs
-:6.cs*4/:6.cs
+:6.cs*4/%3A6.cs
 C:\a\b\X.cs*1/a/b/X.cs
 C:\a\B\x.cs*1/a/B/x.cs
 SRCSRV: end ------------------------------------------------]]></srcsvr>
@@ -1304,7 +1304,7 @@ C:\A\b\c\x.cs*1/a/b/c/x.cs
 C:\a\b\x.cs*1/a/b/x.cs
 C:\a\B\3.cs*1/a/B/3.cs
 C:\a\B\c\4.cs*1/a/B/c/4.cs
-:6.cs*4/:6.cs
+:6.cs*4/%3A6.cs
 C:\a\b\X.cs*1/a/b/X.cs
 C:\a\B\x.cs*1/a/B/x.cs
 SRCSRV: end ------------------------------------------------]]></srcsvr>

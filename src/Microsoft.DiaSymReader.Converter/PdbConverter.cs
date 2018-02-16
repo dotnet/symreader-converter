@@ -10,8 +10,14 @@ namespace Microsoft.DiaSymReader.Tools
 {
     public sealed class PdbConverter
     {
-        public static readonly PdbConverter Default = new PdbConverter();
+        /// <summary>
+        /// An instance of <see cref="PdbConverter"/> with no diagnostic reporting.
+        /// </summary>
+        public static PdbConverter Default { get; } = new PdbConverter();
 
+        /// <summary>
+        /// Creates PDB converter with an optional callback invoked whenever a diagnostic is to be reported.
+        /// </summary>
         private readonly Action<PdbDiagnostic> _diagnosticReporterOpt;
 
         public PdbConverter(Action<PdbDiagnostic> diagnosticReporter = null)
