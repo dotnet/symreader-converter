@@ -59,8 +59,8 @@
                            the PDB referenced by or embedded in the DLL/EXE is used.
 /out &lt;path&gt;                Output PDB path.
 /extract                   Extract PDB embedded in the DLL/EXE. 
-/sourcelink                Preserve Source Link when converting from Portable PDB to 
-                           Windows PDB, instead of converting to srcsrv format.
+/sourcelink                When converting to Windows PDB do not convert SourceLink to srcsrv format.
+                           By default both SourceLink and srcsrv are included in the converted PDB.
 /verbose                   Print detailed diagnostics.
 /srcsvrvar &lt;name&gt;=&lt;value&gt;  Add specified variable to srcsvr stream. Only applicable 
                            when converting to Windows PDB and /sourcelink is not
@@ -68,7 +68,7 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="translated">使用方式: Pdb2Pdb &lt;dll/exe 路徑&gt; [/pdb &lt;路徑&gt;] [/out &lt;路徑&gt;] [/extract]
+        <target state="needs-review-translation">使用方式: Pdb2Pdb &lt;dll/exe 路徑&gt; [/pdb &lt;路徑&gt;] [/out &lt;路徑&gt;] [/extract]
 
 /pdb &lt;路徑&gt;                所要轉換之 PDB 的路徑。若未明確指定，
                            會使用 DLL/EXE 所參考或內嵌的 PDB。

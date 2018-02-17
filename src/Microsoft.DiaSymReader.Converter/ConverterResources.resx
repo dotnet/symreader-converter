@@ -222,11 +222,11 @@
   <data name="UnmappedDocumentName" xml:space="preserve">
     <value>Document name doesn't match any pattern in Source Link: '{0}'</value>
   </data>
-  <data name="UriSchemeIsNotHttp" xml:space="preserve">
-    <value>The scheme of URI specified in Source Link is not http/https: '{0}'</value>
+  <data name="UrlSchemeIsNotHttp" xml:space="preserve">
+    <value>The scheme of URL specified in Source Link is not http/https: '{0}'</value>
   </data>
-  <data name="NoSupportedUrisFoundInSourceLink" xml:space="preserve">
-    <value>No supported URIs found in Source Link</value>
+  <data name="NoSupportedUrlsFoundInSourceLink" xml:space="preserve">
+    <value>No supported well-formed URLs found in Source Link</value>
   </data>
   <data name="PdbNotMatchingDebugDirectory" xml:space="preserve">
     <value>The PDB doesn't match debug directory record in the PE file</value>
@@ -236,6 +236,9 @@
   </data>
   <data name="InvalidSourceLink" xml:space="preserve">
     <value>Invalid Source Link: {0}</value>
+  </data>
+  <data name="MalformedSourceLinkUrl" xml:space="preserve">
+    <value>Malformed Source Link URL: '{0}'</value>
   </data>
   <data name="InvalidSourceServerData" xml:space="preserve">
     <value>Invalid srcsrv data</value>

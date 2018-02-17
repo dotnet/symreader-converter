@@ -28,13 +28,14 @@ namespace Microsoft.DiaSymReader.Tools
         InvalidLocalScope = 19,
         InvalidSequencePointDocument = 20,
         UnmappedDocumentName = 21,
-        UriSchemeIsNotHttp = 22,
-        NoSupportedUrisFoundInSourceLink = 23,
+        UrlSchemeIsNotHttp = 22,
+        NoSupportedUrlsFoundInSourceLink = 23,
         InvalidSourceLinkData = 24,
         InvalidSourceServerData = 25,
         InvalidEmbeddedSource = 26,
         InconsistentStateMachineMethodMapping = 27,
         InvalidSourceLink = 28,
+        MalformedSourceLinkUrl = 29,
     }
 
     internal static class PdbDiagnosticIdExtensions
@@ -67,13 +68,14 @@ namespace Microsoft.DiaSymReader.Tools
                 case PdbDiagnosticId.InvalidLocalScope: return ConverterResources.InvalidLocalScope;
                 case PdbDiagnosticId.InvalidSequencePointDocument: return ConverterResources.InvalidSequencePointDocument;
                 case PdbDiagnosticId.UnmappedDocumentName: return ConverterResources.UnmappedDocumentName;
-                case PdbDiagnosticId.UriSchemeIsNotHttp: return ConverterResources.UriSchemeIsNotHttp;
-                case PdbDiagnosticId.NoSupportedUrisFoundInSourceLink: return ConverterResources.NoSupportedUrisFoundInSourceLink;
+                case PdbDiagnosticId.UrlSchemeIsNotHttp: return ConverterResources.UrlSchemeIsNotHttp;
+                case PdbDiagnosticId.NoSupportedUrlsFoundInSourceLink: return ConverterResources.NoSupportedUrlsFoundInSourceLink;
                 case PdbDiagnosticId.InvalidSourceLinkData: return ConverterResources.InvalidSourceLinkData;
                 case PdbDiagnosticId.InvalidSourceServerData: return ConverterResources.InvalidSourceServerData;
                 case PdbDiagnosticId.InvalidEmbeddedSource: return ConverterResources.InvalidEmbeddedSource;
                 case PdbDiagnosticId.InconsistentStateMachineMethodMapping: return ConverterResources.InconsistentStateMachineMethodMapping;
                 case PdbDiagnosticId.InvalidSourceLink: return ConverterResources.InvalidSourceLink;
+                case PdbDiagnosticId.MalformedSourceLinkUrl: return ConverterResources.MalformedSourceLinkUrl;
 
                 default:
                     throw ExceptionUtilities.UnexpectedValue(id);

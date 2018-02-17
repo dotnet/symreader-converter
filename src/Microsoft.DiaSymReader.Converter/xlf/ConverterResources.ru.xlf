@@ -177,16 +177,6 @@
         <target state="translated">Имя документа не соответствует ни одному из шаблонов в исходной ссылке: "{0}"</target>
         <note />
       </trans-unit>
-      <trans-unit id="UriSchemeIsNotHttp">
-        <source>The scheme of URI specified in Source Link is not http/https: '{0}'</source>
-        <target state="translated">Указанная в исходной ссылке схема URI отличается от http/https: "{0}"</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="NoSupportedUrisFoundInSourceLink">
-        <source>No supported URIs found in Source Link</source>
-        <target state="translated">В исходной ссылке найдены неподдерживаемые URI</target>
-        <note />
-      </trans-unit>
       <trans-unit id="PdbNotMatchingDebugDirectory">
         <source>The PDB doesn't match debug directory record in the PE file</source>
         <target state="translated">PDB не соответствует записи каталога отладки в PE-файле</target>
@@ -235,6 +225,21 @@
       <trans-unit id="InvalidSrcSvrVariableValue">
         <source>Value of srcsvr variable '{0}' contains invalid characters</source>
         <target state="translated">Значение переменной srcsvr "{0}" содержит недопустимые символы</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="MalformedSourceLinkUrl">
+        <source>Malformed Source Link URL: '{0}'</source>
+        <target state="new">Malformed Source Link URL: '{0}'</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="UrlSchemeIsNotHttp">
+        <source>The scheme of URL specified in Source Link is not http/https: '{0}'</source>
+        <target state="new">The scheme of URL specified in Source Link is not http/https: '{0}'</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NoSupportedUrlsFoundInSourceLink">
+        <source>No supported well-formed URLs found in Source Link</source>
+        <target state="new">No supported well-formed URLs found in Source Link</target>
         <note />
       </trans-unit>
     </body>

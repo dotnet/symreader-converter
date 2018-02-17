@@ -455,6 +455,14 @@ namespace Roslyn.Test.Utilities
 
         public static void AssertLinesEqual(string expected, string actual, string message = null, Func<string, string, bool> comparer = null)
         {
+            if (expected == actual)
+            {
+                return;
+            }
+
+            Assert.NotNull(expected);
+            Assert.NotNull(actual);
+
             IEnumerable<string> GetLines(string str) => 
                 str.Trim().Replace("\r\n", "\n").Split(new[] { '\r', '\n' }, StringSplitOptions.None);
 
