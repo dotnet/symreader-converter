@@ -1000,7 +1000,7 @@ namespace Microsoft.DiaSymReader.Tools
             string commonScheme = null;
             foreach (string documentName in documentNames)
             {
-                string uri = map.GetUri(documentName, out string uriPattern);
+                string uri = map.GetUri(documentName);
                 if (uri == null)
                 {
                     ReportDiagnostic(PdbDiagnosticId.UnmappedDocumentName, 0, documentName);
@@ -1009,7 +1009,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                 if (!Uri.IsWellFormedUriString(uri, UriKind.Absolute))
                 {
-                    ReportDiagnostic(PdbDiagnosticId.MalformedSourceLinkUrl, 0, uriPattern);
+                    ReportDiagnostic(PdbDiagnosticId.MalformedSourceLinkUrl, 0, uri);
                     continue;
                 }
 

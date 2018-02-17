@@ -50,43 +50,50 @@ namespace Microsoft.DiaSymReader.Tools
 
         internal static SourceLinkMap Parse(string json, Action<string> reportDiagnostic)
         {
+            bool errorReported = false;
+            void ReportInvalidJsonDataOnce()
+            {
+                if (!errorReported)
+                {
+                    // Bad source link format
+                    reportDiagnostic(ConverterResources.InvalidJsonDataFormat);
+                }
+
+                errorReported = true;
+            }
+
             var list = new List<(FilePathPattern key, UriPattern value)>();
             try
             {
                 // trim BOM if present:
                 var root = JObject.Parse(json.TrimStart('\uFEFF'));
+                var documents = root["documents"];
 
-                foreach (var token in root["documents"])
+                if (documents.Type != JTokenType.Object)
+                {
+                    ReportInvalidJsonDataOnce();
+                    return null;
+                }
+
+                foreach (var token in documents)
                 {
                     if (!(token is JProperty property))
                     {
-                        // Bad source link format
-                        reportDiagnostic(ConverterResources.InvalidJsonDataFormat);
+                        ReportInvalidJsonDataOnce();
                         continue;
                     }
 
-                    string value;
-                    try
+                    string value = (property.Value.Type == JTokenType.String) ?
+                        property.Value.Value<string>() : null;
+
+                    if (value == null ||
+                        !TryParseEntry(property.Name, value, out var path, out var uri))
                     {
-                        value = property.Value.Value<string>();
-                    }
-                    catch (FormatException)
-                    {
-                        // Bad source link format
-                        reportDiagnostic(ConverterResources.InvalidJsonDataFormat);
+                        ReportInvalidJsonDataOnce();
                         continue;
                     }
 
-                    if (TryParseEntry(property.Name, value, out var path, out var uri))
-                    {
-                        list.Add((path, uri));
-                    }
-                    else
-                    {
-                        // Bad source link format
-                        reportDiagnostic(ConverterResources.InvalidJsonDataFormat);
-                        continue;
-                    }
+                    list.Add((path, uri));
                 }
             }
             catch (JsonReaderException e)
@@ -156,11 +163,10 @@ namespace Microsoft.DiaSymReader.Tools
             return true;
         }
 
-        public string GetUri(string path, out string uriPattern)
+        public string GetUri(string path)
         {
             if (path.IndexOf('*') >= 0)
             {
-                uriPattern = null;
                 return null;
             }
 
@@ -173,19 +179,16 @@ namespace Microsoft.DiaSymReader.Tools
                     if (path.StartsWith(file.Path, StringComparison.OrdinalIgnoreCase))
                     {
                         var escapedPath = string.Join("/", path.Substring(file.Path.Length).Split(new[] { '/', '\\' }).Select(Uri.EscapeDataString));
-                        uriPattern = uri.Prefix + "*" + uri.Suffix;
                         return uri.Prefix + escapedPath + uri.Suffix;
                     }
                 }
                 else if (string.Equals(path, file.Path, StringComparison.OrdinalIgnoreCase))
                 {
                     Debug.Assert(uri.Suffix.Length == 0);
-                    uriPattern = uri.Prefix;
                     return uri.Prefix;
                 }
             }
 
-            uriPattern = null;
             return null;
         }
     }
