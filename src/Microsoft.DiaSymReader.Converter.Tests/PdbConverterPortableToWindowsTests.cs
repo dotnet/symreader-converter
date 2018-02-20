@@ -226,5 +226,39 @@ SRCSRV: end ------------------------------------------------",
                 new PdbDiagnostic(PdbDiagnosticId.MalformedSourceLinkUrl, 0, new[] { "http%3A//server/2/a.cs" }),
             });
         }
+
+        [Fact]
+        public void SourceChecksumValidation()
+        {
+            void ValidateSourceChecksum(Guid guid, byte[] checksum, string documentName, params PdbDiagnostic[] expectedErrors)
+            {
+                var actualErrors = new List<PdbDiagnostic>();
+                var converter = new PdbConverterPortableToWindows(actualErrors.Add);
+                converter.ValidateSourceChecksum(guid, checksum, documentName);
+                AssertEx.Equal(expectedErrors, actualErrors);
+            }
+
+            // SHA1
+            ValidateSourceChecksum(new Guid("ff1816ec-aa5e-4d10-87f7-6f4963833460"), Array.Empty<byte>(), "doc1.cs",
+                new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { "SHA1", "doc1.cs" }));
+
+            ValidateSourceChecksum(new Guid("ff1816ec-aa5e-4d10-87f7-6f4963833460"), new byte[32], "doc1.cs",
+                new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { "SHA1", "doc1.cs" }));
+
+            ValidateSourceChecksum(new Guid("ff1816ec-aa5e-4d10-87f7-6f4963833460"), new byte[20], "doc1.cs");
+
+            // SHA256
+            ValidateSourceChecksum(new Guid("8829d00f-11b8-4213-878b-770e8597ac16"), Array.Empty<byte>(), "doc1.cs",
+                new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { "SHA256", "doc1.cs" }));
+
+            ValidateSourceChecksum(new Guid("8829d00f-11b8-4213-878b-770e8597ac16"), new byte[20], "doc1.cs",
+                new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { "SHA256", "doc1.cs" }));
+
+            ValidateSourceChecksum(new Guid("8829d00f-11b8-4213-878b-770e8597ac16"), new byte[32], "doc1.cs");
+
+            // unknown
+            ValidateSourceChecksum(new Guid("11111111-1111-1111-1111-111111111111"), new byte[0], "doc1.cs");
+            ValidateSourceChecksum(new Guid("11111111-1111-1111-1111-111111111111"), new byte[1], "doc1.cs");
+        }
     }
 }

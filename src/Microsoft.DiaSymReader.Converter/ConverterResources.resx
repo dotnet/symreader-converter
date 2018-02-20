@@ -261,4 +261,10 @@
   <data name="InvalidSrcSvrVariableValue" xml:space="preserve">
     <value>Value of srcsvr variable '{0}' contains invalid characters</value>
   </data>
+  <data name="SourceChecksumAlgorithmSizeMismatch" xml:space="preserve">
+    <value>Source file checksum size doesn't match the hash algorithm '{0}': '{1}'</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>none</value>
+  </data>
 </root>
