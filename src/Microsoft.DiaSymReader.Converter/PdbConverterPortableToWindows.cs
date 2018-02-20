@@ -22,13 +22,6 @@ namespace Microsoft.DiaSymReader.Tools
 {
     internal sealed class PdbConverterPortableToWindows
     {
-        private static readonly Guid s_languageVendorMicrosoft = new Guid("{994b45c4-e6e9-11d2-903f-00c04fa302a1}");
-        private static readonly Guid s_documentTypeText = new Guid("{5a869d0b-6611-11d3-bd2a-0000f80849bd}");
-
-        private static readonly Guid s_csharpGuid = new Guid("3f5162f8-07c6-11d3-9053-00c04fa302a1");
-        private static readonly Guid s_visualBasicGuid = new Guid("3a12d0b8-c26c-11d0-b442-00a0244a1dd2");
-        private static readonly Guid s_fsharpGuid = new Guid("ab4f38c9-b6e6-43ba-be3b-58080b2ccce3");
-
         private readonly Action<PdbDiagnostic> _diagnosticReporterOpt;
 
         public PdbConverterPortableToWindows(Action<PdbDiagnostic> diagnosticReporterOpt)
@@ -52,8 +45,8 @@ namespace Microsoft.DiaSymReader.Tools
 
         private static Guid GetLanguageVendorGuid(Guid languageGuid)
         {
-            return (languageGuid == s_csharpGuid || languageGuid == s_visualBasicGuid || languageGuid == s_fsharpGuid) ?
-                s_languageVendorMicrosoft : default;
+            return (languageGuid == PdbGuids.Language.CSharp || languageGuid == PdbGuids.Language.VisualBasic || languageGuid == PdbGuids.Language.FSharp) ?
+                PdbGuids.LanguageVendor.Microsoft : default;
         }
 
         private struct LocalScopeInfo
@@ -128,13 +121,17 @@ namespace Microsoft.DiaSymReader.Tools
                 var embeddedSourceHandle = pdbReader.GetCustomDebugInformation(documentHandle, PortableCustomDebugInfoKinds.EmbeddedSource);
                 var sourceBlob = embeddedSourceHandle.IsNil ? null : pdbReader.GetBlobBytes(embeddedSourceHandle);
 
+                var algorithmId = pdbReader.GetGuid(document.HashAlgorithm);
+                var checksum = pdbReader.GetBlobBytes(document.Hash);
+                ValidateSourceChecksum(algorithmId, checksum, name);
+
                 pdbWriter.DefineDocument(
                     name: name,
                     language: languageGuid,
-                    type: s_documentTypeText,
                     vendor: GetLanguageVendorGuid(languageGuid),
-                    algorithmId: pdbReader.GetGuid(document.HashAlgorithm),
-                    checksum: pdbReader.GetBlobBytes(document.Hash),
+                    type: PdbGuids.DocumentType.Text,
+                    algorithmId: algorithmId,
+                    checksum: checksum,
                     source: sourceBlob);
             }
 
@@ -596,7 +593,40 @@ namespace Microsoft.DiaSymReader.Tools
             SymReaderHelpers.GetWindowsPdbSignature(pdbReader.DebugMetadataHeader.Id, out var guid, out var stamp, out var age);
             pdbWriter.UpdateSignature(guid, stamp, age);
         }
-               
+
+        // internal for testing
+        internal void ValidateSourceChecksum(Guid algorithmId, byte[] checksum, string documentName)
+        {
+            int expectedSize;
+            string algorithmName;
+
+            if (algorithmId == default)
+            {
+                expectedSize = 0;
+                algorithmName = ConverterResources.None;
+            }
+            else if (algorithmId == PdbGuids.HashAlgorithm.SHA1)
+            {
+                expectedSize = 20;
+                algorithmName = nameof(PdbGuids.HashAlgorithm.SHA1);
+            }
+            else if (algorithmId == PdbGuids.HashAlgorithm.SHA256)
+            {
+                expectedSize = 32;
+                algorithmName = nameof(PdbGuids.HashAlgorithm.SHA256);
+            }
+            else
+            {
+                // ignore unknown algorithms
+                return;
+            }
+
+            if (checksum.Length != expectedSize)
+            {
+                ReportDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { algorithmName, documentName });
+            }
+        }
+
         private static string GetMethodNamespace(MetadataReader metadataReader, MethodDefinition methodDef)
         {
             var typeDefHandle = methodDef.GetDeclaringType();

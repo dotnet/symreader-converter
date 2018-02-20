@@ -36,6 +36,7 @@ namespace Microsoft.DiaSymReader.Tools
         InconsistentStateMachineMethodMapping = 27,
         InvalidSourceLink = 28,
         MalformedSourceLinkUrl = 29,
+        SourceChecksumAlgorithmSizeMismatch = 30,
     }
 
     internal static class PdbDiagnosticIdExtensions
@@ -76,6 +77,7 @@ namespace Microsoft.DiaSymReader.Tools
                 case PdbDiagnosticId.InconsistentStateMachineMethodMapping: return ConverterResources.InconsistentStateMachineMethodMapping;
                 case PdbDiagnosticId.InvalidSourceLink: return ConverterResources.InvalidSourceLink;
                 case PdbDiagnosticId.MalformedSourceLinkUrl: return ConverterResources.MalformedSourceLinkUrl;
+                case PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch: return ConverterResources.SourceChecksumAlgorithmSizeMismatch;
 
                 default:
                     throw ExceptionUtilities.UnexpectedValue(id);

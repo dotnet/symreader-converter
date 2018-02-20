@@ -242,6 +242,16 @@
         <target state="new">No supported well-formed URLs found in Source Link</target>
         <note />
       </trans-unit>
+      <trans-unit id="SourceChecksumAlgorithmSizeMismatch">
+        <source>Source file checksum size doesn't match the hash algorithm '{0}': '{1}'</source>
+        <target state="new">Source file checksum size doesn't match the hash algorithm '{0}': '{1}'</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="None">
+        <source>none</source>
+        <target state="new">none</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

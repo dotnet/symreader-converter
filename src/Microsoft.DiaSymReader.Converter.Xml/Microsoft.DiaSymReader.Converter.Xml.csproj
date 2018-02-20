@@ -34,6 +34,7 @@
   
   <!-- Workaround for https://github.com/NuGet/Home/issues/4856 -->
   <ItemGroup>
+    <Compile Include="..\Common\PdbGuids.cs" Link="Common\PdbGuids.cs" />
     <Compile Update="@(Compile)">
       <Link Condition="'%(NuGetPackageId)' != ''">%(NuGetPackageId)\%(Link)</Link>
     </Compile>
