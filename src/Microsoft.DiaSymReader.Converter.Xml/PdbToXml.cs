@@ -1502,18 +1502,28 @@ namespace Microsoft.DiaSymReader.Tools
 
                 _writer.WriteAttributeString("id", CultureInvariantToString(id));
                 _writer.WriteAttributeString("name", name);
-                _writer.WriteAttributeString("language", doc.GetLanguage().ToString());
-                _writer.WriteAttributeString("languageVendor", doc.GetLanguageVendor().ToString());
-                _writer.WriteAttributeString("documentType", doc.GetDocumentType().ToString());
+                _writer.WriteAttributeString("language", GetLanguageName(doc.GetLanguage()));
+
+                var vendor = doc.GetLanguageVendor();
+                if (vendor != PdbGuids.LanguageVendor.Microsoft)
+                {
+                    _writer.WriteAttributeString("languageVendor", vendor.ToString());
+                }
+
+                var documentType = doc.GetDocumentType();
+                if (documentType != PdbGuids.DocumentType.Text)
+                {
+                    _writer.WriteAttributeString("documentType", documentType.ToString());
+                }
 
                 var algorithm = doc.GetHashAlgorithm();
-                if (algorithm != default(Guid))
+                if (algorithm != default)
                 {
                     var checksumBytes = doc.GetChecksum();
                     if (checksumBytes.Length != 0)
                     {
-                        _writer.WriteAttributeString("checkSumAlgorithmId", algorithm.ToString());
-                        _writer.WriteAttributeString("checkSum", string.Concat(checksumBytes.Select(b => $"{b,2:X}, ")));
+                        _writer.WriteAttributeString("checksumAlgorithm", GetHashAlgorithmName(algorithm));
+                        _writer.WriteAttributeString("checksum", BitConverter.ToString(checksumBytes));
                     }
                 }
 
@@ -1537,6 +1547,17 @@ namespace Microsoft.DiaSymReader.Tools
                 _writer.WriteEndElement();
             }
         }
+
+        private static string GetLanguageName(Guid guid)
+            => (guid == PdbGuids.Language.CSharp) ? "C#" :
+               (guid == PdbGuids.Language.VisualBasic) ? "VB" :
+               (guid == PdbGuids.Language.FSharp) ? "F#" :
+               guid.ToString();
+
+        private static string GetHashAlgorithmName(Guid guid)
+            => (guid == PdbGuids.HashAlgorithm.SHA1) ? "SHA1" : 
+               (guid == PdbGuids.HashAlgorithm.SHA256) ? "SHA256" :
+               guid.ToString();
 
         private void WriteEmbeddedSource(ISymUnmanagedDocument doc)
         {

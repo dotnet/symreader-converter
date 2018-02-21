@@ -18,19 +18,19 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\Documents.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
-    <file id=""2"" name=""C:\a\b\c\d\1.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""3"" name=""C:\a\b\c\D\2.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""4"" name=""C:\a\b\C\d\3.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""5"" name=""C:\a\b\c\d\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""6"" name=""C:\A\b\c\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""7"" name=""C:\a\b\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""8"" name=""C:\a\B\3.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""9"" name=""C:\a\B\c\4.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""10"" name=""C:\*\5.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""11"" name="":6.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""12"" name=""C:\a\b\X.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""13"" name=""C:\a\B\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
+    <file id=""1"" name=""C:\Documents.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE"" />
+    <file id=""2"" name=""C:\a\b\c\d\1.cs"" language=""C#"" />
+    <file id=""3"" name=""C:\a\b\c\D\2.cs"" language=""C#"" />
+    <file id=""4"" name=""C:\a\b\C\d\3.cs"" language=""C#"" />
+    <file id=""5"" name=""C:\a\b\c\d\x.cs"" language=""C#"" />
+    <file id=""6"" name=""C:\A\b\c\x.cs"" language=""C#"" />
+    <file id=""7"" name=""C:\a\b\x.cs"" language=""C#"" />
+    <file id=""8"" name=""C:\a\B\3.cs"" language=""C#"" />
+    <file id=""9"" name=""C:\a\B\c\4.cs"" language=""C#"" />
+    <file id=""10"" name=""C:\*\5.cs"" language=""C#"" />
+    <file id=""11"" name="":6.cs"" language=""C#"" />
+    <file id=""12"" name=""C:\a\b\X.cs"" language=""C#"" />
+    <file id=""13"" name=""C:\a\B\x.cs"" language=""C#"" />
   </files>
   <methods>
     <method containingType=""C"" name=""M"">
@@ -75,7 +75,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\Scopes.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
+    <file id=""1"" name=""C:\Scopes.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE"" />
   </files>
   <methods>
     <method containingType=""C`1"" name=""F"">
@@ -270,7 +270,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\Async.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
+    <file id=""1"" name=""C:\Async.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE"" />
   </files>
   <methods>
     <method containingType=""C"" name=""M1"">
@@ -363,7 +363,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\Iterator.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
+    <file id=""1"" name=""C:\Iterator.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE"" />
   </files>
   <methods>
     <method containingType=""C`1+D`1"" name=""M"">
@@ -452,7 +452,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\Imports.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
+    <file id=""1"" name=""C:\Imports.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE"" />
   </files>
   <methods>
     <method containingType=""C`1"" name=""G"">
@@ -514,9 +514,9 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\MethodBoundaries1.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
-    <file id=""2"" name=""C:\MethodBoundaries2.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""3"" name=""C:\MethodBoundaries3.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
+    <file id=""1"" name=""C:\MethodBoundaries1.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE"" />
+    <file id=""2"" name=""C:\MethodBoundaries2.cs"" language=""C#"" />
+    <file id=""3"" name=""C:\MethodBoundaries3.cs"" language=""C#"" />
   </files>
   <methods>
     <method containingType=""C"" name="".ctor"">
@@ -708,7 +708,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\LanguageOnlyTypes.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
+    <file id=""1"" name=""C:\LanguageOnlyTypes.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE"" />
   </files>
   <methods>
     <method containingType=""C"" name=""F"">
@@ -776,7 +776,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\VB.vb"" language=""3a12d0b8-c26c-11d0-b442-00a0244a1dd2"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
+    <file id=""1"" name=""C:\VB.vb"" language=""VB"" />
   </files>
   <methods>
     <method containingType=""N1.C"" name=""Foo"">
@@ -1024,7 +1024,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\Misc.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
+    <file id=""1"" name=""C:\Misc.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE"" />
   </files>
   <methods>
     <method containingType=""C`1"" name=""M"" parameterNames=""b"">
@@ -1072,19 +1072,19 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\Documents.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
-    <file id=""2"" name=""C:\a\b\c\d\1.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""3"" name=""C:\a\b\c\D\2.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""4"" name=""C:\a\b\C\d\3.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""5"" name=""C:\a\b\c\d\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""6"" name=""C:\A\b\c\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""7"" name=""C:\a\b\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""8"" name=""C:\a\B\3.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""9"" name=""C:\a\B\c\4.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""10"" name=""C:\*\5.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""11"" name="":6.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""12"" name=""C:\a\b\X.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""13"" name=""C:\a\B\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
+    <file id=""1"" name=""C:\Documents.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE"" />
+    <file id=""2"" name=""C:\a\b\c\d\1.cs"" language=""C#"" />
+    <file id=""3"" name=""C:\a\b\c\D\2.cs"" language=""C#"" />
+    <file id=""4"" name=""C:\a\b\C\d\3.cs"" language=""C#"" />
+    <file id=""5"" name=""C:\a\b\c\d\x.cs"" language=""C#"" />
+    <file id=""6"" name=""C:\A\b\c\x.cs"" language=""C#"" />
+    <file id=""7"" name=""C:\a\b\x.cs"" language=""C#"" />
+    <file id=""8"" name=""C:\a\B\3.cs"" language=""C#"" />
+    <file id=""9"" name=""C:\a\B\c\4.cs"" language=""C#"" />
+    <file id=""10"" name=""C:\*\5.cs"" language=""C#"" />
+    <file id=""11"" name="":6.cs"" language=""C#"" />
+    <file id=""12"" name=""C:\a\b\X.cs"" language=""C#"" />
+    <file id=""13"" name=""C:\a\B\x.cs"" language=""C#"" />
   </files>
   <methods>
     <method containingType=""C"" name=""M"">
@@ -1144,19 +1144,19 @@ SRCSRV: end ------------------------------------------------]]></srcsvr>
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\Documents.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
-    <file id=""2"" name=""C:\a\b\c\d\1.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""3"" name=""C:\a\b\c\D\2.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""4"" name=""C:\a\b\C\d\3.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""5"" name=""C:\a\b\c\d\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""6"" name=""C:\A\b\c\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""7"" name=""C:\a\b\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""8"" name=""C:\a\B\3.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""9"" name=""C:\a\B\c\4.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""10"" name=""C:\*\5.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""11"" name="":6.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""12"" name=""C:\a\b\X.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""13"" name=""C:\a\B\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
+    <file id=""1"" name=""C:\Documents.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE"" />
+    <file id=""2"" name=""C:\a\b\c\d\1.cs"" language=""C#"" />
+    <file id=""3"" name=""C:\a\b\c\D\2.cs"" language=""C#"" />
+    <file id=""4"" name=""C:\a\b\C\d\3.cs"" language=""C#"" />
+    <file id=""5"" name=""C:\a\b\c\d\x.cs"" language=""C#"" />
+    <file id=""6"" name=""C:\A\b\c\x.cs"" language=""C#"" />
+    <file id=""7"" name=""C:\a\b\x.cs"" language=""C#"" />
+    <file id=""8"" name=""C:\a\B\3.cs"" language=""C#"" />
+    <file id=""9"" name=""C:\a\B\c\4.cs"" language=""C#"" />
+    <file id=""10"" name=""C:\*\5.cs"" language=""C#"" />
+    <file id=""11"" name="":6.cs"" language=""C#"" />
+    <file id=""12"" name=""C:\a\b\X.cs"" language=""C#"" />
+    <file id=""13"" name=""C:\a\B\x.cs"" language=""C#"" />
   </files>
   <methods>
     <method containingType=""C"" name=""M"">
@@ -1234,19 +1234,19 @@ SRCSRV: end ------------------------------------------------]]></srcsvr>
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\Documents.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""DB, EB, 2A,  6, 7B, 2F,  E,  D, 67, 8A,  0, 2C, 58, 7A, 28,  6,  5, 6C, 3D, CE, "" />
-    <file id=""2"" name=""C:\a\b\c\d\1.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""3"" name=""C:\a\b\c\D\2.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""4"" name=""C:\a\b\C\d\3.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""5"" name=""C:\a\b\c\d\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""6"" name=""C:\A\b\c\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""7"" name=""C:\a\b\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""8"" name=""C:\a\B\3.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""9"" name=""C:\a\B\c\4.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""10"" name=""C:\*\5.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""11"" name="":6.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""12"" name=""C:\a\b\X.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
-    <file id=""13"" name=""C:\a\B\x.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" />
+    <file id=""1"" name=""C:\Documents.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE"" />
+    <file id=""2"" name=""C:\a\b\c\d\1.cs"" language=""C#"" />
+    <file id=""3"" name=""C:\a\b\c\D\2.cs"" language=""C#"" />
+    <file id=""4"" name=""C:\a\b\C\d\3.cs"" language=""C#"" />
+    <file id=""5"" name=""C:\a\b\c\d\x.cs"" language=""C#"" />
+    <file id=""6"" name=""C:\A\b\c\x.cs"" language=""C#"" />
+    <file id=""7"" name=""C:\a\b\x.cs"" language=""C#"" />
+    <file id=""8"" name=""C:\a\B\3.cs"" language=""C#"" />
+    <file id=""9"" name=""C:\a\B\c\4.cs"" language=""C#"" />
+    <file id=""10"" name=""C:\*\5.cs"" language=""C#"" />
+    <file id=""11"" name="":6.cs"" language=""C#"" />
+    <file id=""12"" name=""C:\a\b\X.cs"" language=""C#"" />
+    <file id=""13"" name=""C:\a\B\x.cs"" language=""C#"" />
   </files>
   <methods>
     <method containingType=""C"" name=""M"">
@@ -1309,7 +1309,7 @@ C:\a\b\X.cs*1/a/b/X.cs
 C:\a\B\x.cs*1/a/B/x.cs
 SRCSRV: end ------------------------------------------------]]></srcsvr>
 </symbols>
-",  
+",
 new[]
 {
     new PdbDiagnostic(PdbDiagnosticId.UnmappedDocumentName, 0, new[] { @"C:\*\5.cs" })
@@ -1331,12 +1331,12 @@ new PortablePdbConversionOptions(srcSvrVariables: new[]
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\EmbeddedSourceSmall.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""48, 30, 92, B9, 4A, 92, 50, A7, 75, 33, E8,  5,  D, 2E, DD, CD, 3F, 58, 9F, 7F, "" embeddedSourceLength=""109""><![CDATA[// should be less than compression threshold (200 chars)
+    <file id=""1"" name=""C:\EmbeddedSourceSmall.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""48-30-92-B9-4A-92-50-A7-75-33-E8-05-0D-2E-DD-CD-3F-58-9F-7F"" embeddedSourceLength=""109""><![CDATA[// should be less than compression threshold (200 chars)
 public class Small
 {
     public Small() {}
 }]]></file>
-    <file id=""2"" name=""C:\EmbeddedSource.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""1D, BB, A3, 11, 47, F6, 42, 7D, 82, 99, B4, 31, E9, 32, 7D, 6B,  9, C3, 59, EB, "" embeddedSourceLength=""229""><![CDATA[// should be higher than compression threshold (200 chars)
+    <file id=""2"" name=""C:\EmbeddedSource.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""1D-BB-A3-11-47-F6-42-7D-82-99-B4-31-E9-32-7D-6B-09-C3-59-EB"" embeddedSourceLength=""229""><![CDATA[// should be higher than compression threshold (200 chars)
 
 using System;
 
@@ -1356,9 +1356,9 @@ namespace Test
     }
 }
 ]]></file>
-    <file id=""3"" name=""C:\EmbeddedSourceNoCode.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""4B, 4C, 47, 82, 20, 10, AC, 63, A9, 24, 1E, 33, CE, BA, 74, 76, 40, F3, 33, BB, "" embeddedSourceLength=""26""><![CDATA[// file with no code
+    <file id=""3"" name=""C:\EmbeddedSourceNoCode.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""4B-4C-47-82-20-10-AC-63-A9-24-1E-33-CE-BA-74-76-40-F3-33-BB"" embeddedSourceLength=""26""><![CDATA[// file with no code
 ]]></file>
-    <file id=""4"" name=""C:\EmbeddedSourceNoSequencePoints.cs"" language=""3f5162f8-07c6-11d3-9053-00c04fa302a1"" languageVendor=""994b45c4-e6e9-11d2-903f-00c04fa302a1"" documentType=""5a869d0b-6611-11d3-bd2a-0000f80849bd"" checkSumAlgorithmId=""ff1816ec-aa5e-4d10-87f7-6f4963833460"" checkSum=""8B, 74, C4, 70, 25, F1, 77, 43, 94, 81, 81, 6A, D1, 80, BA, F4, 57, 12, 58, 5E, "" embeddedSourceLength=""56""><![CDATA[// file with no sequence points
+    <file id=""4"" name=""C:\EmbeddedSourceNoSequencePoints.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""8B-74-C4-70-25-F1-77-43-94-81-81-6A-D1-80-BA-F4-57-12-58-5E"" embeddedSourceLength=""56""><![CDATA[// file with no sequence points
 
 interface I { }
 ]]></file>
