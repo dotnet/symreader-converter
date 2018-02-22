@@ -68,14 +68,14 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">用法: Pdb2Pdb &lt;dll/exe path&gt; [/pdb &lt;path&gt;] [/out &lt;path&gt;] [/extract]
+        <target state="translated">用法: Pdb2Pdb &lt;dll/exe path&gt; [/pdb &lt;path&gt;] [/out &lt;path&gt;] [/extract]
 
 /pdb &lt;path&gt;                待转换 PDB 的路径。如果未显式指定，
                            则会使用 DLL/EXE 所引用或 DLL/EXE 中嵌入的 PDB。
 /out &lt;path&gt;                输出 PDB 路径。
 /extract                  提取 DLL/EXE 中嵌入的 PDB。
-/sourcelink                从可移植 PDB 转换为 Windows PDB 时而不是在转换为 srcsrv 格式时，
-                           ，保留源链接。
+/sourcelink                在转换为 Windows PDB 时，请勿将 SourceLink 转换为 srcsrv 格式。
+                           默认情况下，转换的 PDB 中同时包括 SourceLink 和 srcsrv。
 /verbose                   打印详细诊断。
 /srcsvrvar &lt;name&gt;=&lt;value&gt;  将指定变量添加到 srcsvr 流。仅在转换为 Windows PDB 
                            且未指定 /sourcelink 时

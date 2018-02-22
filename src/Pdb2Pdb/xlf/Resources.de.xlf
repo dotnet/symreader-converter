@@ -68,14 +68,14 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">Syntax: Pdb2Pdb &lt;dll/exe path&gt; [/pdb &lt;path&gt;] [/out &lt;path&gt;] [/extract]
+        <target state="translated">Syntax: Pdb2Pdb &lt;dll/exe path&gt; [/pdb &lt;path&gt;] [/out &lt;path&gt;] [/extract]
 
 /pdb &lt;path&gt;                Pfad zur PDB, die konvertiert werden soll. Sofern nicht explizit angegeben, 
                            wird die in der DLL/EXE referenzierte oder eingebettete PDB verwendet.
 /out &lt;path&gt;                Pfad für die Ausgabe-PDB.
 /extract                   In der DLL/EXE eingebettete PDB extrahieren. 
-/sourcelink                Quelllink beim Konvertieren von einer portablen PDB in eine 
-                           Windows-PDB beibehalten, statt in das srcsrv-Format zu konvertieren.
+/sourcelink                SourceLink beim Konvertieren in Windows-PDB nicht in das srcsrv-Format konvertieren.
+                           Standardmäßig werden sowohl SourceLink als auch srcsrv in die konvertierte PDB einbezogen.
 /verbose                   Detaillierte Diagnose ausgeben.
 /srcsvrvar &lt;name&gt;=&lt;value&gt;  Angegebene Variable zu srcsvr-Stream hinzufügen. Gilt nur,
                            wenn eine Konvertierung in eine Windows-PDB durchgeführt wird und /sourcelink nicht
