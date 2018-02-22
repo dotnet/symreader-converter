@@ -229,17 +229,17 @@
       </trans-unit>
       <trans-unit id="MalformedSourceLinkUrl">
         <source>Malformed Source Link URL: '{0}'</source>
-        <target state="new">Malformed Source Link URL: '{0}'</target>
+        <target state="translated">Nieprawidłowo sformułowany adres URL linku źródłowego: „{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="UrlSchemeIsNotHttp">
         <source>The scheme of URL specified in Source Link is not http/https: '{0}'</source>
-        <target state="new">The scheme of URL specified in Source Link is not http/https: '{0}'</target>
+        <target state="translated">Schemat adresu URL określony w linku źródłowym jest inny niż http/https: „{0}”</target>
         <note />
       </trans-unit>
       <trans-unit id="NoSupportedUrlsFoundInSourceLink">
         <source>No supported well-formed URLs found in Source Link</source>
-        <target state="new">No supported well-formed URLs found in Source Link</target>
+        <target state="translated">Nie odnaleziono obsługiwanych i prawidłowo sformułowanych adresów URL w linku źródłowym</target>
         <note />
       </trans-unit>
     </body>

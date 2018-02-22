@@ -68,14 +68,14 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">Kullanım: Pdb2Pdb &lt;dll/exe yolu&gt; [/pdb &lt;yol&gt;] [/out &lt;yol&gt;] [/extract]
+        <target state="translated">Kullanım: Pdb2Pdb &lt;dll/exe yolu&gt; [/pdb &lt;yol&gt;] [/out &lt;yol&gt;] [/extract]
 
 /pdb &lt;yol&gt;                Dönüştürülecek PDB’nin yolu. Açıkça belirtilmezse, 
                            DLL/EXE tarafından başvurulan veya DLL/EXE’ye gömülü PDB kullanılır.
 /out &lt;yol&gt;                Çıkış PDB yolu.
 /extract                   DLL/EXE’ye gömülü PDB’yi ayıklayın. 
-/sourcelink                Taşınabilir PDB’den Windows PDB’ye 
-                           dönüştürürken, srcsrv biçimine dönüştürmek yerine Kaynak Bağlantıyı koruyun.
+/sourcelink                Windows PDB’ye dönüştürürken SourceLink’i srcsrv biçimine dönüştürmeyin.
+                           SourceLink ve srcsrv varsayılan olarak dönüştürülmüş PDB’ye dahildir.
 /verbose                   Ayrıntılı tanılamayı yazdırın.
 /srcsvrvar &lt;ad&gt;=&lt;değer&gt;  Belirtilen değişkeni srcsvr akışına ekleyin. Yalnızca 
                            Windows PDB’ye dönüştürürken ve /sourcelink belirtilmediğinde

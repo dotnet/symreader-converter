@@ -229,17 +229,17 @@
       </trans-unit>
       <trans-unit id="MalformedSourceLinkUrl">
         <source>Malformed Source Link URL: '{0}'</source>
-        <target state="new">Malformed Source Link URL: '{0}'</target>
+        <target state="translated">잘못된 형식의 소스 링크 URL: '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="UrlSchemeIsNotHttp">
         <source>The scheme of URL specified in Source Link is not http/https: '{0}'</source>
-        <target state="new">The scheme of URL specified in Source Link is not http/https: '{0}'</target>
+        <target state="translated">소스 링크에서 구성된 URL의 구성표가 http/https가 아닙니다. '{0}'</target>
         <note />
       </trans-unit>
       <trans-unit id="NoSupportedUrlsFoundInSourceLink">
         <source>No supported well-formed URLs found in Source Link</source>
-        <target state="new">No supported well-formed URLs found in Source Link</target>
+        <target state="translated">소스 링크에서 지원되는 올바른 형식의 URL을 찾을 수 없습니다.</target>
         <note />
       </trans-unit>
     </body>
