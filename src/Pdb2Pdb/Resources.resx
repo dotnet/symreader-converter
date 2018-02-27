@@ -153,6 +153,9 @@
   <data name="InvalidPdbPathInDebugDirectory" xml:space="preserve">
     <value>Invalid PDB path in Debug Directory (file '{0}').</value>
   </data>
+  <data name="InvalidWarningNumber" xml:space="preserve">
+    <value>Invalid warning number: '{0}'.</value>
+  </data>
   <data name="Pdb2PdbUsage" xml:space="preserve">
     <value><![CDATA[Usage: Pdb2Pdb <dll/exe path> [/pdb <path>] [/out <path>] [/extract]
 
@@ -162,7 +165,8 @@
 /extract                   Extract PDB embedded in the DLL/EXE. 
 /sourcelink                When converting to Windows PDB do not convert SourceLink to srcsrv format.
                            By default both SourceLink and srcsrv are included in the converted PDB.
-/verbose                   Print detailed diagnostics.
+/nowarn *                  Suppress all warnings. All warnings are reported by default.
+/nowarn <n1,n2,...>        Suppress specified warning.
 /srcsvrvar <name>=<value>  Add specified variable to srcsvr stream. Only applicable 
                            when converting to Windows PDB and /sourcelink is not
                            specified.

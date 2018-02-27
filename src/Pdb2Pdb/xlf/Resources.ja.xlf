@@ -61,7 +61,7 @@
 /extract                   Extract PDB embedded in the DLL/EXE. 
 /sourcelink                When converting to Windows PDB do not convert SourceLink to srcsrv format.
                            By default both SourceLink and srcsrv are included in the converted PDB.
-/verbose                   Print detailed diagnostics.
+/nowarn &lt;n1,n2,...&gt;        Suppress specified warning. All warnings are reported by default.
 /srcsvrvar &lt;name&gt;=&lt;value&gt;  Add specified variable to srcsvr stream. Only applicable 
                            when converting to Windows PDB and /sourcelink is not
                            specified.
@@ -93,6 +93,11 @@
       <trans-unit id="CantSpecifyBothSrcSvrVariableAndSourcelinkOptions">
         <source>Can't specify both /srcsvrvar and /sourcelink options.</source>
         <target state="translated">/srcsvrvar オプションと /sourcelink オプションの両方を指定することはできません。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InvalidWarningNumber">
+        <source>Invalid warning number: '{0}'.</source>
+        <target state="new">Invalid warning number: '{0}'.</target>
         <note />
       </trans-unit>
     </body>
