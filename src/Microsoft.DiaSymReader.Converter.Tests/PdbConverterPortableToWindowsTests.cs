@@ -230,35 +230,55 @@ SRCSRV: end ------------------------------------------------",
         [Fact]
         public void SourceChecksumValidation()
         {
-            void ValidateSourceChecksum(Guid guid, byte[] checksum, string documentName, params PdbDiagnostic[] expectedErrors)
+            void ValidateSourceChecksum(Guid guid, Guid correctedGuid, byte[] checksum, string documentName, params PdbDiagnostic[] expectedErrors)
             {
                 var actualErrors = new List<PdbDiagnostic>();
                 var converter = new PdbConverterPortableToWindows(actualErrors.Add);
-                converter.ValidateSourceChecksum(guid, checksum, documentName);
+                var originalGuid = guid;
+                converter.ValidateAndCorrectSourceChecksum(ref guid, checksum, documentName);
+
                 AssertEx.Equal(expectedErrors, actualErrors);
+                Assert.True(expectedErrors.Length != 0 || guid == originalGuid);
+                Assert.Equal(correctedGuid, guid);
             }
 
+            var sha1 = new Guid("ff1816ec-aa5e-4d10-87f7-6f4963833460");
+            var sha256 = new Guid("8829d00f-11b8-4213-878b-770e8597ac16");
+            var unknown = new Guid("11111111-1111-1111-1111-111111111111");
+
             // SHA1
-            ValidateSourceChecksum(new Guid("ff1816ec-aa5e-4d10-87f7-6f4963833460"), Array.Empty<byte>(), "doc1.cs",
+            ValidateSourceChecksum(sha1, sha1, Array.Empty<byte>(), "doc1.cs",
                 new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { "SHA1", "doc1.cs" }));
 
-            ValidateSourceChecksum(new Guid("ff1816ec-aa5e-4d10-87f7-6f4963833460"), new byte[32], "doc1.cs",
+            ValidateSourceChecksum(sha1, sha1, new byte[32], "doc1.cs",
                 new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { "SHA1", "doc1.cs" }));
 
-            ValidateSourceChecksum(new Guid("ff1816ec-aa5e-4d10-87f7-6f4963833460"), new byte[20], "doc1.cs");
+            ValidateSourceChecksum(default, sha1, new byte[20], "doc1.cs",
+                new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { ConverterResources.None, "doc1.cs" }));
+
+            ValidateSourceChecksum(default, default, new byte[22], "doc1.cs",
+                new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { ConverterResources.None, "doc1.cs" }));
+
+            ValidateSourceChecksum(sha1, sha1, new byte[20], "doc1.cs");
 
             // SHA256
-            ValidateSourceChecksum(new Guid("8829d00f-11b8-4213-878b-770e8597ac16"), Array.Empty<byte>(), "doc1.cs",
+            ValidateSourceChecksum(sha256, sha256, Array.Empty<byte>(), "doc1.cs",
                 new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { "SHA256", "doc1.cs" }));
 
-            ValidateSourceChecksum(new Guid("8829d00f-11b8-4213-878b-770e8597ac16"), new byte[20], "doc1.cs",
+            ValidateSourceChecksum(sha256, sha256, new byte[20], "doc1.cs",
                 new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { "SHA256", "doc1.cs" }));
 
-            ValidateSourceChecksum(new Guid("8829d00f-11b8-4213-878b-770e8597ac16"), new byte[32], "doc1.cs");
+            ValidateSourceChecksum(default, sha256, new byte[32], "doc1.cs",
+                new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { ConverterResources.None, "doc1.cs" }));
+
+            ValidateSourceChecksum(default, default, new byte[30], "doc1.cs",
+                new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { ConverterResources.None, "doc1.cs" }));
+
+            ValidateSourceChecksum(sha256, sha256, new byte[32], "doc1.cs");
 
             // unknown
-            ValidateSourceChecksum(new Guid("11111111-1111-1111-1111-111111111111"), new byte[0], "doc1.cs");
-            ValidateSourceChecksum(new Guid("11111111-1111-1111-1111-111111111111"), new byte[1], "doc1.cs");
+            ValidateSourceChecksum(unknown, unknown, new byte[0], "doc1.cs");
+            ValidateSourceChecksum(unknown, unknown, new byte[1], "doc1.cs");
         }
     }
 }
