@@ -123,7 +123,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                 var algorithmId = pdbReader.GetGuid(document.HashAlgorithm);
                 var checksum = pdbReader.GetBlobBytes(document.Hash);
-                ValidateSourceChecksum(algorithmId, checksum, name);
+                ValidateAndCorrectSourceChecksum(ref algorithmId, checksum, name);
 
                 pdbWriter.DefineDocument(
                     name: name,
@@ -595,8 +595,11 @@ namespace Microsoft.DiaSymReader.Tools
         }
 
         // internal for testing
-        internal void ValidateSourceChecksum(Guid algorithmId, byte[] checksum, string documentName)
+        internal void ValidateAndCorrectSourceChecksum(ref Guid algorithmId, byte[] checksum, string documentName)
         {
+            const int SizeOfSHA1 = 20;
+            const int SizeOfSHA256 = 32;
+
             int expectedSize;
             string algorithmName;
 
@@ -607,12 +610,12 @@ namespace Microsoft.DiaSymReader.Tools
             }
             else if (algorithmId == PdbGuids.HashAlgorithm.SHA1)
             {
-                expectedSize = 20;
+                expectedSize = SizeOfSHA1;
                 algorithmName = nameof(PdbGuids.HashAlgorithm.SHA1);
             }
             else if (algorithmId == PdbGuids.HashAlgorithm.SHA256)
             {
-                expectedSize = 32;
+                expectedSize = SizeOfSHA256;
                 algorithmName = nameof(PdbGuids.HashAlgorithm.SHA256);
             }
             else
@@ -624,6 +627,21 @@ namespace Microsoft.DiaSymReader.Tools
             if (checksum.Length != expectedSize)
             {
                 ReportDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { algorithmName, documentName });
+
+                if (algorithmId == default)
+                {
+                    // guess correct algorithm id based on the checksum size:
+                    switch (checksum.Length)
+                    {
+                        case SizeOfSHA1:
+                            algorithmId = PdbGuids.HashAlgorithm.SHA1;
+                            break;
+
+                        case SizeOfSHA256:
+                            algorithmId = PdbGuids.HashAlgorithm.SHA256;
+                            break;
+                    }
+                }
             }
         }
 
