@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -21,9 +22,10 @@ namespace Microsoft.DiaSymReader.Tools
             public readonly string OutPdbFilePathOpt;
             public readonly PortablePdbConversionOptions Options;
             public readonly bool Extract;
-            public readonly bool Verbose;
+            public readonly ImmutableArray<PdbDiagnosticId> SuppressedWarnings;
+            public readonly bool SuppressAllWarnings;
 
-            public Args(string peFilePath, string pdbFilePathOpt, string outPdbFilePathOpt, PortablePdbConversionOptions options, bool extract, bool verbose)
+            public Args(string peFilePath, string pdbFilePathOpt, string outPdbFilePathOpt, PortablePdbConversionOptions options, ImmutableArray<PdbDiagnosticId> suppressedWarnings, bool suppressAllWarnings, bool extract)
             {
                 Debug.Assert(options != null);
 
@@ -32,7 +34,8 @@ namespace Microsoft.DiaSymReader.Tools
                 OutPdbFilePathOpt = outPdbFilePathOpt;
                 Options = options;
                 Extract = extract;
-                Verbose = verbose;
+                SuppressAllWarnings = suppressAllWarnings;
+                SuppressedWarnings = suppressedWarnings;
             }
         }
 
@@ -68,9 +71,10 @@ namespace Microsoft.DiaSymReader.Tools
             string peFile = null;
             bool extract = false;
             bool sourceLink = false;
-            bool verbose = false;
             string inPdb = null;
             string outPdb = null;
+            bool suppressAllWarnings = false;
+            var suppressedWarnings = new List<PdbDiagnosticId>();
             var srcSvrVariables = new List<KeyValuePair<string, string>>();
 
             int i = 0;
@@ -90,16 +94,28 @@ namespace Microsoft.DiaSymReader.Tools
                         sourceLink = true;
                         break;
 
-                    case "/verbose":
-                        verbose = true;
-                        break;
-
                     case "/pdb":
                         inPdb = ReadValue();
                         break;
 
                     case "/out":
                         outPdb = ReadValue();
+                        break;
+
+                    case "/nowarn":
+                        var value = ReadValue();
+                        if (value == "*")
+                        {
+                            suppressAllWarnings = true;
+                        }
+                        else
+                        {
+                            suppressedWarnings.AddRange(value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(
+                            n => (int.TryParse(n, out int id) && id != 0 && ((PdbDiagnosticId)id).IsValid()) ?
+                                (PdbDiagnosticId)id :
+                                throw new InvalidDataException(string.Format(Resources.InvalidWarningNumber, n))));
+                        }
+
                         break;
 
                     case "/srcsvrvar":
@@ -166,7 +182,7 @@ namespace Microsoft.DiaSymReader.Tools
                 throw new InvalidDataException(e.Message);
             }
 
-            return new Args(peFile, inPdb, outPdb, options, extract, verbose);
+            return new Args(peFile, inPdb, outPdb, options, suppressedWarnings.ToImmutableArray(), suppressAllWarnings, extract);
         }
 
         private static KeyValuePair<string, string> ParseSrcSvrVariable(string value)
@@ -184,11 +200,24 @@ namespace Microsoft.DiaSymReader.Tools
         internal static bool Convert(Args args)
         {
             bool success = true;
-            var reporter = args.Verbose ? new Action<PdbDiagnostic>(d => 
+
+            Action<PdbDiagnostic> reporter;
+            if (args.SuppressAllWarnings)
             {
-                Console.Error.WriteLine(d.ToString(CultureInfo.CurrentCulture));
-                success = false;
-            }) : null;
+                reporter = null;
+            }
+            else
+            {
+                var suppressedWarnings = new HashSet<PdbDiagnosticId>(args.SuppressedWarnings);
+                reporter = d =>
+                {
+                    if (!suppressedWarnings.Contains(d.Id))
+                    {
+                        Console.Error.WriteLine(d.ToString(CultureInfo.CurrentCulture));
+                        success = false;
+                    }
+                };
+            }
 
             var converter = new PdbConverter(reporter);
 

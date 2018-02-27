@@ -39,8 +39,11 @@ namespace Microsoft.DiaSymReader.Tools
         SourceChecksumAlgorithmSizeMismatch = 30,
     }
 
-    internal static class PdbDiagnosticIdExtensions
+    public static class PdbDiagnosticIdExtensions
     {
+        public static bool IsValid(this PdbDiagnosticId id)
+            => id >= 0 && id <= PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch;
+
         internal static string GetMessageTemplate(this PdbDiagnosticId id)
         {
             switch (id)
