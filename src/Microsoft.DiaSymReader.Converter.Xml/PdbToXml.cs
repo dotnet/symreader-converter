@@ -149,7 +149,7 @@ namespace Microsoft.DiaSymReader.Tools
             using (var writer = XmlWriter.Create(xmlWriter, s_xmlWriterSettings))
             {
                 // metadata reader is on stack -> no owner needed
-                var symReader = CreateReader(pdbStream, metadataReaderOpt);
+                var symReader = CreateReader(pdbStream, metadataReaderOpt, useNativeReader: (options & PdbToXmlOptions.UseNativeReader) != 0);
 
                 try
                 {
@@ -163,12 +163,12 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        private static ISymUnmanagedReader3 CreateReader(Stream pdbStream, MetadataReader metadataReaderOpt)
+        private static ISymUnmanagedReader3 CreateReader(Stream pdbStream, MetadataReader metadataReaderOpt, bool useNativeReader)
         {
             var metadataProvider = metadataReaderOpt != null ? new SymMetadataProvider(metadataReaderOpt) : DummySymReaderMetadataProvider.Instance;
             var importer = SymUnmanagedReaderFactory.CreateSymReaderMetadataImport(metadataProvider);
 
-            if (SymReaderHelpers.IsPortable(pdbStream))
+            if (!useNativeReader && SymReaderHelpers.IsPortable(pdbStream))
             {
                 return (ISymUnmanagedReader3)new PortablePdb.SymBinder().GetReaderFromStream(pdbStream, importer);
             }
