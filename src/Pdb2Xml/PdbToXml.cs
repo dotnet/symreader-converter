@@ -34,7 +34,7 @@ namespace Microsoft.DiaSymReader.Tools
             }
             catch (InvalidDataException e)
             {
-                Console.Error.WriteLine("Usage: Pdb2Xml <PEFile | DeltaPdb> [/out <output file>] [/tokens] [/methodSpans] [/delta] [/srcsvr] [/sources]");
+                Console.Error.WriteLine("Usage: Pdb2Xml <PEFile | DeltaPdb> [/out <output file>] [/tokens] [/methodSpans] [/delta] [/srcsvr] [/sources] [/native]");
                 Console.Error.WriteLine();
                 Console.Error.WriteLine(e.Message);
                 return 1;
@@ -92,6 +92,10 @@ namespace Microsoft.DiaSymReader.Tools
 
                     case "/sources":
                         options |= PdbToXmlOptions.IncludeEmbeddedSources;
+                        break;
+
+                    case "/native":
+                        options |= PdbToXmlOptions.UseNativeReader;
                         break;
 
                     default:

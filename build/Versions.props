@@ -9,7 +9,7 @@
     <MicrosoftCodeAnalysisPooledObjectsVersion>2.7.0-beta3-62511-04</MicrosoftCodeAnalysisPooledObjectsVersion>
     <MicrosoftCodeAnalysisDebuggingVersion>2.7.0-beta3-62511-04</MicrosoftCodeAnalysisDebuggingVersion>
     <MicrosoftDiaSymReaderVersion>1.2.0</MicrosoftDiaSymReaderVersion>
-    <MicrosoftDiaSymReaderNativeVersion>1.7.0</MicrosoftDiaSymReaderNativeVersion>
+    <MicrosoftDiaSymReaderNativeVersion>1.8.0-private-26131-01</MicrosoftDiaSymReaderNativeVersion>
     <MicrosoftDiaSymReaderPortablePdbVersion>1.4.0</MicrosoftDiaSymReaderPortablePdbVersion>
     <MicrosoftMetadataVisualizerVersion>1.0.0-beta1-61530-02</MicrosoftMetadataVisualizerVersion>
     <NewtonsoftJsonVersion>9.0.1</NewtonsoftJsonVersion>

@@ -21,5 +21,11 @@ namespace Microsoft.DiaSymReader.Tools
         ExcludeCustomDebugInformation = 1 << 11,
         IncludeSourceServerInformation = 1 << 12,
         IncludeEmbeddedSources = 1 << 13,
+
+        /// <summary>
+        /// Use DIA for reading Portable PDBs.
+        /// Note that not all information is available via DIA APIs.
+        /// </summary>
+        UseNativeReader = 1 << 14,
     }
 }

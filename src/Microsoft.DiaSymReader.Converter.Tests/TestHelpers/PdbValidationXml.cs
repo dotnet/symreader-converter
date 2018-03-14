@@ -20,6 +20,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         public static void VerifyWindowsPdb(TestResource portable, TestResource windows, string expectedXml, PdbDiagnostic[] expectedDiagnostics = null, PortablePdbConversionOptions options = null)
         {
             VerifyWindowsMatchesExpected(windows, expectedXml);
+            VerifyPortableReadNativelyMatchesExpected(portable, expectedXml);
             VerifyWindowsConvertedFromPortableMatchesExpected(portable, expectedXml, expectedDiagnostics, options, validateTimeIndifference: false);
         }
 
@@ -33,6 +34,40 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             var adjustedActualXml = AdjustForInherentDifferences(actualXml);
 
             AssertEx.AssertLinesEqual(adjustedExpectedXml, adjustedActualXml, "Comparing Windows PDB with expected XML");
+        }
+
+        public static void VerifyPortableReadNativelyMatchesExpected(TestResource portable, string expectedXml)
+        {
+            var portablePEStream = new MemoryStream(portable.PE);
+            var portablePdbStream = new MemoryStream(portable.Pdb);
+            var actualXml = PdbToXmlConverter.ToXml(portablePdbStream, portablePEStream, Options | PdbToXmlOptions.UseNativeReader);
+
+            var adjustedActualXml = RemoveElementsNotSupportedByNativeReader(actualXml);
+            var adjustedExpectedXml = RemoveElementsNotSupportedByNativeReader(expectedXml);
+
+            AssertEx.AssertLinesEqual(adjustedExpectedXml, adjustedActualXml, "Comparing Portable PDB read via native reader with expected XML");
+        }
+
+        private static string RemoveElementsNotSupportedByNativeReader(string xml)
+        {
+            var element = XElement.Parse(xml);
+
+            RemoveElements(from e in element.DescendantsAndSelf()
+                           where e.Name == "customDebugInfo" ||
+                                 e.Name == "scope" ||
+                                 e.Name == "asyncInfo"
+                           select e);
+
+            foreach (var e in element.DescendantsAndSelf())
+            {
+                if (e.Name == "file")
+                {
+                    e.Attribute("languageVendor")?.Remove();
+                    e.Attribute("documentType")?.Remove();
+                }
+            }
+
+            return element.ToString();
         }
 
         public static void VerifyWindowsConvertedFromPortableMatchesExpected(TestResource portable, string expectedXml, PdbDiagnostic[] expectedDiagnostics, PortablePdbConversionOptions options, bool validateTimeIndifference)
@@ -93,6 +128,18 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             {
                 ((ISymUnmanagedDispose)symReader).Destroy();
             }
+        }
+
+        private static bool RemoveElements(IEnumerable<XElement> elements)
+        {
+            var array = elements.ToArray();
+
+            foreach (var e in array)
+            {
+                e.Remove();
+            }
+
+            return array.Length > 0;
         }
 
         private static string AdjustForInherentDifferences(string xml)
