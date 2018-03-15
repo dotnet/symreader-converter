@@ -61,14 +61,15 @@
 /extract                   Extract PDB embedded in the DLL/EXE. 
 /sourcelink                When converting to Windows PDB do not convert SourceLink to srcsrv format.
                            By default both SourceLink and srcsrv are included in the converted PDB.
-/nowarn &lt;n1,n2,...&gt;        Suppress specified warning. All warnings are reported by default.
+/nowarn *                  Suppress all warnings. All warnings are reported by default.
+/nowarn &lt;n1,n2,...&gt;        Suppress specified warning.
 /srcsvrvar &lt;name&gt;=&lt;value&gt;  Add specified variable to srcsvr stream. Only applicable 
                            when converting to Windows PDB and /sourcelink is not
                            specified.
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="translated">Uso: Pdb2Pdb &lt;ruta de acceso de dll/exe&gt; [/pdb &lt;ruta de acceso&gt;] [/out &lt;ruta de acceso&gt;] [/extract]
+        <target state="needs-review-translation">Uso: Pdb2Pdb &lt;ruta de acceso de dll/exe&gt; [/pdb &lt;ruta de acceso&gt;] [/out &lt;ruta de acceso&gt;] [/extract]
 
 /pdb &lt;ruta de acceso&gt;     Ruta de acceso al archivo PDB que se debe convertir.
                                  Si no se especifica de forma explícita, se usa el archivo PDB
