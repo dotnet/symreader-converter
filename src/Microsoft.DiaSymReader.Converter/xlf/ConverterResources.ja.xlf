@@ -244,12 +244,12 @@
       </trans-unit>
       <trans-unit id="SourceChecksumAlgorithmSizeMismatch">
         <source>Source file checksum size doesn't match the hash algorithm '{0}': '{1}'</source>
-        <target state="new">Source file checksum size doesn't match the hash algorithm '{0}': '{1}'</target>
+        <target state="translated">ソース ファイル チェックサム サイズは、ハッシュ アルゴリズム '{0}' と一致しません: '{1}'</target>
         <note />
       </trans-unit>
       <trans-unit id="None">
         <source>none</source>
-        <target state="new">none</target>
+        <target state="translated">なし</target>
         <note />
       </trans-unit>
     </body>
