@@ -244,7 +244,7 @@
       </trans-unit>
       <trans-unit id="SourceChecksumAlgorithmSizeMismatch">
         <source>Source file checksum size doesn't match the hash algorithm '{0}': '{1}'</source>
-        <target state="translated">Velikost kontrolního součtu zdrojového souboru nesouhlasí s algoritmem hash {0}: {1}.</target>
+        <target state="translated">Velikost kontrolního součtu zdrojového souboru neodpovídá algoritmu hash {0}: {1}.</target>
         <note />
       </trans-unit>
       <trans-unit id="None">
