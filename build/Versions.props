@@ -15,8 +15,8 @@
     <NewtonsoftJsonVersion>9.0.1</NewtonsoftJsonVersion>
 
     <!-- CoreFX -->
-    <SystemCollectionsImmutableVersion>1.4.0</SystemCollectionsImmutableVersion>
-    <SystemReflectionMetadataVersion>1.5.0</SystemReflectionMetadataVersion>
+    <SystemCollectionsImmutableVersion>1.5.0-preview3-26319-04</SystemCollectionsImmutableVersion>
+    <SystemReflectionMetadataVersion>1.6.0-preview3-26319-04</SystemReflectionMetadataVersion>
     <SystemValueTupleVersion>4.3.0</SystemValueTupleVersion>
   </PropertyGroup>
 
