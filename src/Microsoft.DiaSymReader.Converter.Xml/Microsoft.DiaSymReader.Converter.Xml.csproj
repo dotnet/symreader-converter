@@ -24,8 +24,8 @@
     <PackageReference Include="System.Collections.Immutable" Version="$(SystemCollectionsImmutableVersion)" />
     <PackageReference Include="System.Reflection.Metadata" Version="$(SystemReflectionMetadataVersion)" />
     <PackageReference Include="System.ValueTuple" Version="$(SystemValueTupleVersion)" />
-    <PackageReference Include="Microsoft.CodeAnalysis.PooledObjects" Version="$(MicrosoftCodeAnalysisPooledObjectsVersion)" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Debugging" Version="$(MicrosoftCodeAnalysisDebuggingVersion)" />
+    <PackageReference Include="Microsoft.CodeAnalysis.PooledObjects" Version="$(MicrosoftCodeAnalysisPooledObjectsVersion)" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Debugging" Version="$(MicrosoftCodeAnalysisDebuggingVersion)" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="PdbToXmlResources.resx" GenerateSource="true" />
