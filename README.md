@@ -18,8 +18,10 @@ The converter is available as a command line tool as well as a library. Both are
 | `/out <path>` | Output PDB path. |
 | `/extract`    | Extract PDB embedded in the DLL/EXE. |
 | `/sourcelink` | When converting to Windows PDB do not convert SourceLink to `srcsrv` format. By default both SourceLink and srcsrv are included in the converted PDB. |
-| `/verbose`    | Print detailed diagnostics. |
+| `/nowarn *`                 | Suppress all warnings. All warnings are reported by default. |
+| `/nowarn <n1,n2,...>`       | Suppress specified warning. |
 | `/srcsvrvar <name>=<value>` | Add specified variable to srcsvr stream. Only applicable when converting to Windows PDB and `/sourcelink` is not specified. |
+
 
 `/extract` and `/pdb` are mutually exclusive.
 
