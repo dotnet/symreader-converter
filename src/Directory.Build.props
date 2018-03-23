@@ -3,7 +3,7 @@
   <Import Project="..\Directory.Build.props"/>
 
   <PropertyGroup>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>Latest</LangVersion>
 
     <!-- 
       TODO: Can't use embedded PDBs with LUT:
