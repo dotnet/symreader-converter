@@ -1,8 +1,10 @@
-﻿<!-- Copyright (c)  Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information. -->
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
   <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+
     <!-- This repo version -->
-    <VersionBase>1.1.0</VersionBase>
+    <VersionPrefix>1.1.0</VersionPrefix>
     <PreReleaseVersionLabel>beta1</PreReleaseVersionLabel>
 
     <!-- libs -->
