@@ -166,9 +166,9 @@ namespace Microsoft.DiaSymReader.Tools
 
 [//]: # (Begin current test results)
 
-|          |Windows Debug|Windows Release|
-|:--------:|:-----------:|:-------------:|
-|**master**|[![Build Status](https://ci2.dot.net/job/dotnet_symreader-converter/job/master/job/windows_debug/badge/icon)](https://ci2.dot.net/job/dotnet_symreader-converter/job/master/job/windows_debug/)|[![Build Status](https://ci2.dot.net/job/dotnet_symreader-converter/job/master/job/windows_release/badge/icon)](https://ci2.dot.net/job/dotnet_symreader-converter/job/master/job/windows_release/)|
+|    | x64 Debug|x64 Release|
+|:--:|:--:|:--:|
+|**Windows**|[![Build Status](https://ci2.dot.net/job/dotnet_symreader-converter/job/master/job/Windows_NT_Debug/badge/icon)](https://ci2.dot.net/job/dotnet_symreader-converter/job/master/job/Windows_NT_Debug/)|[![Build Status](https://ci2.dot.net/job/dotnet_symreader-converter/job/master/job/Windows_NT_Release/badge/icon)](https://ci2.dot.net/job/dotnet_symreader-converter/job/master/job/Windows_NT_Release/)|
 
 [//]: # (End current test results)
 
