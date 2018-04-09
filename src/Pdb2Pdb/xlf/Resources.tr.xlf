@@ -69,7 +69,7 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">Kullanım: Pdb2Pdb &lt;dll/exe yolu&gt; [/pdb &lt;yol&gt;] [/out &lt;yol&gt;] [/extract]
+        <target state="translated">Kullanım: Pdb2Pdb &lt;dll/exe yolu&gt; [/pdb &lt;yol&gt;] [/out &lt;yol&gt;] [/extract]
 
 /pdb &lt;yol&gt;                Dönüştürülecek PDB’nin yolu. Açıkça belirtilmezse, 
                            DLL/EXE tarafından başvurulan veya DLL/EXE’ye gömülü PDB kullanılır.
@@ -77,8 +77,9 @@
 /extract                   DLL/EXE’ye gömülü PDB’yi ayıklayın. 
 /sourcelink                Windows PDB’ye dönüştürürken SourceLink’i srcsrv biçimine dönüştürmeyin.
                            SourceLink ve srcsrv varsayılan olarak dönüştürülmüş PDB’ye dahildir.
-/verbose                   Ayrıntılı tanılamayı yazdırın.
-/srcsvrvar &lt;ad&gt;=&lt;değer&gt;  Belirtilen değişkeni srcsvr akışına ekleyin. Yalnızca 
+/nowarn *                  Tüm uyarıları gizleyin. Varsayılan olarak tüm uyarılar bildirilir.
+/nowarn &lt;n1,n2,...&gt;        Belirtilen uyarıyı gizleyin.
+/srcsvrvar &lt;name&gt;=&lt;value&gt;  Belirtilen değişkeni srcsvr akışına ekleyin. Yalnızca 
                            Windows PDB’ye dönüştürürken ve /sourcelink belirtilmediğinde
                            geçerlidir.
 
@@ -98,7 +99,7 @@
       </trans-unit>
       <trans-unit id="InvalidWarningNumber">
         <source>Invalid warning number: '{0}'.</source>
-        <target state="new">Invalid warning number: '{0}'.</target>
+        <target state="translated">Geçersiz uyarı numarası: '{0}'.</target>
         <note />
       </trans-unit>
     </body>

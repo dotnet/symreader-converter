@@ -69,7 +69,7 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">用法: Pdb2Pdb &lt;dll/exe path&gt; [/pdb &lt;path&gt;] [/out &lt;path&gt;] [/extract]
+        <target state="translated">用法: Pdb2Pdb &lt;dll/exe path&gt; [/pdb &lt;path&gt;] [/out &lt;path&gt;] [/extract]
 
 /pdb &lt;path&gt;                待转换 PDB 的路径。如果未显式指定，
                            则会使用 DLL/EXE 所引用或 DLL/EXE 中嵌入的 PDB。
@@ -77,9 +77,10 @@
 /extract                  提取 DLL/EXE 中嵌入的 PDB。
 /sourcelink                在转换为 Windows PDB 时，请勿将 SourceLink 转换为 srcsrv 格式。
                            默认情况下，转换的 PDB 中同时包括 SourceLink 和 srcsrv。
-/verbose                   打印详细诊断。
-/srcsvrvar &lt;name&gt;=&lt;value&gt;  将指定变量添加到 srcsvr 流。仅在转换为 Windows PDB 
-                           且未指定 /sourcelink 时
+/nowarn *                  取消显示所有警告。默认报告所有警告。
+/nowarn &lt;n1,n2,...&gt;        取消显示指定警告。
+/srcsvrvar &lt;name&gt;=&lt;value&gt;  向 srcsvr 流添加指定变量。仅当
+                            转换为 Windows PDB 且未指定 /sourcelink 时
                            适用。
 
 /extract 和 /pdb 相互排斥。
@@ -98,7 +99,7 @@
       </trans-unit>
       <trans-unit id="InvalidWarningNumber">
         <source>Invalid warning number: '{0}'.</source>
-        <target state="new">Invalid warning number: '{0}'.</target>
+        <target state="translated">警告编号“{0}”无效。</target>
         <note />
       </trans-unit>
     </body>

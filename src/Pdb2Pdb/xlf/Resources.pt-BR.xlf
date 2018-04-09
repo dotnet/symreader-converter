@@ -69,15 +69,19 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">Uso: Pdb2Pdb &lt;caminho do dll/exe&gt; [/pdb &lt;caminho&gt;] [/out &lt;caminho&gt;] [/extract]
+        <target state="translated">Uso: Pdb2Pdb &lt;dll/exe path&gt; [/pdb &lt;path&gt;] [/out &lt;path&gt;] [/extract]
 
-/pdb &lt;caminho&gt;                Caminho do PDB a ser convertido. Se não for especificado explicitamente, o PDB referenciado pelo DLL/EXE ou nele inserido será usado.
-/out &lt;caminho&gt;                Caminho do PDB de saída.
+/pdb &lt;path&gt;                Caminho para o PDB a ser convertido. Se não especificado explicitamente, 
+                           o PDB referenciado ou inserido no DLL/EXE será usado.
+/out &lt;path&gt;                Caminho do PDB de saída.
 /extract                   Extrair o PDB inserido no DLL/EXE. 
-/sourcelink                Ao converter para PDB do Windows, não converte SourceLink para um formato srcsrv.
-                                     Por padrão, SourceLink e srcsrv são incluídos no PDB convertido.
-/verbose                   Imprimir diagnósticos detalhados.
-/srcsvrvar &lt;nome&gt;=&lt;valor&gt;  Adicionar a variável especificada ao fluxo de srcsvr. Aplicável somente ao converter para o PDB do Windows sem que /sourcelink seja especificado.
+/sourcelink                Ao converter em PDB do Windows, não converter SourceLink no formato srcsrv.
+                           Por padrão, tanto SourceLink quanto srcsrv são incluídos no PDB convertido.
+/nowarn *                  Suprimir todos os avisos. Todos os avisos são relatados por padrão.
+/nowarn &lt;n1,n2,...&gt;        Suprimir o aviso especificado.
+/srcsvrvar &lt;name&gt;=&lt;value&gt; Adicionar a variável especificada ao fluxo de srcsvr. Aplicável somente 
+                           ao converter no PDB do Windows PDB sem que /sourcelink seja
+                           especificado.
 
 /extract e /pdb são mutuamente exclusivos.
 </target>
@@ -95,7 +99,7 @@
       </trans-unit>
       <trans-unit id="InvalidWarningNumber">
         <source>Invalid warning number: '{0}'.</source>
-        <target state="new">Invalid warning number: '{0}'.</target>
+        <target state="translated">Número de aviso inválido: '{0}'.</target>
         <note />
       </trans-unit>
     </body>
