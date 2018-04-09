@@ -69,17 +69,18 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">Utilisation : Pdb2Pdb &lt;chemin dll/exe&gt; [/pdb &lt;chemin&gt;] [/out &lt;chemin&gt;] [/extract]
+        <target state="translated">Utilisation : Pdb2Pdb &lt;chemin du fichier dll/exe&gt; [/pdb &lt;chemin&gt;] [/out &lt;chemin&gt;] [/extract]
 
-/pdb &lt;chemin&gt;                Chemin du fichier PDB à convertir. S'il n'est pas spécifié explicitement, 
-                           le fichier PDB référencé par le fichier DLL/EXE ou incorporé dans celui-ci est utilisé.
-/out &lt;chemin&gt;                Chemin du fichier PDB de sortie. 
-/extract                   Extraire le fichier PDB incorporé dans le fichier DLL/EXE. 
-/sourcelink                Quand vous effectuez la conversion vers un fichier PDB Windows, ne convertissez pas SourceLink au format srcsrv.
+/pdb &lt;chemin&gt;              Chemin du fichier PDB à convertir. S'il n'est pas spécifié explicitement, 
+                           le fichier PDB référencé ou incorporé dans le fichier DLL/EXE est utilisé.
+/out &lt;chemin&gt;              Chemin de sortie du fichier PDB.
+/extract                   Permet d'extraire le fichier PDB incorporé dans le fichier DLL/EXE. 
+/sourcelink                Durant la conversion en fichier PDB Windows, SourceLink n'est pas converti au format srcsrv.
                            Par défaut, SourceLink et srcsrv sont inclus dans le fichier PDB converti.
-/verbose                   Imprimer les diagnostics détaillés.
-/srcsvrvar &lt;nom&gt;=&lt;valeur&gt;  Ajouter la variable spécifiée au flux srcsvr. Applicable uniquement 
-                           pendant la conversion au format PDB Windows si /sourcelink n'est pas
+/nowarn *                  Permet de supprimer tous les avertissements. Par défaut, tous les avertissements sont signalés.
+/nowarn &lt;n1,n2,...&gt;        Permet de supprimer les avertissements spécifiés.
+/srcsvrvar &lt;nom&gt;=&lt;valeur&gt;  Permet d'ajouter la variable spécifiée au flux srcsvr. Applicable uniquement 
+                           durant la conversion en fichier PDB Windows et quand /sourcelink n'est pas
                            spécifié.
 
 /extract et /pdb s'excluent mutuellement.
@@ -98,7 +99,7 @@
       </trans-unit>
       <trans-unit id="InvalidWarningNumber">
         <source>Invalid warning number: '{0}'.</source>
-        <target state="new">Invalid warning number: '{0}'.</target>
+        <target state="translated">Numéro d'avertissement non valide : '{0}'.</target>
         <note />
       </trans-unit>
     </body>

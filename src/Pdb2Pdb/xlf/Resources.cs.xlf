@@ -69,7 +69,7 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">Použití: Pdb2Pdb &lt;cesta k souboru dll/exe&gt; [/pdb &lt;cesta&gt;] [/out &lt;cesta&gt;] [/extract]
+        <target state="translated">Použití: Pdb2Pdb &lt;cesta k souboru dll/exe&gt; [/pdb &lt;cesta&gt;] [/out &lt;cesta&gt;] [/extract]
 
 /pdb &lt;cesta&gt;                Cesta k souboru PDB, který se má převést. Pokud není zadaný explicitně, 
                            použije se soubor PDB, na který odkazuje DLL/EXE nebo který je v něm vnořený.
@@ -77,7 +77,8 @@
 /extract                   Extrahuje soubor PDB vnořený v souboru DLL/EXE. 
 /sourcelink                Při převodu na formát Windows PDB nepřevede odkaz na zdroj na formát srcsrv.
                            Ve výchozím nastavení jsou v převedeném souboru PDB zahrnuté jak odkaz na zdroj, tak i srcsrv.
-/verbose                   Vypíše podrobnou diagnostiku.
+/nowarn *                  Potlačí všechna upozornění. Ve výchozím nastavení se všechna upozornění oznamují.
+/nowarn &lt;n1,n2,...&gt;        Potlačí zadaná upozornění.
 /srcsvrvar &lt;název&gt;=&lt;hodnota&gt;  Přidá zadanou proměnnou do streamu srcsvr. Dá se použít 
                            jenom v případě, že převádíte do souboru Windows PDB a není zadaný parametr
                            /sourcelink.
@@ -98,7 +99,7 @@ Parametry /extract a /pdb se vzájemně vylučují.
       </trans-unit>
       <trans-unit id="InvalidWarningNumber">
         <source>Invalid warning number: '{0}'.</source>
-        <target state="new">Invalid warning number: '{0}'.</target>
+        <target state="translated">Neplatné číslo upozornění: {0}.</target>
         <note />
       </trans-unit>
     </body>

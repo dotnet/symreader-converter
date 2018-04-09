@@ -69,7 +69,7 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">Sintassi: Pdb2Pdb &lt;percorso DLL/EXE&gt; [/pdb &lt;percorso&gt;] [/out &lt;percorso&gt;] [/extract]
+        <target state="translated">Sintassi: Pdb2Pdb &lt;percorso DLL/EXE&gt; [/pdb &lt;percorso&gt;] [/out &lt;percorso&gt;] [/extract]
 
 /pdb &lt;percorso&gt;                Percorso del PDB da convertire. Se non è specificato in modo esplicito, 
                            viene usato il PDB a cui viene fatto riferimento o incorporato nel file DLL/EXE.
@@ -77,9 +77,10 @@
 /extract                   Estrae il PDB incorporato nel file DLL/EXE. 
 /sourcelink                Durante la conversione in PDB di Windows non converte SourceLink in formato srcsrv.
                            Per impostazione predefinita sia SourceLink che srcsrv sono inclusi nel PDB convertito.
-/verbose                   Stampa informazioni dettagliate sulla diagnostica.
+/nowarn *                  Disattiva la visualizzazione di tutti gli avvisi. Per impostazione predefinita, vengono restituiti tutti gli avvisi.
+/nowarn &lt;n1,n2,...&gt;        Disattiva la visualizzazione dell'avviso specificato.
 /srcsvrvar &lt;nome&gt;=&lt;valore&gt;  Aggiunge la variabile specificata al flusso srcsvr. Applicabile 
-                           solo durante la conversione in Windows PDB e l'opzione /sourcelink 
+                           solo durante la conversione in Windows PDB e quando l'opzione /sourcelink 
                            non è specificata.
 
 Le opzioni /extract e /pdb si escludono a vicenda.
@@ -98,7 +99,7 @@ Le opzioni /extract e /pdb si escludono a vicenda.
       </trans-unit>
       <trans-unit id="InvalidWarningNumber">
         <source>Invalid warning number: '{0}'.</source>
-        <target state="new">Invalid warning number: '{0}'.</target>
+        <target state="translated">Numero di avviso non valido: '{0}'</target>
         <note />
       </trans-unit>
     </body>

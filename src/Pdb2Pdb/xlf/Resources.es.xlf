@@ -69,7 +69,7 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="needs-review-translation">Uso: Pdb2Pdb &lt;ruta de acceso de dll/exe&gt; [/pdb &lt;ruta de acceso&gt;] [/out &lt;ruta de acceso&gt;] [/extract]
+        <target state="translated">Uso: Pdb2Pdb &lt;ruta de acceso de dll/exe&gt; [/pdb &lt;ruta de acceso&gt;] [/out &lt;ruta de acceso&gt;] [/extract]
 
 /pdb &lt;ruta de acceso&gt;     Ruta de acceso al archivo PDB que se debe convertir.
                                  Si no se especifica de forma explícita, se usa el archivo PDB
@@ -79,10 +79,11 @@
 /sourcelink             En la conversión a PDB de Windows, SourceLink no se convierte
                                  al formato srcsrv. De forma predeterminada, se incluyen los dos
                                  (SourceLink y srcsrv) en el archivo PDB convertido.
-/verbose                 Imprime el diagnóstico detallado.
-/srcsvrvar &lt;nombre&gt;=&lt;valor&gt;  Agrega la variable especificada al flujo srcsvr. Se aplica
-                                 solo cuando se convierte a PDB de Windows y no se especifica 
-                                 /sourcelink.
+/nowarn *                  Suprime todas las advertencias. Todas las advertencias se notifican de manera predeterminada.
+/nowarn &lt;n1,n2,...&gt;        Suprime la advertencia especificada.
+/srcsvrvar &lt;name&gt;=&lt;value&gt;  Agrega la variable especificada al flujo srcsvr. Solo aplicable 
+                           al convertir a Windows PDB y si /sourcelink no se ha
+                           especificado.
 
 /extract y /pdb se excluyen mutuamente.
 </target>
@@ -100,7 +101,7 @@
       </trans-unit>
       <trans-unit id="InvalidWarningNumber">
         <source>Invalid warning number: '{0}'.</source>
-        <target state="new">Invalid warning number: '{0}'.</target>
+        <target state="translated">Número de advertencia "{0}" no válido.</target>
         <note />
       </trans-unit>
     </body>
