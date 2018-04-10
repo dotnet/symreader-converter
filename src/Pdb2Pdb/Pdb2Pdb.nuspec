@@ -1,21 +1,19 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
-    <id>Microsoft.DiaSymReader.Pdb2Pdb</id>
-    <version>$version$</version>
-    <authors>Microsoft</authors>
-    <owners>Microsoft</owners>
-    <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <licenseUrl>$licenseUrl$</licenseUrl>
-    <projectUrl>$repoUrl$</projectUrl>
-    <copyright>$copyright$</copyright>
-    <repository url="$repoUrl$" />
-    <developmentDependency>true</developmentDependency>
-    <tags>DiaSymReader ISymUnmanagedReader Portable PDB debugging conversion tool</tags> 
-    <serviceable>true</serviceable>
-    <description>Converter between Windows PDB and Portable PDB (standalone or embedded) file formats.</description>
-    <language>en-US</language>
-  </metadata>
+    <id>$PackageId$</id>
+    <description>$Description$</description>
+    <version>$Version$</version>
+    <authors>$Authors$</authors>
+    <requireLicenseAcceptance>$RequireLicenseAcceptance$</requireLicenseAcceptance>
+    <licenseUrl>$PackageLicenseUrl$</licenseUrl>
+    <projectUrl>$PackageProjectUrl$</projectUrl>
+    <copyright>$Copyright$</copyright>
+    <developmentDependency>$DevelopmentDependency$</developmentDependency>
+    <tags>$PackageTags$</tags>
+    <serviceable>$Serviceable$</serviceable>
+    <repository type="$RepositoryType$" url="$RepositoryUrl$" commit="$RepositoryCommit$" />
+  </metadata>  
   <files>
     <!-- Dependencies built by this repo -->
     <file src="..\Microsoft.DiaSymReader.Converter\net45\Microsoft.DiaSymReader.Converter.dll" target="tools" />

@@ -7,11 +7,15 @@
     <LargeAddressAware>true</LargeAddressAware>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- NuGet -->
     <IsPackable>true</IsPackable>
     <NuspecFile>Pdb2Pdb.nuspec</NuspecFile>
     <NuspecBasePath>$(OutputPath)</NuspecBasePath>
-    <NuspecProperties>version=$(Version);licenseUrl=$(PackageLicenseUrl);repoUrl=$(RepositoryUrl);copyright=$(Copyright)</NuspecProperties>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <PackageTags>DiaSymReader ISymUnmanagedReader Portable PDB debugging conversion tool</PackageTags> 
+    <Description>Converter between Windows PDB and Portable PDB (standalone or embedded) file formats.</Description>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.DiaSymReader.Converter\Microsoft.DiaSymReader.Converter.csproj" />
