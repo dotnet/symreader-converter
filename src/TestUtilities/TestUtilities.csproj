@@ -1,7 +1,7 @@
 ﻿<Project Sdk="RoslynTools.RepoToolset">
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>    
-    <PublishOutputToSymStore>false</PublishOutputToSymStore>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <IsShipping>false</IsShipping>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Collections.Immutable" Version="$(SystemCollectionsImmutableVersion)" />

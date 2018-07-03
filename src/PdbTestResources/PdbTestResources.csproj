@@ -2,7 +2,7 @@
 <Project Sdk="RoslynTools.RepoToolset">
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
-    <PublishOutputToSymStore>false</PublishOutputToSymStore>
+    <IsShipping>false</IsShipping>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Resources\**\*.cs" />
