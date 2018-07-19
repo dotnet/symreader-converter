@@ -1330,7 +1330,7 @@ namespace Microsoft.DiaSymReader.Tools
         // internal for testing
         internal static string ConvertSourceServerToSourceLinkData(string sourceServerData)
         {
-            // TODO: replicate what debugger does (https://github.com/dotnet/symreader-converter/issues/510)
+            // TODO: replicate what debugger does (https://github.com/dotnet/symreader-converter/issues/51)
 
             string[] lines = sourceServerData.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 
