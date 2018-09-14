@@ -16,15 +16,14 @@
   </metadata>
   <files>
     <!-- Dependencies built by this repo -->
-    <file src="..\Microsoft.DiaSymReader.Converter.Xml\netstandard1.3\Microsoft.DiaSymReader.Converter.Xml.dll" target="tools" />
+    <file src="..\Microsoft.DiaSymReader.Converter.Xml\netstandard2.0\Microsoft.DiaSymReader.Converter.Xml.dll" target="tools" />
     <!-- External dependencies -->
-    <file src="net46\Microsoft.DiaSymReader.dll" target="tools" />
-    <file src="net46\Microsoft.DiaSymReader.Native.*.dll" target="tools" />
-    <file src="net46\Microsoft.DiaSymReader.PortablePdb.dll" target="tools" />
-    <file src="net46\Microsoft.Win32.*.dll" target="tools" />
-    <file src="net46\System.*.dll" target="tools" />
-    <file src="net46\*.exe" target="tools" />
-    <file src="net46\*.exe.config" target="tools" />
-    <file src="net46\**\*.resources.dll" target="tools" />
+    <file src="net472\Microsoft.DiaSymReader.dll" target="tools" />
+    <file src="net472\Microsoft.DiaSymReader.Native.*.dll" target="tools" />
+    <file src="net472\Microsoft.DiaSymReader.PortablePdb.dll" target="tools" />
+    <file src="net472\System.*" target="tools" />
+    <file src="net472\*.exe" target="tools" />
+    <file src="net472\*.exe.config" target="tools" />
+    <file src="net472\**\*.resources.dll" target="tools" />
   </files>
 </package>
