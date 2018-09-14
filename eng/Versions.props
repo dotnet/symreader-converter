@@ -23,6 +23,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <RestoreSources>
       $(RestoreSources);
       https://dotnet.myget.org/F/symreader/api/v3/index.json;
