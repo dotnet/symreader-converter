@@ -6,6 +6,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IsPackable>true</IsPackable>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Description>Converter between Windows PDB and Portable PDB formats.</Description>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageTags>DiaSymReader ISymUnmanagedReader Portable PDB debugging conversion</PackageTags>
