@@ -10,7 +10,8 @@
     <file src="net472\Newtonsoft.Json.dll" target="tools" />
     <file src="net472\Microsoft.DiaSymReader.dll" target="tools" />
     <file src="net472\Microsoft.DiaSymReader.Native.*.dll" target="tools" />
-    <file src="net472\System.*.dll" target="tools" />
+    <file src="net472\System.Collections.Immutable.dll" target="tools" />
+    <file src="net472\System.Reflection.Metadata.dll" target="tools" />
     <file src="net472\*.exe" target="tools" />
     <file src="net472\*.exe.config" target="tools" />    
     <file src="net472\**\*.resources.dll" target="tools" />
