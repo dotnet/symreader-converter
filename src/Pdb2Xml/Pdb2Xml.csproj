@@ -1,5 +1,5 @@
 ﻿<!-- Copyright (c)  Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information. -->
-<Project Sdk="RoslynTools.RepoToolset">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <RootNamespace>Microsoft.DiaSymReader.Tools</RootNamespace>
@@ -7,42 +7,19 @@
     <LargeAddressAware>true</LargeAddressAware>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <PlatformTarget>AnyCPU</PlatformTarget>
-  
-    <!-- NuGet -->
     <IsPackable>true</IsPackable>
     <NuspecFile>Pdb2Xml.nuspec</NuspecFile>
     <NuspecBasePath>$(OutputPath)</NuspecBasePath>
-    <DevelopmentDependency>true</DevelopmentDependency>
-    <PackageTags>DiaSymReader ISymUnmanagedReader Windows PDB debugging XML Pdb2Xml tool</PackageTags> 
-    <Description>Converts content of PDB symbol file to XML representation.</Description>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.DiaSymReader.Converter.Xml\Microsoft.DiaSymReader.Converter.Xml.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Resources.Designer.cs">
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
+    <EmbeddedResource Update="Resources.resx" GenerateSource="true" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Resources.resx">
-      <CustomToolNamespace>Microsoft.DiaSymReader.Tools</CustomToolNamespace>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
+    <NuspecProperty Include="Configuration=$(Configuration)"/>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="$(NuGetPackageRoot)\Microsoft.DiaSymReader.Native\$(MicrosoftDiaSymReaderNativeVersion)\runtimes\win\native\Microsoft.DiaSymReader.Native.x86.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-      <Link>Microsoft.DiaSymReader.Native.x86.dll</Link>
-    </Content>
-    <Content Include="$(NuGetPackageRoot)\Microsoft.DiaSymReader.Native\$(MicrosoftDiaSymReaderNativeVersion)\runtimes\win\native\Microsoft.DiaSymReader.Native.amd64.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-      <Link>Microsoft.DiaSymReader.Native.amd64.dll</Link>
-    </Content>
-  </ItemGroup>
+
+  <Import Project="$(RepositoryEngineeringDir)DiaSymReaderNative.targets" />
 </Project>
