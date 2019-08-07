@@ -105,8 +105,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         <constant name=""U4"" value=""6"" runtime-type=""UInt32"" unknown-signature="""" />
         <constant name=""I8"" value=""7"" runtime-type=""Int64"" unknown-signature="""" />
         <constant name=""U8"" value=""8"" runtime-type=""UInt64"" unknown-signature="""" />
-        <constant name=""R4"" value=""9.1"" runtime-type=""Single"" unknown-signature="""" />
-        <constant name=""R8"" value=""10.2"" runtime-type=""Double"" unknown-signature="""" />
+        <constant name=""R4"" value=""0x4111999A"" runtime-type=""Single"" unknown-signature="""" />
+        <constant name=""R8"" value=""0x4024666666666666"" runtime-type=""Double"" unknown-signature="""" />
         <constant name=""EI1"" value=""1"" runtime-type=""Int16"" unknown-signature="""" />
         <constant name=""EU1"" value=""2"" runtime-type=""Int16"" unknown-signature="""" />
         <constant name=""EI2"" value=""3"" runtime-type=""Int16"" unknown-signature="""" />
@@ -946,7 +946,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         <currentnamespace name=""N2"" />
         <constant name=""D1"" value=""0"" type=""Decimal"" />
         <constant name=""D2"" value=""1.23"" type=""Decimal"" />
-        <constant name=""DT"" value=""3.479442310755E-266"" runtime-type=""Double"" unknown-signature="""" />
+        <constant name=""DT"" value=""0x08D1F36D05308000"" runtime-type=""Double"" unknown-signature="""" />
       </scope>
     </method>
     <method containingType=""N3.G+VB$StateMachine_1_It1"" name=""MoveNext"">

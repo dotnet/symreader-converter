@@ -26,9 +26,6 @@ namespace Microsoft.DiaSymReader.Tools
     /// </summary>
     public sealed class PdbToXmlConverter
     {
-        // For printing integers in a standard hex format.
-        private const string IntHexFormat = "0x{0:X}";
-
         private readonly MetadataReader _metadataReader;
         private readonly ISymUnmanagedReader3 _symReader;
         private readonly MetadataReader _portablePdbMetadataOpt;
@@ -373,7 +370,7 @@ namespace Microsoft.DiaSymReader.Tools
 
         // Order in Windows PDBs and Portable PDBs is different, but it doesn't matter. 
         // To enable matching between XML of both formats use the Windows PDB order for both.
-        private static IReadOnlyDictionary<Guid, int> s_cdiOrdering = new Dictionary<Guid, int>()
+        private static readonly IReadOnlyDictionary<Guid, int> s_cdiOrdering = new Dictionary<Guid, int>()
         {
             {PortableCustomDebugInfoKinds.StateMachineHoistedLocalScopes, 0},
             {PortableCustomDebugInfoKinds.EncLocalSlotMap, 1},
@@ -1177,15 +1174,15 @@ namespace Microsoft.DiaSymReader.Tools
                 }
                 else
                 {
-                    var str = value as string;
-                    if (str != null)
+                    var strValue = value switch
                     {
-                        _writer.WriteAttributeString("value", StringUtilities.EscapeNonPrintableCharacters(str));
-                    }
-                    else
-                    {
-                        _writer.WriteAttributeString("value", string.Format(CultureInfo.InvariantCulture, "{0}", value));
-                    }
+                        string str => StringUtilities.EscapeNonPrintableCharacters(str),
+                        float f => "0x" + SingleToInt32Bits(f).ToString("X8"),                // display the underlying raw bytes to ensure display independent of platform (core/netfx)
+                        double d => "0x" + BitConverter.DoubleToInt64Bits(d).ToString("X16"), // display the underlying raw bytes to ensure display independent of platform (core/netfx)
+                        _ => string.Format(CultureInfo.InvariantCulture, "{0}", value)
+                    };
+
+                    _writer.WriteAttributeString("value", strValue);
 
                     if (signature.Length == 0)
                     {
@@ -1216,6 +1213,8 @@ namespace Microsoft.DiaSymReader.Tools
                 _writer.WriteEndElement();
             }
         }
+
+        private static unsafe int SingleToInt32Bits(float value) => *(int*)&value;
 
         private static bool IsPossiblyNullConstantType(byte[] signature)
         {
