@@ -94,44 +94,43 @@ namespace Microsoft.DiaSymReader.Tools
         {
             IEnumerable<MethodDefinitionHandle> methodHandles;
 
-            using (var peReader = new PEReader(peStream, PEStreamOptions.LeaveOpen))
+            using var peReader = new PEReader(peStream, PEStreamOptions.LeaveOpen);
+
+            var metadataReader = peReader.GetMetadataReader();
+
+            if (string.IsNullOrEmpty(methodName))
             {
-                var metadataReader = peReader.GetMetadataReader();
+                methodHandles = metadataReader.MethodDefinitions;
+            }
+            else
+            {
+                var matching = metadataReader.MethodDefinitions.
+                    Where(methodHandle => GetQualifiedMethodName(metadataReader, methodHandle) == methodName).ToArray();
 
-                if (string.IsNullOrEmpty(methodName))
+                if (matching.Length == 0)
                 {
-                    methodHandles = metadataReader.MethodDefinitions;
-                }
-                else
-                {
-                    var matching = metadataReader.MethodDefinitions.
-                        Where(methodHandle => GetQualifiedMethodName(metadataReader, methodHandle) == methodName).ToArray();
+                    xmlWriter.WriteLine("<error>");
+                    xmlWriter.WriteLine($"<message><![CDATA[No method '{methodName}' found in metadata.]]></message>");
+                    xmlWriter.WriteLine("<available-methods>");
 
-                    if (matching.Length == 0)
+                    foreach (var methodHandle in metadataReader.MethodDefinitions)
                     {
-                        xmlWriter.WriteLine("<error>");
-                        xmlWriter.WriteLine($"<message><![CDATA[No method '{methodName}' found in metadata.]]></message>");
-                        xmlWriter.WriteLine("<available-methods>");
-
-                        foreach (var methodHandle in metadataReader.MethodDefinitions)
-                        {
-                            xmlWriter.Write("<method><![CDATA[");
-                            xmlWriter.Write(GetQualifiedMethodName(metadataReader, methodHandle));
-                            xmlWriter.Write("]]></method>");
-                            xmlWriter.WriteLine();
-                        }
-
-                        xmlWriter.WriteLine("</available-methods>");
-                        xmlWriter.WriteLine("</error>");
-
-                        return;
+                        xmlWriter.Write("<method><![CDATA[");
+                        xmlWriter.Write(GetQualifiedMethodName(metadataReader, methodHandle));
+                        xmlWriter.Write("]]></method>");
+                        xmlWriter.WriteLine();
                     }
 
-                    methodHandles = matching;
+                    xmlWriter.WriteLine("</available-methods>");
+                    xmlWriter.WriteLine("</error>");
+
+                    return;
                 }
 
-                ToXml(xmlWriter, pdbStream, metadataReader, options, methodHandles);
+                methodHandles = matching;
             }
+
+            ToXml(xmlWriter, pdbStream, metadataReader, options, methodHandles);
         }
 
         /// <summary>
@@ -142,21 +141,21 @@ namespace Microsoft.DiaSymReader.Tools
         {
             Debug.Assert(pdbStream != null);
             Debug.Assert((options & PdbToXmlOptions.ResolveTokens) == 0 || metadataReaderOpt != null);
+            Debug.Assert(methodHandles != null);
 
-            using (var writer = XmlWriter.Create(xmlWriter, s_xmlWriterSettings))
+            using var writer = XmlWriter.Create(xmlWriter, s_xmlWriterSettings);
+
+            // metadata reader is on stack -> no owner needed
+            var symReader = CreateReader(pdbStream, metadataReaderOpt, useNativeReader: (options & PdbToXmlOptions.UseNativeReader) != 0);
+
+            try
             {
-                // metadata reader is on stack -> no owner needed
-                var symReader = CreateReader(pdbStream, metadataReaderOpt, useNativeReader: (options & PdbToXmlOptions.UseNativeReader) != 0);
-
-                try
-                {
-                    var converter = new PdbToXmlConverter(writer, symReader, metadataReaderOpt, options);
-                    converter.WriteRoot(methodHandles ?? metadataReaderOpt.MethodDefinitions);
-                }
-                finally
-                {
-                    ((ISymUnmanagedDispose)symReader).Destroy();
-                }
+                var converter = new PdbToXmlConverter(writer, symReader, metadataReaderOpt, options);
+                converter.WriteRoot(methodHandles);
+            }
+            finally
+            {
+                ((ISymUnmanagedDispose)symReader).Destroy();
             }
         }
 
@@ -182,7 +181,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             var documents = _symReader.GetDocuments();
             var documentIndex = BuildDocumentIndex(documents);
-            var methodTokenMap = BuildMethodTokenMap();
+            var portableMethodTokenMap = BuildPortableMethodTokenMap();
 
             if ((_options & PdbToXmlOptions.ExcludeDocuments) == 0)
             {
@@ -192,7 +191,7 @@ namespace Microsoft.DiaSymReader.Tools
             if ((_options & PdbToXmlOptions.ExcludeMethods) == 0)
             {
                 WriteEntryPoint();
-                WriteAllMethods(methodHandles, methodTokenMap, documentIndex);
+                WriteAllMethods(methodHandles, portableMethodTokenMap, documentIndex);
                 WriteAllMethodSpans();
             }
 
@@ -209,17 +208,36 @@ namespace Microsoft.DiaSymReader.Tools
         {
             _writer.WriteStartElement("methods");
 
+            Dictionary<MethodDefinitionHandle, MethodDefinitionHandle> aggregateToRelativeMap = null;
+            if (tokenMap.Length > 0)
+            {
+                // maps aggregate handles to generation-relative method handles:
+                aggregateToRelativeMap = new Dictionary<MethodDefinitionHandle, MethodDefinitionHandle>(tokenMap.Length);
+                for (int i = 0; i < tokenMap.Length; i++)
+                {
+                    aggregateToRelativeMap.Add(tokenMap[i], MetadataTokens.MethodDefinitionHandle(i + 1));
+                }
+            }
+
             foreach (var methodHandle in methodHandles)
             {
-                WriteMethod(methodHandle, tokenMap, documentIndex);
+                // for non-delta PDB these handles are the same:
+                var generationMethodHandle = methodHandle;
+
+                if (aggregateToRelativeMap?.TryGetValue(methodHandle, out generationMethodHandle) == false)
+                {
+                    continue;
+                }
+
+                WriteMethod(methodHandle, generationMethodHandle, documentIndex);
             }
 
             _writer.WriteEndElement();
         }
 
-        private void WriteMethod(MethodDefinitionHandle methodHandle, ImmutableArray<MethodDefinitionHandle> tokenMap, IReadOnlyDictionary<string, int> documentIndex)
+        private void WriteMethod(MethodDefinitionHandle methodHandle, MethodDefinitionHandle generationMethodHandle, IReadOnlyDictionary<string, int> documentIndex)
         {
-            int token = _metadataReader.GetToken(methodHandle);
+            int token = _metadataReader.GetToken(generationMethodHandle);
             ISymUnmanagedMethod method = _symReader.GetMethod(token);
 
             var windowsCdi = default(byte[]);
@@ -233,7 +251,7 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 if (_portablePdbMetadataOpt != null)
                 {
-                    portableCdi = GetPortableCustomDebugInfo(methodHandle);
+                    portableCdi = GetPortableCustomDebugInfo(generationMethodHandle);
                 }
                 else
                 {
@@ -267,10 +285,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             _writer.WriteStartElement("method");
 
-            int methodRowId = MetadataTokens.GetRowNumber(methodHandle);
-            int tokenToDisplay = (methodRowId <= tokenMap.Length) ? MetadataTokens.GetToken(tokenMap[methodRowId - 1]) : token;
-
-            WriteMethodAttributes(tokenToDisplay, isReference: false);
+            WriteMethodAttributes(MetadataTokens.GetToken(methodHandle), isReference: false);
             WriteCustomDebugInfo(windowsCdi, portableCdi);
 
             if (!sequencePoints.IsEmpty)
@@ -1439,7 +1454,7 @@ namespace Microsoft.DiaSymReader.Tools
             _writer.WriteEndElement(); // sequencepoints
         }
 
-        private unsafe ImmutableArray<MethodDefinitionHandle> BuildMethodTokenMap()
+        private unsafe ImmutableArray<MethodDefinitionHandle> BuildPortableMethodTokenMap()
         {
             if (!(_symReader is ISymUnmanagedReader4 symReader4) ||
                 symReader4.GetPortableDebugMetadata(out byte* metadata, out int size) != 0)
@@ -1449,6 +1464,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             var reader = new MetadataReader(metadata, size);
 
+            // Maps RowId in this generation (index to the resulting array) to aggregate method token:
             return (from handle in reader.GetEditAndContinueMapEntries()
                     where handle.Kind == HandleKind.MethodDebugInformation
                     select MetadataTokens.MethodDefinitionHandle(MetadataTokens.GetRowNumber(handle))).ToImmutableArray();
