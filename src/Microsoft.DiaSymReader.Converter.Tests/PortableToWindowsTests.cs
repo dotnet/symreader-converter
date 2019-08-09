@@ -1331,12 +1331,12 @@ new PortablePdbConversionOptions(srcSvrVariables: new[]
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\EmbeddedSourceSmall.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""48-30-92-B9-4A-92-50-A7-75-33-E8-05-0D-2E-DD-CD-3F-58-9F-7F"" embeddedSourceLength=""109""><![CDATA[// should be less than compression threshold (200 chars)
+    <file id=""1"" name=""C:\EmbeddedSourceSmall.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""48-30-92-B9-4A-92-50-A7-75-33-E8-05-0D-2E-DD-CD-3F-58-9F-7F""><![CDATA[// should be less than compression threshold (200 chars)
 public class Small
 {
     public Small() {}
 }]]></file>
-    <file id=""2"" name=""C:\EmbeddedSource.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""1D-BB-A3-11-47-F6-42-7D-82-99-B4-31-E9-32-7D-6B-09-C3-59-EB"" embeddedSourceLength=""229""><![CDATA[// should be higher than compression threshold (200 chars)
+    <file id=""2"" name=""C:\EmbeddedSource.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""1D-BB-A3-11-47-F6-42-7D-82-99-B4-31-E9-32-7D-6B-09-C3-59-EB""><![CDATA[// should be higher than compression threshold (200 chars)
 
 using System;
 
@@ -1356,9 +1356,9 @@ namespace Test
     }
 }
 ]]></file>
-    <file id=""3"" name=""C:\EmbeddedSourceNoCode.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""4B-4C-47-82-20-10-AC-63-A9-24-1E-33-CE-BA-74-76-40-F3-33-BB"" embeddedSourceLength=""26""><![CDATA[// file with no code
+    <file id=""3"" name=""C:\EmbeddedSourceNoCode.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""4B-4C-47-82-20-10-AC-63-A9-24-1E-33-CE-BA-74-76-40-F3-33-BB""><![CDATA[// file with no code
 ]]></file>
-    <file id=""4"" name=""C:\EmbeddedSourceNoSequencePoints.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""8B-74-C4-70-25-F1-77-43-94-81-81-6A-D1-80-BA-F4-57-12-58-5E"" embeddedSourceLength=""56""><![CDATA[// file with no sequence points
+    <file id=""4"" name=""C:\EmbeddedSourceNoSequencePoints.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""8B-74-C4-70-25-F1-77-43-94-81-81-6A-D1-80-BA-F4-57-12-58-5E""><![CDATA[// file with no sequence points
 
 interface I { }
 ]]></file>
