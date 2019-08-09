@@ -1545,10 +1545,12 @@ namespace Microsoft.DiaSymReader.Tools
                 Marshal.ThrowExceptionForHR(doc.HasEmbeddedSource(out bool hasEmbeddedSource));
                 if (hasEmbeddedSource)
                 {
-                    Marshal.ThrowExceptionForHR(doc.GetSourceLength(out int sourceLength));
-                    _writer.WriteAttributeString("embeddedSourceLength", sourceLength.ToString());
-
-                    if ((_options & PdbToXmlOptions.IncludeEmbeddedSources) != 0)
+                    if ((_options & PdbToXmlOptions.IncludeEmbeddedSources) == 0)
+                    {
+                        // only write out the info that we have embedded source but don't include the source:
+                        _writer.WriteAttributeString("hasEmbeddedSource", "true");
+                    }
+                    else
                     {
                         WriteEmbeddedSource(doc);
                     }
