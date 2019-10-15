@@ -92,7 +92,7 @@ namespace Microsoft.DiaSymReader.Tools
             var metadataReader = peReader.GetMetadataReader();
             var metadataModel = new MetadataModel(metadataReader, vbSemantics);
 
-            var documentNames = new ArrayBuilder<string>(pdbReader.Documents.Count);
+            var nonEmbeddedDocumentNames = new ArrayBuilder<string>(pdbReader.Documents.Count);
             var symSequencePointsWriter = new SymUnmanagedSequencePointsWriter(pdbWriter, capacity: 64);
             var declaredExternAliases = new HashSet<string>();
             var importStringsBuilder = new List<string>();
@@ -116,10 +116,14 @@ namespace Microsoft.DiaSymReader.Tools
                 var document = pdbReader.GetDocument(documentHandle);
                 var languageGuid = pdbReader.GetGuid(document.Language);
                 var name = pdbReader.GetString(document.Name);
-                documentNames.Add(name);
 
                 var embeddedSourceHandle = pdbReader.GetCustomDebugInformation(documentHandle, PortableCustomDebugInfoKinds.EmbeddedSource);
                 var sourceBlob = embeddedSourceHandle.IsNil ? null : pdbReader.GetBlobBytes(embeddedSourceHandle);
+
+                if (embeddedSourceHandle.IsNil)
+                {
+                    nonEmbeddedDocumentNames.Add(name);
+                }
 
                 var algorithmId = pdbReader.GetGuid(document.HashAlgorithm);
                 var checksum = pdbReader.GetBlobBytes(document.Hash);
@@ -580,7 +584,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                 if (!options.SuppressSourceLinkConversion)
                 {
-                    var srcsvrData = ConvertSourceServerData(pdbReader.GetStringUTF8(sourceLinkHandle), documentNames, options);
+                    var srcsvrData = ConvertSourceServerData(pdbReader.GetStringUTF8(sourceLinkHandle), nonEmbeddedDocumentNames, options);
 
                     // an error has been reported:
                     if (srcsvrData != null)
