@@ -1068,7 +1068,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         public void Convert_SourceLinkToSourceData()
         {
             VerifyWindowsMatchesExpected(
-                TestResources.SourceData.WindowsDllAndPdb, 
+                TestResources.SourceData.WindowsDllAndPdb,
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
@@ -1157,6 +1157,8 @@ SRCSRV: end ------------------------------------------------]]></srcsvr>
     <file id=""11"" name="":6.cs"" language=""C#"" />
     <file id=""12"" name=""C:\a\b\X.cs"" language=""C#"" />
     <file id=""13"" name=""C:\a\B\x.cs"" language=""C#"" />
+    <file id=""14"" name=""D:\symreader-converter\src\PdbTestResources\Resources\EmbeddedSourceNoCode.cs"" language=""C#"" checksumAlgorithm=""SHA256"" checksum=""FF-08-24-28-1D-46-0C-E0-4C-DE-9B-1E-8E-7C-20-2A-7D-14-B5-95-B4-CC-E9-F8-9D-BD-3B-70-3A-37-C9-E4""><![CDATA[// file with no code
+]]></file>
   </files>
   <methods>
     <method containingType=""C"" name=""M"">
@@ -1193,7 +1195,7 @@ SRCSRV: end ------------------------------------------------]]></srcsvr>
     ""C:\\a*"": ""http://server/1/a*"",
     ""C:\\A*"": ""http://server/2/A*"",
     ""C:\\*"": ""http://server/3/*.g"",
-    ""*"": ""http://server/4/*""
+    "":*"": ""http://server/4/*""
   }
 }]]></sourceLink>
   <srcsvr><![CDATA[SRCSRV: ini ------------------------------------------------
@@ -1212,7 +1214,7 @@ C:\A\b\c\x.cs*1/a/b/c/x.cs
 C:\a\b\x.cs*1/a/b/x.cs
 C:\a\B\3.cs*1/a/B/3.cs
 C:\a\B\c\4.cs*1/a/B/c/4.cs
-:6.cs*4/%3A6.cs
+:6.cs*4/6.cs
 C:\a\b\X.cs*1/a/b/X.cs
 C:\a\B\x.cs*1/a/B/x.cs
 SRCSRV: end ------------------------------------------------]]></srcsvr>
@@ -1247,6 +1249,8 @@ SRCSRV: end ------------------------------------------------]]></srcsvr>
     <file id=""11"" name="":6.cs"" language=""C#"" />
     <file id=""12"" name=""C:\a\b\X.cs"" language=""C#"" />
     <file id=""13"" name=""C:\a\B\x.cs"" language=""C#"" />
+    <file id=""14"" name=""D:\symreader-converter\src\PdbTestResources\Resources\EmbeddedSourceNoCode.cs"" language=""C#"" checksumAlgorithm=""SHA256"" checksum=""FF-08-24-28-1D-46-0C-E0-4C-DE-9B-1E-8E-7C-20-2A-7D-14-B5-95-B4-CC-E9-F8-9D-BD-3B-70-3A-37-C9-E4""><![CDATA[// file with no code
+]]></file>
   </files>
   <methods>
     <method containingType=""C"" name=""M"">
@@ -1283,7 +1287,7 @@ SRCSRV: end ------------------------------------------------]]></srcsvr>
     ""C:\\a*"": ""http://server/1/a*"",
     ""C:\\A*"": ""http://server/2/A*"",
     ""C:\\*"": ""http://server/3/*.g"",
-    ""*"": ""http://server/4/*""
+    "":*"": ""http://server/4/*""
   }
 }]]></sourceLink>
   <srcsvr><![CDATA[SRCSRV: ini ------------------------------------------------
@@ -1304,7 +1308,7 @@ C:\A\b\c\x.cs*1/a/b/c/x.cs
 C:\a\b\x.cs*1/a/b/x.cs
 C:\a\B\3.cs*1/a/B/3.cs
 C:\a\B\c\4.cs*1/a/B/c/4.cs
-:6.cs*4/%3A6.cs
+:6.cs*4/6.cs
 C:\a\b\X.cs*1/a/b/X.cs
 C:\a\B\x.cs*1/a/B/x.cs
 SRCSRV: end ------------------------------------------------]]></srcsvr>

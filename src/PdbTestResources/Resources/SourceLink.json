@@ -3,6 +3,6 @@
     "C:\\a*": "http://server/1/a*",
     "C:\\A*": "http://server/2/A*",
     "C:\\*": "http://server/3/*.g",
-    "*": "http://server/4/*"
+    ":*": "http://server/4/*"
   }
 }
