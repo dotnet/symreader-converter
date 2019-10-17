@@ -4,6 +4,7 @@
     $CommonMetadataElements$
   </metadata>
   <files>
+    $CommonFileElements$
     <!-- Dependencies built by this repo -->
     <file src="..\..\Microsoft.DiaSymReader.Converter.Xml\$Configuration$\netstandard2.0\Microsoft.DiaSymReader.Converter.Xml.dll" target="tools" />
     <!-- External dependencies -->

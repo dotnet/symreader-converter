@@ -7,7 +7,10 @@
     <LargeAddressAware>true</LargeAddressAware>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <PlatformTarget>AnyCPU</PlatformTarget>
+
+    <!-- NuGet -->
     <IsPackable>true</IsPackable>
+    <PackageId>Microsoft.DiaSymReader.Pdb2Pdb</PackageId>
     <NuspecFile>Pdb2Pdb.nuspec</NuspecFile>
     <NuspecBasePath>$(OutputPath)</NuspecBasePath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
