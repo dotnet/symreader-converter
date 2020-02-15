@@ -2,7 +2,7 @@
 
 Converts between Windows PDB and [Portable PDB](https://github.com/dotnet/core/blob/master/Documentation/diagnostics/portable_pdb.md) formats.
 
-Pre-release builds are available on MyGet gallery: https://dotnet.myget.org/Gallery/symreader-converter.
+Pre-release builds are available from Azure DevOps public feed: `https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json` ([browse](https://dev.azure.com/dnceng/public/_packaging?_a=feed&feed=dotnet-tools)).
 
 ## Usage
 
