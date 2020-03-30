@@ -8,8 +8,8 @@
     <UsingToolMicrosoftNetCompilers>true</UsingToolMicrosoftNetCompilers>
     <UsingToolSymbolUploader>true</UsingToolSymbolUploader>
     <!-- libs -->
-    <MicrosoftCodeAnalysisPooledObjectsVersion>3.3.0-beta3-19407-01</MicrosoftCodeAnalysisPooledObjectsVersion>
-    <MicrosoftCodeAnalysisDebuggingVersion>3.3.0-beta3-19407-01</MicrosoftCodeAnalysisDebuggingVersion>
+    <MicrosoftCodeAnalysisPooledObjectsVersion>3.6.0-beta1-20111-10</MicrosoftCodeAnalysisPooledObjectsVersion>
+    <MicrosoftCodeAnalysisDebuggingVersion>3.6.0-beta1-20111-10</MicrosoftCodeAnalysisDebuggingVersion>
     <MicrosoftDiaSymReaderVersion>1.3.0</MicrosoftDiaSymReaderVersion>
     <MicrosoftDiaSymReaderNativeVersion>1.7.0</MicrosoftDiaSymReaderNativeVersion>
     <MicrosoftDiaSymReaderPortablePdbVersion>1.5.0</MicrosoftDiaSymReaderPortablePdbVersion>
