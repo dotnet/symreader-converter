@@ -36,6 +36,18 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             AssertEx.AssertLinesEqual(adjustedExpectedXml, adjustedActualXml, "Comparing Windows PDB with expected XML");
         }
 
+        public static void VerifyPortablePdb(
+            TestResource portable,
+            string expectedXml,
+            PdbToXmlOptions options = Options)
+        {
+            var portablePEStream = new MemoryStream(portable.PE);
+            var portablePdbStream = new MemoryStream(portable.Pdb);
+            var actualXml = PdbToXmlConverter.ToXml(portablePdbStream, portablePEStream, options);
+
+            AssertEx.AssertLinesEqual(expectedXml, actualXml, "Comparing Portable PDB with expected XML");
+        }
+
         public static void VerifyPortableReadNativelyMatchesExpected(TestResource portable, string expectedXml)
         {
             var portablePEStream = new MemoryStream(portable.PE);

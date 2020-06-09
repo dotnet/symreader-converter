@@ -27,5 +27,7 @@ namespace Microsoft.DiaSymReader.Tools
         /// Note that not all information is available via DIA APIs.
         /// </summary>
         UseNativeReader = 1 << 14,
+
+        IncludeModuleDebugInfo = 1 << 15,
     }
 }

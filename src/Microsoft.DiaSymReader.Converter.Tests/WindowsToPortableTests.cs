@@ -16,10 +16,10 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
                 TestResources.Documents.DllAndPdb(portable: true),
                 TestResources.Documents.DllAndPdb(portable: false), @"
 Document (index: 0x30, size: 104): 
-=============================================================================================================
+=================================================================================================================================================
    Name               Language  HashAlgorithm  Hash                                                         
-=============================================================================================================
-1: 'C:\Documents.cs'  C#        SHA-1          DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE  
+=================================================================================================================================================
+1: '/_/Documents.cs'  C#        SHA-256        46-E0-DA-8D-C6-03-94-AE-09-FA-AD-1C-D8-6F-60-19-64-BE-4E-5A-B0-D8-D9-60-0D-79-E8-92-50-16-04-06  
 2: 'C:\a\b\c\d\1.cs'  C#        nil            nil                                                          
 3: 'C:\a\b\c\D\2.cs'  C#        nil            nil                                                          
 4: 'C:\a\b\C\d\3.cs'  C#        nil            nil                                                          
@@ -34,10 +34,12 @@ c: 'C:\a\b\X.cs'      C#        nil            nil
 d: 'C:\a\B\x.cs'      C#        nil            nil                                                          
 
 MethodDebugInformation (index: 0x31, size: 8): 
-==================================================
+===============================================
+   IL   
+===============================================
 1:
 {
-  IL_0000: (7, 5) - (7, 6) [#1]
+  IL_0000: (6, 5) - (6, 6) [#1]
   IL_0001: (10, 9) - (10, 30) [#2]
   IL_0008: (20, 9) - (20, 30) [#3]
   IL_000F: (30, 9) - (30, 30) [#4]
@@ -60,7 +62,7 @@ LocalScope (index: 0x32, size: 16):
 ===================================================================================================
    Method                  ImportScope               Variables  Constants  StartOffset  Length  
 ===================================================================================================
-1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         99      
+1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       99      
 
 ImportScope (index: 0x35, size: 8): 
 ======================================
@@ -68,6 +70,31 @@ ImportScope (index: 0x35, size: 8):
 ======================================
 1: nil (ImportScope)         nil       
 2: 0x35000001 (ImportScope)  'System'
+«
+CustomDebugInformation (index: 0x37, size: 12): 
+==============================================================================================================================================================
+    Parent               Kind                             Value                                                                                                
+==============================================================================================================================================================
+1: 0x00000001 (Module)  Compilation Options              63-6F-6D-70-69-6C-65-72-2D-76-65-72-73-69-6F-6E-00-33-2E-37-2E-30-2D-64-65-76-00-6C-61-6E-67-75-...  
+{
+  compiler-version: 3.7.0-dev
+  language: C#
+  portability-policy: 0
+  runtime-version: 4.8.4180.0
+  optimization: debug
+  checked: False
+  nullable: Disable
+  unsafe: False
+  language-version: 8.0
+}
+2: 0x00000001 (Module)  Compilation Metadata References  6D-73-63-6F-72-6C-69-62-2E-64-6C-6C-00-00-01-D3-20-7D-5E-00-00-53-00-B5-26-EC-4B-C7-CB-15-47-84-...  
+{
+  -------------------------------------------------------------------------------------------------------
+      FileName        Aliases  Flags     TimeStamp   FileSize    MVID                                  
+  -------------------------------------------------------------------------------------------------------
+  0: 'mscorlib.dll'  ''       Assembly  0x5E7D20D3  0x00530000  4bec26b5-cbc7-4715-8442-f1499e984732  
+}
+»«»
 ");
         }
 
@@ -84,7 +111,9 @@ Document (index: 0x30, size: 8):
 1: 'C:\Scopes.cs'  C#        SHA-1          DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE  
 
 MethodDebugInformation (index: 0x31, size: 20): 
-==================================================
+================================================
+   IL   
+================================================
 1: nil
 2: 
 {
@@ -158,43 +187,43 @@ LocalScope (index: 0x32, size: 240):
 ===========================================================================================================================
     Method                  ImportScope               Variables              Constants              StartOffset  Length  
 ===========================================================================================================================
- 1: 0x06000002 (MethodDef)  0x35000002 (ImportScope)  nil                    0x34000001-0x3400001d  0000         2       
- 2: 0x06000003 (MethodDef)  0x35000002 (ImportScope)  0x33000001-0x33000002  nil                    0000         19      
- 3: 0x06000003 (MethodDef)  0x35000002 (ImportScope)  0x33000003-0x33000003  0x3400001e-0x3400001e  0003         4       
- 4: 0x06000003 (MethodDef)  0x35000002 (ImportScope)  0x33000004-0x33000004  nil                    0009         9       
- 5: 0x06000003 (MethodDef)  0x35000002 (ImportScope)  0x33000005-0x33000005  0x3400001f-0x34000020  000C         5       
- 6: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x33000006-0x33000006  nil                    0000         54      
- 7: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x33000007-0x33000007  nil                    0003         12      
- 8: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x33000008-0x33000008  nil                    0006         4       
- 9: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x33000009-0x33000009  nil                    000A         4       
- a: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x3300000a-0x3300000a  nil                    000F         38      
- b: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x3300000b-0x3300000b  nil                    0014         5       
- c: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x3300000c-0x3300000c  nil                    0019         13      
- d: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x3300000d-0x3300000e  nil                    001D         8       
- e: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x3300000f-0x3300000f  nil                    0026         5       
- f: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x33000010-0x33000011  nil                    002C         8       
+ 1: 0x06000002 (MethodDef)  0x35000002 (ImportScope)  nil                    0x34000001-0x3400001d  0x0000       2       
+ 2: 0x06000003 (MethodDef)  0x35000002 (ImportScope)  0x33000001-0x33000002  nil                    0x0000       19      
+ 3: 0x06000003 (MethodDef)  0x35000002 (ImportScope)  0x33000003-0x33000003  0x3400001e-0x3400001e  0x0003       4       
+ 4: 0x06000003 (MethodDef)  0x35000002 (ImportScope)  0x33000004-0x33000004  nil                    0x0009       9       
+ 5: 0x06000003 (MethodDef)  0x35000002 (ImportScope)  0x33000005-0x33000005  0x3400001f-0x34000020  0x000C       5       
+ 6: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x33000006-0x33000006  nil                    0x0000       54      
+ 7: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x33000007-0x33000007  nil                    0x0003       12      
+ 8: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x33000008-0x33000008  nil                    0x0006       4       
+ 9: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x33000009-0x33000009  nil                    0x000A       4       
+ a: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x3300000a-0x3300000a  nil                    0x000F       38      
+ b: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x3300000b-0x3300000b  nil                    0x0014       5       
+ c: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x3300000c-0x3300000c  nil                    0x0019       13      
+ d: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x3300000d-0x3300000e  nil                    0x001D       8       
+ e: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x3300000f-0x3300000f  nil                    0x0026       5       
+ f: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  0x33000010-0x33000011  nil                    0x002C       8       
 
 LocalVariable (index: 0x33, size: 102): 
-============================
+========================================
     Name  Index  Attributes  
-============================
- 1: 'x0'  0      None        
- 2: 'y0'  1      None        
- 3: 'x1'  2      None        
- 4: 'y1'  3      None        
- 5: 'y2'  4      None        
- 6: 'a'   0      None        
- 7: 'b'   1      None        
- 8: 'c'   2      None        
- 9: 'd'   3      None        
- a: 'e'   4      None        
- b: 'f'   5      None        
- c: 'g'   6      None        
- d: 'h'   7      None        
- e: 'd'   8      None        
- f: 'i'   9      None        
-10: 'j'   10     None        
-11: 'd'   11     None        
+========================================
+ 1: 'x0'  0      0        
+ 2: 'y0'  1      0        
+ 3: 'x1'  2      0        
+ 4: 'y1'  3      0        
+ 5: 'y2'  4      0        
+ 6: 'a'   0      0        
+ 7: 'b'   1      0        
+ 8: 'c'   2      0        
+ 9: 'd'   3      0        
+ a: 'e'   4      0        
+ b: 'f'   5      0        
+ c: 'g'   6      0        
+ d: 'h'   7      0        
+ e: 'd'   8      0        
+ f: 'i'   9      0        
+10: 'j'   10     0        
+11: 'd'   11     0        
 
 LocalConstant (index: 0x34, size: 128): 
 =================================================================================
@@ -241,11 +270,11 @@ ImportScope (index: 0x35, size: 8):
 2: 0x35000001 (ImportScope)  'System', 'System.Collections.Generic'  
 
 CustomDebugInformation (index: 0x37, size: 24): 
-============================================================================================================================================================
+=============================================================================================================================================================
    Parent                      Kind                     Value                                                                                               
-============================================================================================================================================================
+=============================================================================================================================================================
 1: 0x06000003 (MethodDef)      EnC Local Slot Map       01-10-01-76-01-54-01-80-9A-01-81-24                                                                 
-2: 0x06000004 (MethodDef)      EnC Local Slot Map       01-10-01-33-01-5E-01-80-98-01-80-D5-01-81-17-01-81-5D-01-81-98-01-81-BC-01-82-19-01-82-66-01-82-82  
+2: 0x06000004 (MethodDef)      EnC Local Slot Map       01-10-01-33-01-5E-01-80-98-01-80-D5-01-81-17-01-81-5D-01-81-98-01-81-BC-01-82-19-01-82-66-01-82-...    
 3: 0x34000019 (LocalConstant)  Dynamic Local Variables  01                                                                                                  
 4: 0x3400001c (LocalConstant)  Dynamic Local Variables  20");
         }
@@ -263,7 +292,9 @@ Document (index: 0x30, size: 8):
 1: 'C:\Async.cs'  C#        SHA-1          DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE  
 
 MethodDebugInformation (index: 0x31, size: 36): 
-==================================================
+================================================
+   IL   
+================================================
 1: nil
 2: nil
 3: nil
@@ -311,10 +342,10 @@ LocalScope (index: 0x32, size: 64):
 ===================================================================================================
    Method                  ImportScope               Variables  Constants  StartOffset  Length  
 ===================================================================================================
-1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         59      
-2: 0x06000002 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         48      
-3: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         407     
-4: 0x06000008 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         163     
+1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       59      
+2: 0x06000002 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       48      
+3: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       407     
+4: 0x06000008 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       163     
 
 ImportScope (index: 0x35, size: 8): 
 ======================================================
@@ -347,7 +378,9 @@ Document (index: 0x30, size: 8):
 1: 'C:\Iterator.cs'  C#        SHA-1          DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE  
 
 MethodDebugInformation (index: 0x31, size: 80): 
-==================================================
+================================================
+   IL   
+================================================
 1: nil
 2: nil
 3: nil
@@ -404,17 +437,17 @@ LocalScope (index: 0x32, size: 96):
 ===============================================================================================================
    Method                  ImportScope               Variables  Constants              StartOffset  Length  
 ===============================================================================================================
-1: 0x06000002 (MethodDef)  0x35000002 (ImportScope)  nil        nil                    0000         15      
-2: 0x06000003 (MethodDef)  0x35000002 (ImportScope)  nil        nil                    0000         15      
-3: 0x06000007 (MethodDef)  0x35000002 (ImportScope)  nil        nil                    0000         133     
-4: 0x06000007 (MethodDef)  0x35000002 (ImportScope)  nil        0x34000001-0x34000001  001F         102     
-5: 0x06000007 (MethodDef)  0x35000002 (ImportScope)  nil        0x34000002-0x34000002  0030         53      
-6: 0x0600000f (MethodDef)  0x35000002 (ImportScope)  nil        nil                    0000         57      
+1: 0x06000002 (MethodDef)  0x35000002 (ImportScope)  nil        nil                    0x0000       15      
+2: 0x06000003 (MethodDef)  0x35000002 (ImportScope)  nil        nil                    0x0000       15      
+3: 0x06000007 (MethodDef)  0x35000002 (ImportScope)  nil        nil                    0x0000       133     
+4: 0x06000007 (MethodDef)  0x35000002 (ImportScope)  nil        0x34000001-0x34000001  0x001F       102     
+5: 0x06000007 (MethodDef)  0x35000002 (ImportScope)  nil        0x34000002-0x34000002  0x0030       53      
+6: 0x0600000f (MethodDef)  0x35000002 (ImportScope)  nil        nil                    0x0000       57      
 
 LocalConstant (index: 0x34, size: 8): 
-===================
+======================================
    Name  Signature  
-===================
+======================================
 1: 'x'   1 [Int32]  
 2: 'y'   2 [Int32]  
 
@@ -449,7 +482,9 @@ Document (index: 0x30, size: 8):
 1: 'C:\Imports.cs'  C#        SHA-1          DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE  
 
 MethodDebugInformation (index: 0x31, size: 20): 
-==================================================
+================================================
+   IL   
+================================================
 1: 
 {
   Document: #1
@@ -472,8 +507,8 @@ LocalScope (index: 0x32, size: 32):
 ===================================================================================================
    Method                  ImportScope               Variables  Constants  StartOffset  Length  
 ===================================================================================================
-1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         2       
-2: 0x06000003 (MethodDef)  0x35000004 (ImportScope)  nil        nil        0000         2       
+1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       2       
+2: 0x06000003 (MethodDef)  0x35000004 (ImportScope)  nil        nil        0x0000       2       
 
 ImportScope (index: 0x35, size: 16): 
 =============================================================================================================================================================================================================================================================================================================================================================================================================================================
@@ -492,16 +527,19 @@ ImportScope (index: 0x35, size: 16):
             VerifyPortablePdb(
                 TestResources.MethodBoundaries.DllAndPdb(portable: true),
                 TestResources.MethodBoundaries.DllAndPdb(portable: false), @"
-Document (index: 0x30, size: 24): 
-=====================================================================================================================
+Document (index: 0x30, size: 32): 
+=========================================================================================================================================================
    Name                       Language  HashAlgorithm  Hash                                                         
-=====================================================================================================================
+=========================================================================================================================================================
 1: 'C:\MethodBoundaries1.cs'  C#        SHA-1          DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE  
 2: 'C:\MethodBoundaries2.cs'  C#        nil            nil                                                          
-3: 'C:\MethodBoundaries3.cs'  C#        nil            nil                                                          
+3: 'C:\MethodBoundaries3.cs'  C#        nil            nil               
+4: '/_/MethodBoundaries.cs'   C#        SHA-256        62-AB-2C-7D-4E-39-5E-50-62-5B-A8-CF-EA-41-DD-5C-C0-81-A2-AB-B1-F7-14-EE-49-2C-51-F0-26-D7-DB-A9
 
 MethodDebugInformation (index: 0x31, size: 64): 
-==================================================
+================================================
+    IL  
+================================================
 1: 
 {
   Document: #1
@@ -639,22 +677,22 @@ LocalScope (index: 0x32, size: 256):
 ===================================================================================================
     Method                  ImportScope               Variables  Constants  StartOffset  Length  
 ===================================================================================================
- 1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         43      
- 2: 0x06000002 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         49      
- 3: 0x06000003 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         13      
- 4: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         6       
- 5: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         6       
- 6: 0x06000006 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         13      
- 7: 0x06000007 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         6       
- 8: 0x06000008 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         12      
- 9: 0x06000009 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         6       
- a: 0x0600000a (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         8       
- b: 0x0600000b (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         13      
- c: 0x0600000c (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         8       
- d: 0x0600000d (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         8       
- e: 0x0600000e (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         8       
- f: 0x0600000f (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         8       
-10: 0x06000010 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         7       
+ 1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       43      
+ 2: 0x06000002 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       49      
+ 3: 0x06000003 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       13      
+ 4: 0x06000004 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       6       
+ 5: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       6       
+ 6: 0x06000006 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       13      
+ 7: 0x06000007 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       6       
+ 8: 0x06000008 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       12      
+ 9: 0x06000009 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       6       
+ a: 0x0600000a (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       8       
+ b: 0x0600000b (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       13      
+ c: 0x0600000c (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       8       
+ d: 0x0600000d (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       8       
+ e: 0x0600000e (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       8       
+ f: 0x0600000f (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       8       
+10: 0x06000010 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       7       
 
 ImportScope (index: 0x35, size: 8): 
 =====================================
@@ -662,7 +700,35 @@ ImportScope (index: 0x35, size: 8):
 =====================================
 1: nil (ImportScope)         nil      
 2: 0x35000001 (ImportScope)  nil      
-
+«
+CustomDebugInformation (index: 0x37, size: 36):
+=================================================================================================================================================================
+   Parent                  Kind                             Value                                                                                                
+=================================================================================================================================================================
+1: 0x00000001 (Module)     Compilation Options              63-6F-6D-70-69-6C-65-72-2D-76-65-72-73-69-6F-6E-00-33-2E-37-2E-30-2D-64-65-76-00-6C-61-6E-67-75-...  
+{
+  compiler-version: 3.7.0-dev
+  language: C#
+  portability-policy: 0
+  runtime-version: 4.8.4180.0
+  optimization: debug
+  checked: False
+  nullable: Disable
+  unsafe: False
+  language-version: 8.0
+}
+2: 0x00000001 (Module)     Compilation Metadata References  6D-73-63-6F-72-6C-69-62-2E-64-6C-6C-00-00-01-D3-20-7D-5E-00-00-53-00-B5-26-EC-4B-C7-CB-15-47-84-...  
+{
+  -------------------------------------------------------------------------------------------------------
+     FileName        Aliases  Flags     TimeStamp   FileSize    MVID                                  
+  -------------------------------------------------------------------------------------------------------
+  0: 'mscorlib.dll'  ''       Assembly  0x5E7D20D3  0x00530000  4bec26b5-cbc7-4715-8442-f1499e984732  
+}
+3: 0x06000002 (MethodDef)  EnC Local Slot Map               16-01  
+4: 0x06000003 (MethodDef)  EnC Local Slot Map               16-01  
+5: 0x06000006 (MethodDef)  EnC Local Slot Map               16-01  
+6: 0x0600000b (MethodDef)  EnC Local Slot Map               16-01
+»«
 CustomDebugInformation (index: 0x37, size: 24): 
 ======================================================
    Parent                  Kind                Value  
@@ -671,6 +737,7 @@ CustomDebugInformation (index: 0x37, size: 24):
 2: 0x06000003 (MethodDef)  EnC Local Slot Map  16-01  
 3: 0x06000006 (MethodDef)  EnC Local Slot Map  16-01  
 4: 0x0600000b (MethodDef)  EnC Local Slot Map  16-01
+»
 ");
         }
 
@@ -680,52 +747,67 @@ CustomDebugInformation (index: 0x37, size: 24):
             VerifyPortablePdb(
                 TestResources.LanguageOnlyTypes.DllAndPdb(portable: true),
                 TestResources.LanguageOnlyTypes.DllAndPdb(portable: false), @"
-Document (index: 0x30, size: 8): 
-=====================================================================================================================
+Document (index: 0x30, size: 16): 
+=========================================================================================================================================================
    Name                       Language  HashAlgorithm  Hash                                                         
-=====================================================================================================================
-1: 'C:\LanguageOnlyTypes.cs'  C#        SHA-1          DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE  
+=========================================================================================================================================================
+1: '/_/LanguageOnlyTypes.cs'  C#        SHA-256        98-C7-6E-B0-6E-F0-49-67-5A-F3-73-86-AF-FE-24-EC-F9-D3-DC-C1-0A-09-99-52-32-9A-25-C0-0A-B5-E8-D0  
+2: '/_/System.cs'             C#        SHA-256        5C-47-20-0B-0F-35-34-EA-05-59-9A-86-5A-49-38-C9-6D-90-BD-10-A0-4B-08-58-1F-18-0A-ED-BE-B7-2B-6D
 
-MethodDebugInformation (index: 0x31, size: 8): 
-==================================================
+MethodDebugInformation (index: 0x31, size: 56): 
+================================================
+   IL   
+================================================
 1: 
 {
   Locals: 0x11000001 (StandAloneSig)
   Document: #1
 
-  IL_0000: (9, 5) - (9, 6)
-  IL_0001: (10, 9) - (10, 10)
-  IL_0002: (11, 13) - (18, 125)
-  IL_0004: (20, 13) - (26, 144)
-  IL_000C: (30, 9) - (30, 10)
-  IL_000D: (32, 9) - (32, 10)
-  IL_000E: (33, 13) - (33, 99)
-  IL_0010: (38, 9) - (38, 10)
-  IL_0011: (39, 5) - (39, 6)
+  IL_0000: (8, 5) - (8, 6)
+  IL_0001: (9, 9) - (9, 10)
+  IL_0002: (10, 13) - (17, 125)
+  IL_0004: (19, 13) - (25, 144)
+  IL_000C: (29, 9) - (29, 10)
+  IL_000D: (31, 9) - (31, 10)
+  IL_000E: (32, 13) - (32, 99)
+  IL_0010: (37, 9) - (37, 10)
+  IL_0011: (38, 5) - (38, 6)
 }
 2: nil
+3: nil
+4: nil
+5: nil
+6: nil
+7: nil
+8: nil
+9: nil
+a: nil
+b: nil
+c: nil
+d: nil
+e: nil
 
 LocalScope (index: 0x32, size: 48): 
 ===========================================================================================================================
    Method                  ImportScope               Variables              Constants              StartOffset  Length  
 ===========================================================================================================================
-1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0000         18      
-2: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  0x33000001-0x33000002  0x34000001-0x34000002  0001         12      
-3: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  0x33000003-0x33000004  0x34000003-0x34000004  000D         4       
+1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0x0000       18      
+2: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  0x33000001-0x33000002  0x34000001-0x34000002  0x0001       12      
+3: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  0x33000003-0x33000004  0x34000003-0x34000004  0x000D       4       
 
 LocalVariable (index: 0x33, size: 24): 
-============================
+=======================================
    Name  Index  Attributes  
-============================
-1: 'v1'  0      None        
-2: 'v2'  1      None        
-3: 'v1'  2      None        
-4: 'v2'  3      None        
+=======================================
+1: 'v1'  0      0        
+2: 'v2'  1      0        
+3: 'v1'  2      0        
+4: 'v2'  3      0        
 
 LocalConstant (index: 0x34, size: 16): 
-«=========================================»«===================»
+=======================================«==»«»
    Name  Signature                        
-«=========================================»«===================»
+=======================================«==»«»
 1: 'c1'  «default [0x1b000002 (TypeSpec)]»«0 [Int32]»  
 2: 'c2'  «default [0x1b000003 (TypeSpec)]»«0 [Int32]»  
 3: 'c1'  «default [0x1b000004 (TypeSpec)]»«0 [Int32]»  
@@ -738,29 +820,48 @@ ImportScope (index: 0x35, size: 8):
 1: nil (ImportScope)         nil       
 2: 0x35000001 (ImportScope)  'System'  
 «
-CustomDebugInformation (index: 0x37, size: 66): 
-=================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
-   Parent                      Kind                     Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-=================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
-1: 0x06000001 (MethodDef)      EnC Local Slot Map       01-83-48-01-83-66-01-87-AA-01-88-08   
-2: 0x33000001 (LocalVariable)  Dynamic Local Variables  FC-EF-7F-FF-FB-DF-FF-FE-F7-3F
-3: 0x34000001 (LocalConstant)  Dynamic Local Variables  02                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-4: 0x33000002 (LocalVariable)  Dynamic Local Variables  FC-DD-DF-FD-DD-DF-FD-DD-DF-01                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-5: 0x33000002 (LocalVariable)  Tuple Element Names      61-30-00-61-31-00-61-32-00-61-33-00-61-34-00-61-35-00-6E-30-00-6E-31-00-6E-32-00-6E-33-00-6E-34-00-6E-35-00-6E-36-00-6E-37-00-6E-38-00-6E-39-00-00-00-00-6E-30-00-6E-31-00-6E-32-00-6E-33-00-6E-34-00-6E-35-00-6E-36-00-6E-37-00-6E-38-00-6E-39-00-00-00-00-6E-30-00-6E-31-00-6E-32-00-6E-33-00-6E-34-00-6E-35-00-6E-36-00-6E-37-00-6E-38-00-6E-39-00-00-00-00-6E-30-00-6E-31-00-6E-32-00-6E-33-00-6E-34-00-6E-35-00-6E-36-00-6E-37-00-6E-38-00-6E-39-00-00-00-00-6E-30-00-6E-31-00-6E-32-00-6E-33-00-6E-34-00-6E-35-00-6E-36-00-6E-37-00-6E-38-00-6E-39-00-00-00-00-6E-30-00-6E-31-00-6E-32-00-6E-33-00-6E-34-00-6E-35-00-6E-36-00-6E-37-00-6E-38-00-6E-39-00-00-00-00  
-6: 0x34000002 (LocalConstant)  Dynamic Local Variables  0C                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-7: 0x33000003 (LocalVariable)  Dynamic Local Variables  D2-01                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-8: 0x34000003 (LocalConstant)  Dynamic Local Variables  0A                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-9: 0x33000004 (LocalVariable)  Dynamic Local Variables  D2-01                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-a: 0x33000004 (LocalVariable)  Tuple Element Names      61-31-00-61-37-00-61-38-00-00-00-00-61-34-00-00                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
-b: 0x34000004 (LocalConstant)  Dynamic Local Variables  0A
+CustomDebugInformation (index: 0x37, size: 78): 
+=====================================================================================================================================================================
+   Parent                      Kind                             Value                                                                                               
+=====================================================================================================================================================================
+1: 0x06000001 (MethodDef)      EnC Local Slot Map               01-83-48-01-83-66-01-87-AA-01-88-08                                                                 
+2: 0x00000001 (Module)         Compilation Options              63-6F-6D-70-69-6C-65-72-2D-76-65-72-73-69-6F-6E-00-33-2E-37-2E-30-2D-64-65-76-00-6C-61-6E-67-75-... 
+{
+  compiler-version: 3.7.0-dev
+  language: C#
+  portability-policy: 0
+  runtime-version: 4.8.4180.0
+  optimization: debug
+  checked: False
+  nullable: Disable
+  unsafe: False
+  language-version: 8.0
+}
+3: 0x00000001 (Module)         Compilation Metadata References  6D-73-63-6F-72-6C-69-62-2E-64-6C-6C-00-00-01-D3-20-7D-5E-00-00-53-00-B5-26-EC-4B-C7-CB-15-47-84-... 
+{
+  -------------------------------------------------------------------------------------------------------
+     FileName        Aliases  Flags     TimeStamp   FileSize    MVID                                  
+  -------------------------------------------------------------------------------------------------------
+  0: 'mscorlib.dll'  ''       Assembly  0x5E7D20D3  0x00530000  4bec26b5-cbc7-4715-8442-f1499e984732  
+}
+4: 0x33000001 (LocalVariable)  Dynamic Local Variables          FC-EF-7F-FF-FB-DF-FF-FE-F7-3F                                                                       
+5: 0x34000001 (LocalConstant)  Dynamic Local Variables          02                                                                                                  
+6: 0x33000002 (LocalVariable)  Dynamic Local Variables          FC-DD-DF-FD-DD-DF-FD-DD-DF-01                                                                       
+7: 0x33000002 (LocalVariable)  Tuple Element Names              61-30-00-61-31-00-61-32-00-61-33-00-61-34-00-61-35-00-6E-30-00-6E-31-00-6E-32-00-6E-33-00-6E-34-... 
+8: 0x34000002 (LocalConstant)  Dynamic Local Variables          0C                                                                                                  
+9: 0x33000003 (LocalVariable)  Dynamic Local Variables          D2-01                                                                                               
+a: 0x34000003 (LocalConstant)  Dynamic Local Variables          0A                                                                                                  
+b: 0x33000004 (LocalVariable)  Dynamic Local Variables          D2-01                                                                                               
+c: 0x33000004 (LocalVariable)  Tuple Element Names              61-31-00-61-37-00-61-38-00-00-00-00-61-34-00-00                                                     
+d: 0x34000004 (LocalConstant)  Dynamic Local Variables          0A
 »«
 CustomDebugInformation (index: 0x37, size: 54): 
-=================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+=============================================================================================================================================================
    Parent                      Kind                     Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-=================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+=============================================================================================================================================================
 1: 0x06000001 (MethodDef)      EnC Local Slot Map       01-83-48-01-83-66-01-87-AA-01-88-08                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 2: 0x34000001 (LocalConstant)  Dynamic Local Variables  02                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-3: 0x33000002 (LocalVariable)  Tuple Element Names      61-30-00-61-31-00-61-32-00-61-33-00-61-34-00-61-35-00-6E-30-00-6E-31-00-6E-32-00-6E-33-00-6E-34-00-6E-35-00-6E-36-00-6E-37-00-6E-38-00-6E-39-00-00-00-00-6E-30-00-6E-31-00-6E-32-00-6E-33-00-6E-34-00-6E-35-00-6E-36-00-6E-37-00-6E-38-00-6E-39-00-00-00-00-6E-30-00-6E-31-00-6E-32-00-6E-33-00-6E-34-00-6E-35-00-6E-36-00-6E-37-00-6E-38-00-6E-39-00-00-00-00-6E-30-00-6E-31-00-6E-32-00-6E-33-00-6E-34-00-6E-35-00-6E-36-00-6E-37-00-6E-38-00-6E-39-00-00-00-00-6E-30-00-6E-31-00-6E-32-00-6E-33-00-6E-34-00-6E-35-00-6E-36-00-6E-37-00-6E-38-00-6E-39-00-00-00-00-6E-30-00-6E-31-00-6E-32-00-6E-33-00-6E-34-00-6E-35-00-6E-36-00-6E-37-00-6E-38-00-6E-39-00-00-00-00  
+3: 0x33000002 (LocalVariable)  Tuple Element Names      61-30-00-61-31-00-61-32-00-61-33-00-61-34-00-61-35-00-6E-30-00-6E-31-00-6E-32-00-6E-33-00-6E-34-...
 4: 0x34000002 (LocalConstant)  Dynamic Local Variables  0C                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 5: 0x33000003 (LocalVariable)  Dynamic Local Variables  D2-01                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
 6: 0x34000003 (LocalConstant)  Dynamic Local Variables  0A                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
@@ -784,7 +885,9 @@ Document (index: 0x30, size: 8):
 1: 'C:\VB.vb'  Visual Basic  nil            nil   
 
 MethodDebugInformation (index: 0x31, size: 144): 
-==================================================
+=================================================
+    IL   
+=================================================
 1: nil
 2: nil
 3: nil
@@ -910,27 +1013,27 @@ LocalScope (index: 0x32, size: 192):
 ===========================================================================================================================
    Method                  ImportScope               Variables              Constants              StartOffset  Length  
 ===========================================================================================================================
-1: 0x06000002 (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0000         17      
-2: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0000         113     
-3: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  0x33000001-0x33000001  nil                    0017         17      
-4: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  0x33000002-0x33000002  nil                    001B         8       
-5: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  0x33000003-0x33000003  nil                    004C         22      
-6: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  0x33000004-0x33000004  nil                    0053         8       
-7: 0x06000009 (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0000         17      
-8: 0x0600000a (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0000         17      
-9: 0x0600000d (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0000         379     
-a: 0x06000014 (MethodDef)  0x35000002 (ImportScope)  nil                    0x34000001-0x34000003  0000         2       
-b: 0x06000017 (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0000         82      
-c: 0x0600001f (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0000         139     
+1: 0x06000002 (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0x0000       17      
+2: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0x0000       113     
+3: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  0x33000001-0x33000001  nil                    0x0017       17      
+4: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  0x33000002-0x33000002  nil                    0x001B       8       
+5: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  0x33000003-0x33000003  nil                    0x004C       22      
+6: 0x06000005 (MethodDef)  0x35000002 (ImportScope)  0x33000004-0x33000004  nil                    0x0053       8       
+7: 0x06000009 (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0x0000       17      
+8: 0x0600000a (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0x0000       17      
+9: 0x0600000d (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0x0000       379     
+a: 0x06000014 (MethodDef)  0x35000002 (ImportScope)  nil                    0x34000001-0x34000003  0x0000       2       
+b: 0x06000017 (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0x0000       82      
+c: 0x0600001f (MethodDef)  0x35000002 (ImportScope)  nil                    nil                    0x0000       139     
 
 LocalVariable (index: 0x33, size: 24): 
-============================
+=======================================
    Name  Index  Attributes  
-============================
-1: 'x'   2      None        
-2: 'a'   3      None        
-3: 'x'   7      None        
-4: 'a'   8      None        
+=======================================
+1: 'x'   2      0        
+2: 'a'   3      0        
+3: 'x'   7      0        
+4: 'a'   8      0        
 
 LocalConstant (index: 0x34, size: 12): 
 =======================================================================
@@ -948,9 +1051,9 @@ ImportScope (index: 0x35, size: 8):
 2: 0x35000001 (ImportScope)  <'file1' = 'http://stuff/fromFile'>, <nil = 'http://stuff/fromFile1'>, 'AliasE' = 0x02000009 (TypeDef), 'System', 'System.Collections.Generic'  
 
 CustomDebugInformation (index: 0x37, size: 78):
-============================================================================================================================================================================================================================================
+========================================================================================================================================================================
    Parent                      Kind                                Value                                                                                                                                                                    
-============================================================================================================================================================================================================================================
+========================================================================================================================================================================
 1: 0x00000001 (Module)         Default Namespace                   nil                                                                                                                                                                      
 2: 0x06000002 (MethodDef)      EnC Local Slot Map                  01-05-07-3F-09-3F-01-48-07-80-AF-09-80-AF-01-80-B8                                                                                                                       
 3: 0x33000002 (LocalVariable)  Tuple Element Names                 78-00-00-7A-00                                                                                                                                                           
@@ -959,7 +1062,7 @@ CustomDebugInformation (index: 0x37, size: 78):
 6: 0x06000009 (MethodDef)      EnC Local Slot Map                  01-05                                                                                                                                                                    
 7: 0x0600000a (MethodDef)      EnC Local Slot Map                  01-05-01-2A-01-4F-01-74                                                                                                                                                  
 8: 0x0600000d (MethodDef)      EnC Local Slot Map                  15-00-1C-00-02-3F-02-80-AF                                                                                                                                               
-9: 0x0600000d (MethodDef)      State Machine Hoisted Local Scopes  41-00-00-00-3A-01-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-6D-00-00-00-62-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-03-01-00-00-62-00-00-00  
+9: 0x0600000d (MethodDef)      State Machine Hoisted Local Scopes  41-00-00-00-3A-01-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-6D-00-00-00-62-00-00-00-...
 a: 0x06000017 (MethodDef)      EnC Local Slot Map                  15-00-1C-00                                                                                                                                                              
 b: 0x06000017 (MethodDef)      State Machine Hoisted Local Scopes  21-00-00-00-31-00-00-00                                                                                                                                                  
 c: 0x0600001f (MethodDef)      EnC Local Slot Map                  15-00-1C-00                                                                                                                                                              
@@ -980,7 +1083,9 @@ Document (index: 0x30, size: 8):
 1: 'C:\Misc.cs'  C#        SHA-1          DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE  
 
 MethodDebugInformation (index: 0x31, size: 8): 
-==================================================
+===============================================
+   IL  
+===============================================
 1: 
 {
   Locals: 0x11000001 (StandAloneSig)
@@ -1004,14 +1109,14 @@ LocalScope (index: 0x32, size: 32):
 ===============================================================================================================
    Method                  ImportScope               Variables              Constants  StartOffset  Length  
 ===============================================================================================================
-1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  0x33000001-0x33000001  nil        0000         30      
-2: 0x06000002 (MethodDef)  0x35000002 (ImportScope)  nil                    nil        0000         23      
+1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  0x33000001-0x33000001  nil        0x0000       30      
+2: 0x06000002 (MethodDef)  0x35000002 (ImportScope)  nil                    nil        0x0000       23      
 
 LocalVariable (index: 0x33, size: 6): 
-============================
+======================================
    Name  Index  Attributes  
-============================
-1: 'c'   0      None        
+======================================
+1: 'c'   0      0        
 
 ImportScope (index: 0x35, size: 8): 
 =================================================================================================
@@ -1137,7 +1242,9 @@ Document (index: 0x30, size: 32):
 4: 'C:\EmbeddedSourceNoSequencePoints.cs'  C#        SHA-1          8B-74-C4-70-25-F1-77-43-94-81-81-6A-D1-80-BA-F4-57-12-58-5E  
 
 MethodDebugInformation (index: 0x31, size: 8): 
-==================================================
+===============================================
+   IL   
+===============================================
 1: 
 {
   Document: #1
@@ -1164,8 +1271,8 @@ LocalScope (index: 0x32, size: 32):
 ===================================================================================================
    Method                  ImportScope               Variables  Constants  StartOffset  Length  
 ===================================================================================================
-1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0000         9       
-2: 0x06000002 (MethodDef)  0x35000004 (ImportScope)  nil        nil        0000         30      
+1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       9       
+2: 0x06000002 (MethodDef)  0x35000004 (ImportScope)  nil        nil        0x0000       30      
 
 ImportScope (index: 0x35, size: 16): 
 ======================================
@@ -1177,14 +1284,14 @@ ImportScope (index: 0x35, size: 16):
 4: 0x35000003 (ImportScope)  nil       
 
 CustomDebugInformation (index: 0x37, size: 30): 
-===============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
+====================================================================================================================================================
    Parent                  Kind                Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-===============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
-1: 0x30000001 (Document)   Embedded Source     00-00-00-00-2F-2F-20-73-68-6F-75-6C-64-20-62-65-20-6C-65-73-73-20-74-68-61-6E-20-63-6F-6D-70-72-65-73-73-69-6F-6E-20-74-68-72-65-73-68-6F-6C-64-20-28-32-30-30-20-63-68-61-72-73-29-0D-0A-70-75-62-6C-69-63-20-63-6C-61-73-73-20-53-6D-61-6C-6C-0D-0A-7B-0D-0A-20-20-20-20-70-75-62-6C-69-63-20-53-6D-61-6C-6C-28-29-20-7B-7D-0D-0A-7D                                                                                                                                                                                                                                                                                                                                                                          
+====================================================================================================================================================
+1: 0x30000001 (Document)   Embedded Source     00-00-00-00-2F-2F-20-73-68-6F-75-6C-64-20-62-65-20-6C-65-73-73-20-74-68-61-6E-20-63-6F-6D-70-72-...
 2: 0x06000002 (MethodDef)  EnC Local Slot Map  02-10-16-01                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
-3: 0x30000002 (Document)   Embedded Source     88-01-00-00-65-90-C1-6A-C3-30-0C-86-EF-81-BC-83-8E-31-3D-34-94-DD-BA-4B-19-3B-96-42-BB-17-70-1D-25-36-8B-ED-60-C9-EB-C6-E8-BB-4F-6E-0A-4B-B7-1F-83-E4-DF-9F-84-A5-F5-1A-C8-C6-3C-76-70-46-B0-6E-B0-98-80-AD-0E-60-A2-9F-12-12-B9-18-C4-90-CC-46-81-9A-4D-DB-82-B1-3A-91-AA-AB-BA-CA-E4-C2-00-A7-2F-62-F4-DB-62-04-ED-91-26-6D-10-DE-90-B8-AE-BE-EB-0A-44-53-3E-8F-CE-00-B1-66-09-66-D4-44-70-8A-1E-5F-62-87-33-71-07-FF-C3-2E-F0-0D-DD-23-DB-D8-35-E5-FA-A1-C7-8C-EA-B7-60-51-5B-E4-7A-68-6E-08-3C-43-AB-1E-DF-FE-A0-45-32-5C-BC-40-C0-0B-EC-D2-90-3D-06-3E-64-3E-F4-47-1D-06-7C-FD-34-38-B1-AC-A0-29-83-C5-7E-EE-AB-D4-F6-B1-CD-B5-8C-BE-34-12-72-4E-B2-43-8B-E6-1D-BB-FB-6F-56-F0-B4-59-56-5E-E7-54-82-9C-1F  
+3: 0x30000002 (Document)   Embedded Source     88-01-00-00-65-90-C1-6A-C3-30-0C-86-EF-81-BC-83-8E-31-3D-34-94-DD-BA-4B-19-3B-96-42-BB-17-70-1D-...
 4: 0x30000003 (Document)   Embedded Source     00-00-00-00-2F-2F-20-66-69-6C-65-20-77-69-74-68-20-6E-6F-20-63-6F-64-65-0D-0A                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
-5: 0x30000004 (Document)   Embedded Source     00-00-00-00-2F-2F-20-66-69-6C-65-20-77-69-74-68-20-6E-6F-20-73-65-71-75-65-6E-63-65-20-70-6F-69-6E-74-73-0D-0A-0D-0A-69-6E-74-65-72-66-61-63-65-20-49-20-7B-20-7D-0D-0A
+5: 0x30000004 (Document)   Embedded Source     00-00-00-00-2F-2F-20-66-69-6C-65-20-77-69-74-68-20-6E-6F-20-73-65-71-75-65-6E-63-65-20-70-6F-69-...
 ");
         }
     }

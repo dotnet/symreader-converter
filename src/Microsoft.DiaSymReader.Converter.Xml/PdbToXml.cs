@@ -26,6 +26,8 @@ namespace Microsoft.DiaSymReader.Tools
     /// </summary>
     public sealed class PdbToXmlConverter
     {
+        private const string BadMetadataStr = "?";
+
         private readonly MetadataReader _metadataReader;
         private readonly ISymUnmanagedReader3 _symReader;
         private readonly MetadataReader _portablePdbMetadataOpt;
@@ -201,6 +203,11 @@ namespace Microsoft.DiaSymReader.Tools
                 WriteSourceServerInformation();
             }
 
+            if ((_options & PdbToXmlOptions.IncludeModuleDebugInfo) != 0)
+            {
+                WriteModuleCustomDebugInfo();
+            }
+
             _writer.WriteEndElement();
         }
 
@@ -286,7 +293,7 @@ namespace Microsoft.DiaSymReader.Tools
             _writer.WriteStartElement("method");
 
             WriteMethodAttributes(MetadataTokens.GetToken(methodHandle), isReference: false);
-            WriteCustomDebugInfo(windowsCdi, portableCdi);
+            WriteMethodCustomDebugInfo(windowsCdi, portableCdi);
 
             if (!sequencePoints.IsEmpty)
             {
@@ -306,7 +313,7 @@ namespace Microsoft.DiaSymReader.Tools
             _writer.WriteEndElement();
         }
 
-        private void WriteCustomDebugInfo(byte[] windowsCdi, ImmutableArray<(Guid kind, ImmutableArray<byte> data)> portableCdi)
+        private void WriteMethodCustomDebugInfo(byte[] windowsCdi, ImmutableArray<(Guid kind, ImmutableArray<byte> data)> portableCdi)
         {
             Debug.Assert(windowsCdi == null || portableCdi.IsEmpty);
 
@@ -319,11 +326,11 @@ namespace Microsoft.DiaSymReader.Tools
 
             if (windowsCdi != null)
             {
-                WriteCustomDebugInfo(windowsCdi);
+                WriteMethodCustomDebugInfo(windowsCdi);
             }
             else
             {
-                WriteCustomDebugInfo(portableCdi);
+                WriteMethodCustomDebugInfo(portableCdi);
             }
 
             _writer.WriteEndElement();
@@ -333,7 +340,7 @@ namespace Microsoft.DiaSymReader.Tools
         /// Given a byte array of custom debug info, parse the array and write out XML describing
         /// its structure and contents.
         /// </summary>
-        private void WriteCustomDebugInfo(byte[] bytes)
+        private void WriteMethodCustomDebugInfo(byte[] bytes)
         {
             var records = CustomDebugInfoReader.GetCustomDebugInfoRecords(bytes).ToArray();
 
@@ -392,7 +399,7 @@ namespace Microsoft.DiaSymReader.Tools
             {PortableCustomDebugInfoKinds.EncLambdaAndClosureMap, 2},
         };
 
-        private void WriteCustomDebugInfo(ImmutableArray<(Guid kind, ImmutableArray<byte> data)> cdis)
+        private void WriteMethodCustomDebugInfo(ImmutableArray<(Guid kind, ImmutableArray<byte> data)> cdis)
         {
             var mdReader = _portablePdbMetadataOpt;
             Debug.Assert(mdReader != null);
@@ -414,7 +421,42 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        private ImmutableArray<(Guid kind, ImmutableArray<byte> data)> GetPortableCustomDebugInfo(MethodDefinitionHandle handle)
+        private void WriteModuleCustomDebugInfo()
+        {
+            var mdReader = _portablePdbMetadataOpt;
+            if (mdReader == null)
+            {
+                return;
+            }
+
+            var cdiHandles = mdReader.GetCustomDebugInformation(EntityHandle.ModuleDefinition);
+            if (cdiHandles.Count == 0)
+            {
+                return;
+            }
+
+            _writer.WriteStartElement("customDebugInfo");
+
+            foreach (var cdiHandle in cdiHandles)
+            {
+                var cdi = mdReader.GetCustomDebugInformation(cdiHandle);
+                var kind = mdReader.GetGuid(cdi.Kind);
+                var reader = mdReader.GetBlobReader(cdi.Value);
+
+                if (kind == PortableCustomDebugInfoKinds.MetadataReferenceInfo)
+                {
+                    WriteCompilationMetadataReferences(reader);
+                }
+                else if (kind == PortableCustomDebugInfoKinds.CompilationOptions)
+                {
+                    WriteCompilationOptions(reader);
+                }
+            }
+
+            _writer.WriteEndElement();
+        }
+
+        private ImmutableArray<(Guid kind, ImmutableArray<byte> data)> GetPortableCustomDebugInfo(EntityHandle handle)
         {
             var mdReader = _portablePdbMetadataOpt;
             Debug.Assert(mdReader != null);
@@ -676,7 +718,7 @@ namespace Microsoft.DiaSymReader.Tools
                         {
                             if (!blobReader.TryReadCompressedInteger(out syntaxOffsetBaseline))
                             {
-                                _writer.WriteElementString("baseline", "?");
+                                _writer.WriteElementString("baseline", BadMetadataStr);
                                 return;
                             }
 
@@ -704,11 +746,11 @@ namespace Microsoft.DiaSymReader.Tools
                             bool badOrdinal = hasOrdinal && !blobReader.TryReadCompressedInteger(out ordinal);
 
                             _writer.WriteAttributeString("kind", CultureInvariantToString(synthesizedKind));
-                            _writer.WriteAttributeString("offset", badSyntaxOffset ? "?" : CultureInvariantToString(syntaxOffset));
+                            _writer.WriteAttributeString("offset", badSyntaxOffset ? BadMetadataStr : CultureInvariantToString(syntaxOffset));
 
                             if (badOrdinal || hasOrdinal)
                             {
-                                _writer.WriteAttributeString("ordinal", badOrdinal ? "?" : CultureInvariantToString(ordinal));
+                                _writer.WriteAttributeString("ordinal", badOrdinal ? BadMetadataStr : CultureInvariantToString(ordinal));
                             }
                         }
 
@@ -742,7 +784,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                     if (!blobReader.TryReadCompressedInteger(out methodOrdinal))
                     {
-                        _writer.WriteElementString("methodOrdinal", "?");
+                        _writer.WriteElementString("methodOrdinal", BadMetadataStr);
                         _writer.WriteEndElement();
                         return;
                     }
@@ -753,7 +795,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                     if (!blobReader.TryReadCompressedInteger(out syntaxOffsetBaseline))
                     {
-                        _writer.WriteElementString("baseline", "?");
+                        _writer.WriteElementString("baseline", BadMetadataStr);
                         _writer.WriteEndElement();
                         return;
                     }
@@ -761,7 +803,7 @@ namespace Microsoft.DiaSymReader.Tools
                     syntaxOffsetBaseline = -syntaxOffsetBaseline;
                     if (!blobReader.TryReadCompressedInteger(out closureCount))
                     {
-                        _writer.WriteElementString("closureCount", "?");
+                        _writer.WriteElementString("closureCount", BadMetadataStr);
                         _writer.WriteEndElement();
                         return;
                     }
@@ -774,7 +816,7 @@ namespace Microsoft.DiaSymReader.Tools
                             int syntaxOffset;
                             if (!blobReader.TryReadCompressedInteger(out syntaxOffset))
                             {
-                                _writer.WriteElementString("offset", "?");
+                                _writer.WriteElementString("offset", BadMetadataStr);
                                 break;
                             }
 
@@ -794,7 +836,7 @@ namespace Microsoft.DiaSymReader.Tools
                             int syntaxOffset;
                             if (!blobReader.TryReadCompressedInteger(out syntaxOffset))
                             {
-                                _writer.WriteElementString("offset", "?");
+                                _writer.WriteElementString("offset", BadMetadataStr);
                                 return;
                             }
 
@@ -803,7 +845,7 @@ namespace Microsoft.DiaSymReader.Tools
                             int closureOrdinal;
                             if (!blobReader.TryReadCompressedInteger(out closureOrdinal))
                             {
-                                _writer.WriteElementString("closure", "?");
+                                _writer.WriteElementString("closure", BadMetadataStr);
                                 return;
                             }
 
@@ -830,6 +872,91 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 _writer.WriteEndElement(); //encLocalSlotMap
             }
+        }
+
+        [Flags]
+        private enum MetadataReferenceFlags
+        {
+            Assembly = 1,
+            EmbedInteropTypes = 1 << 1,
+        }
+
+        private void WriteCompilationMetadataReferences(BlobReader reader)
+        {
+            _writer.WriteStartElement("compilationMetadataReferences");
+
+            while (reader.RemainingBytes > 0)
+            {
+                var fileName = TryReadUtf8NullTerminated(ref reader);
+                var aliases = TryReadUtf8NullTerminated(ref reader);
+
+                string flags = null;
+                string timeStamp = null;
+                string fileSize = null;
+                string mvid = null;
+
+                try { flags = ((MetadataReferenceFlags)reader.ReadByte()).ToString(); } catch { }
+                try { timeStamp = $"0x{reader.ReadUInt32():X8}"; } catch { }
+                try { fileSize = $"0x{reader.ReadUInt32():X8}"; } catch { }
+                try { mvid = reader.ReadGuid().ToString(); } catch { }
+
+                _writer.WriteStartElement("reference");
+                _writer.WriteAttributeString("fileName", fileName ?? BadMetadataStr);
+                
+                if (aliases != string.Empty)
+                {
+                    _writer.WriteAttributeString("aliases", aliases ?? BadMetadataStr);
+                }
+
+                _writer.WriteAttributeString("flags", flags ?? BadMetadataStr);
+                _writer.WriteAttributeString("timeStamp", timeStamp ?? BadMetadataStr);
+                _writer.WriteAttributeString("fileSize", fileSize ?? BadMetadataStr);
+                _writer.WriteAttributeString("mvid", mvid ?? BadMetadataStr);
+                _writer.WriteEndElement();
+
+                if (fileName == null || aliases == null || flags == null || timeStamp == null || fileSize == null || mvid == null)
+                {
+                    break;
+                }
+            }
+
+            _writer.WriteEndElement(); //compilationMetadataReferences
+        }
+
+        private void WriteCompilationOptions(BlobReader reader)
+        {
+            _writer.WriteStartElement("compilationOptions");
+
+            while (reader.RemainingBytes > 0)
+            {
+                var name = TryReadUtf8NullTerminated(ref reader);
+                var value = TryReadUtf8NullTerminated(ref reader);
+
+                _writer.WriteStartElement("option");
+                _writer.WriteAttributeString("name", name ?? BadMetadataStr);
+                _writer.WriteAttributeString("value", value ?? BadMetadataStr);
+                _writer.WriteEndElement();
+
+                if (name == null || value == null)
+                {
+                    break;
+                }
+            }
+            
+            _writer.WriteEndElement(); //compilationMetadataReferences
+        }
+
+        private static string TryReadUtf8NullTerminated(ref BlobReader reader)
+        {
+            var terminatorIndex = reader.IndexOf(0);
+            if (terminatorIndex == -1)
+            {
+                return null;
+            }
+
+            var value = reader.ReadUTF8(terminatorIndex);
+            _ = reader.ReadByte();
+            return value;
         }
 
         private void WriteScopes(ISymUnmanagedScope rootScope)
@@ -1445,7 +1572,7 @@ namespace Microsoft.DiaSymReader.Tools
                 }
                 else
                 {
-                    _writer.WriteAttributeString("document", "?");
+                    _writer.WriteAttributeString("document", BadMetadataStr);
                 }
 
                 _writer.WriteEndElement();
@@ -1723,7 +1850,7 @@ namespace Microsoft.DiaSymReader.Tools
             var parameterNames = (from paramHandle in method.GetParameters()
                                   let parameter = _metadataReader.GetParameter(paramHandle)
                                   where parameter.SequenceNumber > 0 // exclude return parameter
-                                  select parameter.Name.IsNil ? "?" : _metadataReader.GetString(parameter.Name)).ToArray();
+                                  select parameter.Name.IsNil ? BadMetadataStr : _metadataReader.GetString(parameter.Name)).ToArray();
 
             if (parameterNames.Length > 0)
             {

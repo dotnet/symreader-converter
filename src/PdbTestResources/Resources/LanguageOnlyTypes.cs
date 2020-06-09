@@ -1,5 +1,3 @@
-#line 1 "C:\LanguageOnlyTypes.cs"
-#pragma checksum "C:\LanguageOnlyTypes.cs" "{ff1816ec-aa5e-4d10-87f7-6f4963833460}" "DBEB2A067B2F0E0D678A002C587A2806056C3DCE"
 #pragma warning disable 219,168 // Unused vars
 
 using System;

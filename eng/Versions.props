@@ -8,12 +8,12 @@
     <UsingToolMicrosoftNetCompilers>true</UsingToolMicrosoftNetCompilers>
     <UsingToolSymbolUploader>true</UsingToolSymbolUploader>
     <!-- libs -->
-    <MicrosoftCodeAnalysisPooledObjectsVersion>3.3.0-beta3-19407-01</MicrosoftCodeAnalysisPooledObjectsVersion>
-    <MicrosoftCodeAnalysisDebuggingVersion>3.3.0-beta3-19407-01</MicrosoftCodeAnalysisDebuggingVersion>
+    <MicrosoftCodeAnalysisPooledObjectsVersion>3.7.0-3.20308.2</MicrosoftCodeAnalysisPooledObjectsVersion>
+    <MicrosoftCodeAnalysisDebuggingVersion>3.7.0-3.20308.2</MicrosoftCodeAnalysisDebuggingVersion>
     <MicrosoftDiaSymReaderVersion>1.3.0</MicrosoftDiaSymReaderVersion>
     <MicrosoftDiaSymReaderNativeVersion>1.7.0</MicrosoftDiaSymReaderNativeVersion>
     <MicrosoftDiaSymReaderPortablePdbVersion>1.5.0</MicrosoftDiaSymReaderPortablePdbVersion>
-    <MicrosoftMetadataVisualizerVersion>1.0.0-beta1-62722-02</MicrosoftMetadataVisualizerVersion>
+    <MicrosoftMetadataVisualizerVersion>1.0.0-beta3.20308.3</MicrosoftMetadataVisualizerVersion>
     <NewtonsoftJsonVersion>9.0.1</NewtonsoftJsonVersion>
     <!-- CoreFX -->
     <SystemCollectionsImmutableVersion>1.5.0</SystemCollectionsImmutableVersion>
