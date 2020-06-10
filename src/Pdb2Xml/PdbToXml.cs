@@ -59,7 +59,7 @@ namespace Microsoft.DiaSymReader.Tools
             string inputPath = null;
             string outputPath = null;
             bool delta = false;
-            var options = PdbToXmlOptions.ResolveTokens;
+            var options = PdbToXmlOptions.ResolveTokens | PdbToXmlOptions.IncludeModuleDebugInfo;
 
             int i = 0;
             while (i < args.Length)

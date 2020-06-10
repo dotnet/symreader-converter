@@ -18,7 +18,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\Documents.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE"" />
+    <file id=""1"" name=""/_/Documents.cs"" language=""C#"" checksumAlgorithm=""SHA256"" checksum=""46-E0-DA-8D-C6-03-94-AE-09-FA-AD-1C-D8-6F-60-19-64-BE-4E-5A-B0-D8-D9-60-0D-79-E8-92-50-16-04-06"" />
     <file id=""2"" name=""C:\a\b\c\d\1.cs"" language=""C#"" />
     <file id=""3"" name=""C:\a\b\c\D\2.cs"" language=""C#"" />
     <file id=""4"" name=""C:\a\b\C\d\3.cs"" language=""C#"" />
@@ -40,7 +40,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         </using>
       </customDebugInfo>
       <sequencePoints>
-        <entry offset=""0x0"" startLine=""7"" startColumn=""5"" endLine=""7"" endColumn=""6"" document=""1"" />
+        <entry offset=""0x0"" startLine=""6"" startColumn=""5"" endLine=""6"" endColumn=""6"" document=""1"" />
         <entry offset=""0x1"" startLine=""10"" startColumn=""9"" endLine=""10"" endColumn=""30"" document=""2"" />
         <entry offset=""0x8"" startLine=""20"" startColumn=""9"" endLine=""20"" endColumn=""30"" document=""3"" />
         <entry offset=""0xf"" startLine=""30"" startColumn=""9"" endLine=""30"" endColumn=""30"" document=""4"" />
@@ -517,6 +517,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
     <file id=""1"" name=""C:\MethodBoundaries1.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE"" />
     <file id=""2"" name=""C:\MethodBoundaries2.cs"" language=""C#"" />
     <file id=""3"" name=""C:\MethodBoundaries3.cs"" language=""C#"" />
+    <file id=""4"" name=""/_/MethodBoundaries.cs"" language=""C#"" checksumAlgorithm=""SHA256"" checksum=""62-AB-2C-7D-4E-39-5E-50-62-5B-A8-CF-EA-41-DD-5C-C0-81-A2-AB-B1-F7-14-EE-49-2C-51-F0-26-D7-DB-A9"" />
   </files>
   <methods>
     <method containingType=""C"" name="".ctor"">
@@ -708,7 +709,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""C:\LanguageOnlyTypes.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE"" />
+    <file id=""1"" name=""/_/LanguageOnlyTypes.cs"" language=""C#"" checksumAlgorithm=""SHA256"" checksum=""98-C7-6E-B0-6E-F0-49-67-5A-F3-73-86-AF-FE-24-EC-F9-D3-DC-C1-0A-09-99-52-32-9A-25-C0-0A-B5-E8-D0"" />
+    <file id=""2"" name=""/_/System.cs"" language=""C#"" checksumAlgorithm=""SHA256"" checksum=""5C-47-20-0B-0F-35-34-EA-05-59-9A-86-5A-49-38-C9-6D-90-BD-10-A0-4B-08-58-1F-18-0A-ED-BE-B7-2B-6D"" />
   </files>
   <methods>
     <method containingType=""C"" name=""F"">
@@ -736,15 +738,15 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         </encLocalSlotMap>
       </customDebugInfo>
       <sequencePoints>
-        <entry offset=""0x0"" startLine=""9"" startColumn=""5"" endLine=""9"" endColumn=""6"" document=""1"" />
-        <entry offset=""0x1"" startLine=""10"" startColumn=""9"" endLine=""10"" endColumn=""10"" document=""1"" />
-        <entry offset=""0x2"" startLine=""11"" startColumn=""13"" endLine=""18"" endColumn=""125"" document=""1"" />
-        <entry offset=""0x4"" startLine=""20"" startColumn=""13"" endLine=""26"" endColumn=""144"" document=""1"" />
-        <entry offset=""0xc"" startLine=""30"" startColumn=""9"" endLine=""30"" endColumn=""10"" document=""1"" />
-        <entry offset=""0xd"" startLine=""32"" startColumn=""9"" endLine=""32"" endColumn=""10"" document=""1"" />
-        <entry offset=""0xe"" startLine=""33"" startColumn=""13"" endLine=""33"" endColumn=""99"" document=""1"" />
-        <entry offset=""0x10"" startLine=""38"" startColumn=""9"" endLine=""38"" endColumn=""10"" document=""1"" />
-        <entry offset=""0x11"" startLine=""39"" startColumn=""5"" endLine=""39"" endColumn=""6"" document=""1"" />
+        <entry offset=""0x0"" startLine=""8"" startColumn=""5"" endLine=""8"" endColumn=""6"" document=""1"" />
+        <entry offset=""0x1"" startLine=""9"" startColumn=""9"" endLine=""9"" endColumn=""10"" document=""1"" />
+        <entry offset=""0x2"" startLine=""10"" startColumn=""13"" endLine=""17"" endColumn=""125"" document=""1"" />
+        <entry offset=""0x4"" startLine=""19"" startColumn=""13"" endLine=""25"" endColumn=""144"" document=""1"" />
+        <entry offset=""0xc"" startLine=""29"" startColumn=""9"" endLine=""29"" endColumn=""10"" document=""1"" />
+        <entry offset=""0xd"" startLine=""31"" startColumn=""9"" endLine=""31"" endColumn=""10"" document=""1"" />
+        <entry offset=""0xe"" startLine=""32"" startColumn=""13"" endLine=""32"" endColumn=""99"" document=""1"" />
+        <entry offset=""0x10"" startLine=""37"" startColumn=""9"" endLine=""37"" endColumn=""10"" document=""1"" />
+        <entry offset=""0x11"" startLine=""38"" startColumn=""5"" endLine=""38"" endColumn=""6"" document=""1"" />
       </sequencePoints>
       <scope startOffset=""0x0"" endOffset=""0x12"">
         <namespace name=""System"" />
