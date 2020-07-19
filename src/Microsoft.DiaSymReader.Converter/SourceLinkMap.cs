@@ -5,6 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 
@@ -14,12 +16,12 @@ namespace Microsoft.DiaSymReader.Tools
     {
         private readonly List<(FilePathPattern key, UriPattern value)> _entries;
 
-        public SourceLinkMap(List<(FilePathPattern key, UriPattern value)> entries)
+        private SourceLinkMap(List<(FilePathPattern key, UriPattern value)> entries)
         {
             _entries = entries;
         }
 
-        internal readonly struct FilePathPattern
+        private readonly struct FilePathPattern
         {
             public readonly string Path;
             public readonly bool IsPrefix;
@@ -31,7 +33,7 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        internal readonly struct UriPattern
+        private readonly struct UriPattern
         {
             public readonly string Prefix;
             public readonly string Suffix;
@@ -43,61 +45,50 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        internal static SourceLinkMap? Parse(string json, Action<string> reportDiagnostic)
+        /// <summary>
+        /// Parses Source Link JSON string.
+        /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="json"/> is null.</exception>
+        /// <exception cref="InvalidDataException">The JSON does not follow Source Link specification.</exception>
+        /// <exception cref="JsonException"><paramref name="json"/> is not valid JSON string.</exception>
+        public static SourceLinkMap Parse(string json)
         {
-            bool errorReported = false;
-            void ReportInvalidJsonDataOnce()
+            if (json is null)
             {
-                if (!errorReported)
-                {
-                    // Bad source link format
-                    reportDiagnostic(ConverterResources.InvalidJsonDataFormat);
-                }
-
-                errorReported = true;
+                throw new ArgumentNullException(nameof(json));
             }
 
             var list = new List<(FilePathPattern key, UriPattern value)>();
-            try
+
+            var root = JsonDocument.Parse(json, new JsonDocumentOptions() { AllowTrailingCommas = true }).RootElement;
+            if (root.ValueKind != JsonValueKind.Object)
             {
-                var root = JsonDocument.Parse(json).RootElement;
-                if (root.ValueKind != JsonValueKind.Object)
-                {
-                    ReportInvalidJsonDataOnce();
-                    return null;
-                }
-
-                foreach (var rootEntry in root.EnumerateObject())
-                {
-                    if (!rootEntry.NameEquals("documents"))
-                    {
-                        // potential future extensibility
-                        continue;
-                    }
-
-                    if (rootEntry.Value.ValueKind != JsonValueKind.Object)
-                    {
-                        ReportInvalidJsonDataOnce();
-                        continue;
-                    }
-
-                    foreach (var documentsEntry in rootEntry.Value.EnumerateObject())
-                    {
-                        if (documentsEntry.Value.ValueKind != JsonValueKind.String ||
-                            !TryParseEntry(documentsEntry.Name, documentsEntry.Value.GetString(), out var path, out var uri))
-                        {
-                            ReportInvalidJsonDataOnce();
-                            continue;
-                        }
-
-                        list.Add((path, uri));
-                    }
-                }
+                throw new InvalidDataException();
             }
-            catch (JsonException e)
+
+            foreach (var rootEntry in root.EnumerateObject())
             {
-                reportDiagnostic(e.Message);
-                return null;
+                if (!rootEntry.NameEquals("documents"))
+                {
+                    // potential future extensibility
+                    continue;
+                }
+
+                if (rootEntry.Value.ValueKind != JsonValueKind.Object)
+                {
+                    throw new InvalidDataException();
+                }
+
+                foreach (var documentsEntry in rootEntry.Value.EnumerateObject())
+                {
+                    if (documentsEntry.Value.ValueKind != JsonValueKind.String ||
+                        !TryParseEntry(documentsEntry.Name, documentsEntry.Value.GetString(), out var path, out var uri))
+                    {
+                        throw new InvalidDataException();
+                    }
+
+                    list.Add((path, uri));
+                }
             }
 
             // Sort the map by decreasing file path length. This ensures that the most specific paths will checked before the least specific

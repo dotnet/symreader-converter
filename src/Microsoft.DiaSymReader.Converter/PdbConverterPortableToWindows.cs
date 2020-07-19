@@ -14,6 +14,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using Microsoft.CodeAnalysis.Collections;
 using Microsoft.CodeAnalysis.Debugging;
 using Microsoft.CodeAnalysis.PooledObjects;
@@ -1035,16 +1036,24 @@ namespace Microsoft.DiaSymReader.Tools
                 // no documents in the PDB
                 return null;
             }
-            
-            var builder = new StringBuilder();
 
-            var map = SourceLinkMap.Parse(sourceLink, errorMessage => ReportDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, errorMessage));
-            if (map == null)
+            SourceLinkMap map;
+            try
             {
-                // error already reported
+                map = SourceLinkMap.Parse(sourceLink);
+            }
+            catch (JsonException e)
+            {
+                ReportDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, e.Message);
+                return null;
+            }
+            catch (InvalidDataException)
+            {
+                ReportDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, ConverterResources.InvalidJsonDataFormat);
                 return null;
             }
 
+            var builder = new StringBuilder();
             var mapping = new List<(string name, string uri)>();
 
             string? commonScheme = null;
