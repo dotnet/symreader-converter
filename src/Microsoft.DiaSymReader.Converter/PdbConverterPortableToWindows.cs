@@ -51,7 +51,7 @@ namespace Microsoft.DiaSymReader.Tools
                 PdbGuids.LanguageVendor.Microsoft : default;
         }
 
-        private struct LocalScopeInfo
+        private readonly struct LocalScopeInfo
         {
             public readonly LocalScope? LocalScope;
 
