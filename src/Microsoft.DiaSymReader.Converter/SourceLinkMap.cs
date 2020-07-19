@@ -6,8 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace Microsoft.DiaSymReader.Tools
 {
@@ -61,38 +60,41 @@ namespace Microsoft.DiaSymReader.Tools
             var list = new List<(FilePathPattern key, UriPattern value)>();
             try
             {
-                // trim BOM if present:
-                var root = JObject.Parse(json.TrimStart('\uFEFF'));
-                var documents = root["documents"];
-
-                if (documents.Type != JTokenType.Object)
+                var root = JsonDocument.Parse(json).RootElement;
+                if (root.ValueKind != JsonValueKind.Object)
                 {
                     ReportInvalidJsonDataOnce();
                     return null;
                 }
 
-                foreach (var token in documents)
+                foreach (var rootEntry in root.EnumerateObject())
                 {
-                    if (!(token is JProperty property))
+                    if (!rootEntry.NameEquals("documents"))
+                    {
+                        // potential future extensibility
+                        continue;
+                    }
+
+                    if (rootEntry.Value.ValueKind != JsonValueKind.Object)
                     {
                         ReportInvalidJsonDataOnce();
                         continue;
                     }
 
-                    string? value = (property.Value.Type == JTokenType.String) ?
-                        property.Value.Value<string>() : null;
-
-                    if (value == null ||
-                        !TryParseEntry(property.Name, value, out var path, out var uri))
+                    foreach (var documentsEntry in rootEntry.Value.EnumerateObject())
                     {
-                        ReportInvalidJsonDataOnce();
-                        continue;
-                    }
+                        if (documentsEntry.Value.ValueKind != JsonValueKind.String ||
+                            !TryParseEntry(documentsEntry.Name, documentsEntry.Value.GetString(), out var path, out var uri))
+                        {
+                            ReportInvalidJsonDataOnce();
+                            continue;
+                        }
 
-                    list.Add((path, uri));
+                        list.Add((path, uri));
+                    }
                 }
             }
-            catch (JsonReaderException e)
+            catch (JsonException e)
             {
                 reportDiagnostic(e.Message);
                 return null;

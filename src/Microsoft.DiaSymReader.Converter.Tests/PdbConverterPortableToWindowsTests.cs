@@ -5,8 +5,7 @@ using System;
 using System.Collections.Generic;
 using Roslyn.Test.Utilities;
 using System.Text;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace Microsoft.DiaSymReader.Tools.UnitTests
 {
@@ -171,9 +170,9 @@ SRCSRV: end ------------------------------------------------
             Exception expectedException = null;
             try
             {
-                JObject.Parse(json);
+                _ = JsonDocument.Parse(json);
             }
-            catch (JsonReaderException e)
+            catch (JsonException e)
             {
                 expectedException = e;
             }
