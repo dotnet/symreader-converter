@@ -5,14 +5,7 @@
   </metadata>
   <files>
     $CommonFileElements$
-    <!-- Dependencies built by this repo -->
-    <file src="..\..\Microsoft.DiaSymReader.Converter\$Configuration$\net45\Microsoft.DiaSymReader.Converter.dll" target="tools" />
-    <!-- External dependencies -->
-    <file src="net472\Newtonsoft.Json.dll" target="tools" />
-    <file src="net472\Microsoft.DiaSymReader.dll" target="tools" />
-    <file src="net472\Microsoft.DiaSymReader.Native.*.dll" target="tools" />
-    <file src="net472\System.Collections.Immutable.dll" target="tools" />
-    <file src="net472\System.Reflection.Metadata.dll" target="tools" />
+    <file src="net472\*.dll" target="tools" />
     <file src="net472\*.exe" target="tools" />
     <file src="net472\*.exe.config" target="tools" />    
     <file src="net472\**\*.resources.dll" target="tools" />
