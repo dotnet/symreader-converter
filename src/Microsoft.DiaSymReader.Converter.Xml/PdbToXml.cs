@@ -1499,8 +1499,12 @@ namespace Microsoft.DiaSymReader.Tools
         {
             return (SignatureTypeCode)signature[0] switch
             {
-                SignatureTypeCode.Boolean or SignatureTypeCode.Byte or SignatureTypeCode.SByte or SignatureTypeCode.Int16 => typeof(short),
-                SignatureTypeCode.Char or SignatureTypeCode.UInt16 => typeof(ushort),
+                SignatureTypeCode.Boolean => typeof(short),
+                SignatureTypeCode.Byte => typeof(short),
+                SignatureTypeCode.SByte => typeof(short),
+                SignatureTypeCode.Int16 => typeof(short),
+                SignatureTypeCode.Char => typeof(ushort),
+                SignatureTypeCode.UInt16 => typeof(ushort),
                 SignatureTypeCode.Int32 => typeof(int),
                 SignatureTypeCode.UInt32 => typeof(uint),
                 SignatureTypeCode.Int64 => typeof(long),
