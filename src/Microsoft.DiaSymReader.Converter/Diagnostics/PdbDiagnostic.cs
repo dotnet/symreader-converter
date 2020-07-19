@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using System;
 using System.Globalization;
 using Microsoft.CodeAnalysis.Collections;
@@ -7,7 +9,7 @@ using Roslyn.Utilities;
 
 namespace Microsoft.DiaSymReader.Tools
 {
-    public struct PdbDiagnostic : IEquatable<PdbDiagnostic>
+    public readonly struct PdbDiagnostic : IEquatable<PdbDiagnostic>
     {
         public PdbDiagnosticId Id { get; }
         public int Token { get; }
@@ -20,7 +22,7 @@ namespace Microsoft.DiaSymReader.Tools
             Args = args;
         }
 
-        public override bool Equals(object obj) => 
+        public override bool Equals(object? obj) => 
             obj is PdbDiagnostic other && Equals(other);
 
         public bool Equals(PdbDiagnostic other) =>
@@ -40,7 +42,7 @@ namespace Microsoft.DiaSymReader.Tools
             return $"PDB{(int)Id:D4}{location}: {GetMessage(formatProvider)}";
         }
 
-        public string GetMessage(IFormatProvider formatProvider)
+        public string? GetMessage(IFormatProvider formatProvider)
         {
             if (formatProvider == null)
             {
@@ -48,6 +50,11 @@ namespace Microsoft.DiaSymReader.Tools
             }
 
             var template = Id.GetMessageTemplate();
+            if (template == null)
+            {
+                return null;
+            }
+
             return (Args?.Length > 0) ? string.Format(formatProvider, template, Args) : template;
         }
     }

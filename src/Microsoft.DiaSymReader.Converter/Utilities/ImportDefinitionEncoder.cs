@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using System.Reflection.Metadata.Ecma335;
 
 namespace System.Reflection.Metadata
@@ -17,7 +19,7 @@ namespace System.Reflection.Metadata
             Builder = builder;
         }
 
-        public void Type(EntityHandle type, string alias = null)
+        public void Type(EntityHandle type, string? alias = null)
         {
             if (alias != null)
             {
@@ -34,7 +36,7 @@ namespace System.Reflection.Metadata
             Builder.WriteCompressedInteger(CodedIndex.TypeDefOrRefOrSpec(type));
         }
 
-        public void Namespace(string namespaceName, string alias = null, AssemblyReferenceHandle externAlias = default(AssemblyReferenceHandle))
+        public void Namespace(string namespaceName, string? alias = null, AssemblyReferenceHandle externAlias = default)
         {
             if (!externAlias.IsNil)
             {

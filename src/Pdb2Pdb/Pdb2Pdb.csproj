@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Resources.resx" GenerateSource="true" />
+    <Compile Include="..\Common\NullableAttributes.cs" Link="Common\NullableAttributes.cs" />
   </ItemGroup>
   <ItemGroup>
     <NuspecProperty Include="Configuration=$(Configuration)"/>

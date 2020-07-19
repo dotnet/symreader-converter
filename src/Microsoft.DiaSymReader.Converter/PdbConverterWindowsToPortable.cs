@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -20,16 +22,16 @@ namespace Microsoft.DiaSymReader.Tools
 {
     internal sealed partial class PdbConverterWindowsToPortable
     {
-        private readonly Action<PdbDiagnostic> _diagnosticReporterOpt;
+        private readonly Action<PdbDiagnostic>? _diagnosticReporter;
 
-        public PdbConverterWindowsToPortable(Action<PdbDiagnostic> diagnosticReporterOpt)
+        public PdbConverterWindowsToPortable(Action<PdbDiagnostic>? diagnosticReporter)
         {
-            _diagnosticReporterOpt = diagnosticReporterOpt;
+            _diagnosticReporter = diagnosticReporter;
         }
 
         private void ReportDiagnostic(PdbDiagnosticId id, int token, params object[] args)
         {
-            _diagnosticReporterOpt?.Invoke(new PdbDiagnostic(id, token, args));
+            _diagnosticReporter?.Invoke(new PdbDiagnostic(id, token, args));
         }
 
         /// <exception cref="COMException">Invalid PDB format.</exception>
@@ -41,7 +43,7 @@ namespace Microsoft.DiaSymReader.Tools
                 throw new InvalidDataException(ConverterResources.SpecifiedPEFileHasNoAssociatedPdb);
             }
 
-            ISymUnmanagedReader5 symReader = null;
+            ISymUnmanagedReader5? symReader = null;
             try
             {
                 symReader = SymReaderHelpers.CreateWindowsPdbReader(sourcePdbStream, peReader);
@@ -56,7 +58,7 @@ namespace Microsoft.DiaSymReader.Tools
             }
             finally
             {
-                ((ISymUnmanagedDispose)symReader)?.Destroy();
+                _ = (((ISymUnmanagedDispose?)symReader)?.Destroy());
             }
         }
 
@@ -99,7 +101,7 @@ namespace Microsoft.DiaSymReader.Tools
             var externAliasImports = new List<ImportInfo>();
             var externAliasStringSet = new HashSet<string>(StringComparer.Ordinal);
 
-            string vbDefaultNamespace = null;
+            string? vbDefaultNamespace = null;
             var vbProjectLevelImports = new List<ImportInfo>();
 
             // first pass:
@@ -242,16 +244,16 @@ namespace Microsoft.DiaSymReader.Tools
                 }
 
                 // method debug info:
-                MethodBodyBlock methodBodyOpt;
+                MethodBodyBlock? methodBody;
                 int localSignatureRowId;
                 if (methodDef.RelativeVirtualAddress != 0)
                 {
-                    methodBodyOpt = peReader.GetMethodBody(methodDef.RelativeVirtualAddress);
-                    localSignatureRowId = methodBodyOpt.LocalSignature.IsNil ? 0 : MetadataTokens.GetRowNumber(methodBodyOpt.LocalSignature);
+                    methodBody = peReader.GetMethodBody(methodDef.RelativeVirtualAddress);
+                    localSignatureRowId = methodBody.LocalSignature.IsNil ? 0 : MetadataTokens.GetRowNumber(methodBody.LocalSignature);
                 }
                 else
                 {
-                    methodBodyOpt = null;
+                    methodBody = null;
                     localSignatureRowId = 0;
                 }
 
@@ -437,7 +439,7 @@ namespace Microsoft.DiaSymReader.Tools
                     scopes.Clear();
                     vbHoistedLocalScopes.Clear();
                 }
-                else if (methodBodyOpt != null)
+                else if (methodBody != null)
                 {
                     metadataBuilder.AddLocalScope(
                         method: methodHandle,
@@ -445,7 +447,7 @@ namespace Microsoft.DiaSymReader.Tools
                         variableList: NextHandle(lastLocalVariableHandle),
                         constantList: NextHandle(lastLocalConstantHandle),
                         startOffset: 0,
-                        length: methodBodyOpt.GetILReader().Length);
+                        length: methodBody.GetILReader().Length);
                 }
             }
 
@@ -457,7 +459,7 @@ namespace Microsoft.DiaSymReader.Tools
             // If the PDB has SourceLink take it as is.
             // Otherwise if it has srcsvr data convert them to SourceLink.
 
-            byte[] sourceLinkData;
+            byte[]? sourceLinkData;
             try
             {
                 sourceLinkData = symReader.GetRawSourceLinkData();
@@ -470,7 +472,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             if (sourceLinkData == null)
             {
-                byte[] sourceServerData;
+                byte[]? sourceServerData;
                 try
                 {
                     sourceServerData = symReader.GetRawSourceServerData();
@@ -511,7 +513,7 @@ namespace Microsoft.DiaSymReader.Tools
                 hash: checksumHandle,
                 language: metadataBuilder.GetOrAddGuid(language));
 
-            byte[] sourceBlob;
+            byte[]? sourceBlob;
 
             try
             {
@@ -639,7 +641,7 @@ namespace Microsoft.DiaSymReader.Tools
             ImportTargetKind kind;
             string target;
             string alias;
-            string externAlias = null;
+            string? externAlias = null;
             var scope = VBImportScopeKind.Unspecified;
 
             if (vbSemantics ? 
@@ -696,7 +698,7 @@ namespace Microsoft.DiaSymReader.Tools
                 Imports = imports;
             }
 
-            public override bool Equals(object obj) => obj is ImportScopeInfo && Equals((ImportScopeInfo)obj);
+            public override bool Equals(object? obj) => obj is ImportScopeInfo info && Equals(info);
             public bool Equals(ImportScopeInfo other) => Parent == other.Parent && Imports.SequenceEqual(other.Imports);
             public override int GetHashCode() => Hash.Combine(Parent.GetHashCode(), Hash.CombineValues(Imports));
         }
@@ -747,7 +749,7 @@ namespace Microsoft.DiaSymReader.Tools
             MetadataBuilder metadataBuilder,
             IEnumerable<ImportInfo> csExternAliasImports,
             IEnumerable<ImportInfo> vbProjectLevelImports,
-            string vbDefaultNamespace,
+            string? vbDefaultNamespace,
             MetadataModel metadataModel)
         {
             // module-level import scope:
@@ -793,15 +795,15 @@ namespace Microsoft.DiaSymReader.Tools
             return metadataBuilder.GetOrAddBlob(builder);
         }
 
-        private struct ImportInfo
+        private readonly struct ImportInfo
         {
             public readonly ImportTargetKind Kind;
             public readonly string Target;
-            public readonly string ExternAlias;
+            public readonly string? ExternAlias;
             public readonly string Alias;
             public readonly VBImportScopeKind Scope;
 
-            public ImportInfo(ImportTargetKind kind, string target, string alias, string externAlias, VBImportScopeKind scope)
+            public ImportInfo(ImportTargetKind kind, string target, string alias, string? externAlias, VBImportScopeKind scope)
             {
                 Kind = kind;
                 Target = target;
@@ -1321,14 +1323,14 @@ namespace Microsoft.DiaSymReader.Tools
                 value: metadataBuilder.GetOrAddBlob(data));
         }
 
-        private static byte[] ConvertSourceServerToSourceLinkData(byte[] sourceServerData)
+        private static byte[]? ConvertSourceServerToSourceLinkData(byte[] sourceServerData)
         {
             var sourceLinkData = ConvertSourceServerToSourceLinkData(Encoding.UTF8.GetString(sourceServerData));
             return (sourceLinkData != null) ? Encoding.UTF8.GetBytes(sourceLinkData) : null;
         }
 
         // internal for testing
-        internal static string ConvertSourceServerToSourceLinkData(string sourceServerData)
+        internal static string? ConvertSourceServerToSourceLinkData(string sourceServerData)
         {
             // TODO: replicate what debugger does (https://github.com/dotnet/symreader-converter/issues/51)
 
@@ -1352,11 +1354,11 @@ namespace Microsoft.DiaSymReader.Tools
                 }
             }
 
-            var rawurl = GetPairs(variablesStart + 1, '=').FirstOrDefault(v => v.key == "RAWURL");
+            var (_, rawUrl) = GetPairs(variablesStart + 1, '=').FirstOrDefault(v => v.key == "RAWURL");
             var files = GetPairs(sourceFilesStart + 1, '*').ToArray();
 
-            string commonUriPrefix = rawurl.value?.EndsWith("%var2%", StringComparison.Ordinal) == true ?
-                rawurl.value.Substring(0, rawurl.value.Length - "%var2%".Length) : null;
+            string? commonUriPrefix = rawUrl?.EndsWith("%var2%", StringComparison.Ordinal) == true ?
+                rawUrl.Substring(0, rawUrl.Length - "%var2%".Length) : null;
 
             var builder = new StringBuilder();
             bool isFirstEntry = true;
@@ -1396,7 +1398,7 @@ namespace Microsoft.DiaSymReader.Tools
                 isFirstEntry = false;
             }
 
-            string commonPathPrefix = null;
+            string? commonPathPrefix = null;
             var nonMatching = new List<(string key, string value)>();
 
             foreach (var file in files)

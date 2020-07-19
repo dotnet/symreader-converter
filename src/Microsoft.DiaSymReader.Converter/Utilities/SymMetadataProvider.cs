@@ -1,6 +1,9 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
@@ -13,7 +16,6 @@ namespace Microsoft.DiaSymReader.Tools
 
         internal SymMetadataProvider(MetadataReader reader)
         {
-            Debug.Assert(reader != null);
             _reader = reader;
         }
 
@@ -35,7 +37,7 @@ namespace Microsoft.DiaSymReader.Tools
             return true;
         }
 
-        public bool TryGetTypeDefinitionInfo(int typeDefinitionToken, out string namespaceName, out string typeName, out TypeAttributes attributes)
+        public bool TryGetTypeDefinitionInfo(int typeDefinitionToken, [NotNullWhen(true)] out string? namespaceName, [NotNullWhen(true)] out string? typeName, out TypeAttributes attributes)
         {
             var handle = (TypeDefinitionHandle)MetadataTokens.Handle(typeDefinitionToken);
             if (handle.IsNil)
@@ -53,7 +55,7 @@ namespace Microsoft.DiaSymReader.Tools
             return true;
         }
 
-        public bool TryGetTypeReferenceInfo(int typeReferenceToken, out string namespaceName, out string typeName)
+        public bool TryGetTypeReferenceInfo(int typeReferenceToken, [NotNullWhen(true)] out string? namespaceName, [NotNullWhen(true)] out string? typeName)
         {
             var handle = (TypeReferenceHandle)MetadataTokens.Handle(typeReferenceToken);
             if (handle.IsNil)
@@ -86,7 +88,7 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        public bool TryGetMethodInfo(int methodDefinitionToken, out string methodName, out int declaringTypeToken)
+        public bool TryGetMethodInfo(int methodDefinitionToken, [NotNullWhen(true)] out string? methodName, out int declaringTypeToken)
         {
             var handle = (MethodDefinitionHandle)MetadataTokens.Handle(methodDefinitionToken);
             if (handle.IsNil)

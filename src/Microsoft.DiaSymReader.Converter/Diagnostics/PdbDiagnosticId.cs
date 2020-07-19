@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using Roslyn.Utilities;
 
 namespace Microsoft.DiaSymReader.Tools
@@ -44,47 +46,43 @@ namespace Microsoft.DiaSymReader.Tools
         public static bool IsValid(this PdbDiagnosticId id)
             => id >= 0 && id <= PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch;
 
-        internal static string GetMessageTemplate(this PdbDiagnosticId id)
+        internal static string? GetMessageTemplate(this PdbDiagnosticId id)
         {
-            switch (id)
+            return id switch
             {
-                case PdbDiagnosticId.None:
-                    return null;
-
-                case PdbDiagnosticId.MethodAssociatedWithLocalScopeHasNoBody: return ConverterResources.MethodAssociatedWithLocalScopeHasNoBody;
-                case PdbDiagnosticId.LocalConstantNameTooLong: return ConverterResources.LocalConstantNameTooLong;
-                case PdbDiagnosticId.LocalVariableNameTooLong: return ConverterResources.LocalVariableNameTooLong;
-                case PdbDiagnosticId.MethodContainingLocalVariablesHasNoLocalSignature: return ConverterResources.MethodContainingLocalVariablesHasNoLocalSignature;
-                case PdbDiagnosticId.LocalScopeRangesNestingIsInvalid: return ConverterResources.LocalScopeRangesNestingIsInvalid;
-                case PdbDiagnosticId.UnsupportedImportType: return ConverterResources.UnsupportedImportType;
-                case PdbDiagnosticId.UndefinedAssemblyReferenceAlias: return ConverterResources.UndefinedAssemblyReferenceAlias;
-                case PdbDiagnosticId.UnknownImportDefinitionKind: return ConverterResources.UnknownImportDefinitionKind;
-                case PdbDiagnosticId.InvalidStateMachineTypeName: return ConverterResources.InvalidStateMachineTypeName;
-                case PdbDiagnosticId.BothStateMachineTypeNameAndImportsSpecified: return ConverterResources.BothStateMachineTypeNameAndImportsSpecified;
-                case PdbDiagnosticId.DuplicateDynamicLocals: return ConverterResources.DuplicateDynamicLocals;
-                case PdbDiagnosticId.DuplicateTupleElementNamesForSlot: return ConverterResources.DuplicateTupleElementNamesForSlot;
-                case PdbDiagnosticId.DuplicateTupleElementNamesForConstant: return ConverterResources.DuplicateTupleElementNamesForConstant;
-                case PdbDiagnosticId.InvalidImportStringFormat: return ConverterResources.InvalidImportStringFormat;
-                case PdbDiagnosticId.InvalidEntryPointToken: return ConverterResources.InvalidEntryPointToken;
-                case PdbDiagnosticId.InvalidScopeILOffsetRange: return ConverterResources.InvalidScopeILOffsetRange;
-                case PdbDiagnosticId.InvalidLocalConstantData: return ConverterResources.InvalidLocalConstantData;
-                case PdbDiagnosticId.InvalidLocalConstantSignature: return ConverterResources.InvalidLocalConstantSignature;
-                case PdbDiagnosticId.InvalidLocalScope: return ConverterResources.InvalidLocalScope;
-                case PdbDiagnosticId.InvalidSequencePointDocument: return ConverterResources.InvalidSequencePointDocument;
-                case PdbDiagnosticId.UnmappedDocumentName: return ConverterResources.UnmappedDocumentName;
-                case PdbDiagnosticId.UrlSchemeIsNotHttp: return ConverterResources.UrlSchemeIsNotHttp;
-                case PdbDiagnosticId.NoSupportedUrlsFoundInSourceLink: return ConverterResources.NoSupportedUrlsFoundInSourceLink;
-                case PdbDiagnosticId.InvalidSourceLinkData: return ConverterResources.InvalidSourceLinkData;
-                case PdbDiagnosticId.InvalidSourceServerData: return ConverterResources.InvalidSourceServerData;
-                case PdbDiagnosticId.InvalidEmbeddedSource: return ConverterResources.InvalidEmbeddedSource;
-                case PdbDiagnosticId.InconsistentStateMachineMethodMapping: return ConverterResources.InconsistentStateMachineMethodMapping;
-                case PdbDiagnosticId.InvalidSourceLink: return ConverterResources.InvalidSourceLink;
-                case PdbDiagnosticId.MalformedSourceLinkUrl: return ConverterResources.MalformedSourceLinkUrl;
-                case PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch: return ConverterResources.SourceChecksumAlgorithmSizeMismatch;
-
-                default:
-                    throw ExceptionUtilities.UnexpectedValue(id);
-            }
+                PdbDiagnosticId.None => null,
+                PdbDiagnosticId.MethodAssociatedWithLocalScopeHasNoBody => ConverterResources.MethodAssociatedWithLocalScopeHasNoBody,
+                PdbDiagnosticId.LocalConstantNameTooLong => ConverterResources.LocalConstantNameTooLong,
+                PdbDiagnosticId.LocalVariableNameTooLong => ConverterResources.LocalVariableNameTooLong,
+                PdbDiagnosticId.MethodContainingLocalVariablesHasNoLocalSignature => ConverterResources.MethodContainingLocalVariablesHasNoLocalSignature,
+                PdbDiagnosticId.LocalScopeRangesNestingIsInvalid => ConverterResources.LocalScopeRangesNestingIsInvalid,
+                PdbDiagnosticId.UnsupportedImportType => ConverterResources.UnsupportedImportType,
+                PdbDiagnosticId.UndefinedAssemblyReferenceAlias => ConverterResources.UndefinedAssemblyReferenceAlias,
+                PdbDiagnosticId.UnknownImportDefinitionKind => ConverterResources.UnknownImportDefinitionKind,
+                PdbDiagnosticId.InvalidStateMachineTypeName => ConverterResources.InvalidStateMachineTypeName,
+                PdbDiagnosticId.BothStateMachineTypeNameAndImportsSpecified => ConverterResources.BothStateMachineTypeNameAndImportsSpecified,
+                PdbDiagnosticId.DuplicateDynamicLocals => ConverterResources.DuplicateDynamicLocals,
+                PdbDiagnosticId.DuplicateTupleElementNamesForSlot => ConverterResources.DuplicateTupleElementNamesForSlot,
+                PdbDiagnosticId.DuplicateTupleElementNamesForConstant => ConverterResources.DuplicateTupleElementNamesForConstant,
+                PdbDiagnosticId.InvalidImportStringFormat => ConverterResources.InvalidImportStringFormat,
+                PdbDiagnosticId.InvalidEntryPointToken => ConverterResources.InvalidEntryPointToken,
+                PdbDiagnosticId.InvalidScopeILOffsetRange => ConverterResources.InvalidScopeILOffsetRange,
+                PdbDiagnosticId.InvalidLocalConstantData => ConverterResources.InvalidLocalConstantData,
+                PdbDiagnosticId.InvalidLocalConstantSignature => ConverterResources.InvalidLocalConstantSignature,
+                PdbDiagnosticId.InvalidLocalScope => ConverterResources.InvalidLocalScope,
+                PdbDiagnosticId.InvalidSequencePointDocument => ConverterResources.InvalidSequencePointDocument,
+                PdbDiagnosticId.UnmappedDocumentName => ConverterResources.UnmappedDocumentName,
+                PdbDiagnosticId.UrlSchemeIsNotHttp => ConverterResources.UrlSchemeIsNotHttp,
+                PdbDiagnosticId.NoSupportedUrlsFoundInSourceLink => ConverterResources.NoSupportedUrlsFoundInSourceLink,
+                PdbDiagnosticId.InvalidSourceLinkData => ConverterResources.InvalidSourceLinkData,
+                PdbDiagnosticId.InvalidSourceServerData => ConverterResources.InvalidSourceServerData,
+                PdbDiagnosticId.InvalidEmbeddedSource => ConverterResources.InvalidEmbeddedSource,
+                PdbDiagnosticId.InconsistentStateMachineMethodMapping => ConverterResources.InconsistentStateMachineMethodMapping,
+                PdbDiagnosticId.InvalidSourceLink => ConverterResources.InvalidSourceLink,
+                PdbDiagnosticId.MalformedSourceLinkUrl => ConverterResources.MalformedSourceLinkUrl,
+                PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch => ConverterResources.SourceChecksumAlgorithmSizeMismatch,
+                _ => throw ExceptionUtilities.UnexpectedValue(id),
+            };
         }
     }
 }

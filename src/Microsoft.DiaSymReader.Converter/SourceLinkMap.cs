@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,40 +17,34 @@ namespace Microsoft.DiaSymReader.Tools
 
         public SourceLinkMap(List<(FilePathPattern key, UriPattern value)> entries)
         {
-            Debug.Assert(entries != null);
             _entries = entries;
         }
 
-        internal struct FilePathPattern
+        internal readonly struct FilePathPattern
         {
             public readonly string Path;
             public readonly bool IsPrefix;
 
             public FilePathPattern(string path, bool isPrefix)
             {
-                Debug.Assert(path != null);
-
                 Path = path;
                 IsPrefix = isPrefix;
             }
         }
 
-        internal struct UriPattern
+        internal readonly struct UriPattern
         {
             public readonly string Prefix;
             public readonly string Suffix;
 
             public UriPattern(string prefix, string suffix)
             {
-                Debug.Assert(prefix != null);
-                Debug.Assert(suffix != null);
-
                 Prefix = prefix;
                 Suffix = suffix;
             }
         }
 
-        internal static SourceLinkMap Parse(string json, Action<string> reportDiagnostic)
+        internal static SourceLinkMap? Parse(string json, Action<string> reportDiagnostic)
         {
             bool errorReported = false;
             void ReportInvalidJsonDataOnce()
@@ -83,7 +79,7 @@ namespace Microsoft.DiaSymReader.Tools
                         continue;
                     }
 
-                    string value = (property.Value.Type == JTokenType.String) ?
+                    string? value = (property.Value.Type == JTokenType.String) ?
                         property.Value.Value<string>() : null;
 
                     if (value == null ||
@@ -163,7 +159,7 @@ namespace Microsoft.DiaSymReader.Tools
             return true;
         }
 
-        public string GetUri(string path)
+        public string? GetUri(string path)
         {
             if (path.IndexOf('*') >= 0)
             {

@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
-using System;
+#nullable enable
+
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 
 namespace Roslyn.Utilities
 {
@@ -40,7 +40,7 @@ namespace Roslyn.Utilities
             return hash;
         }
 
-        internal static int CombineValues<T>(ImmutableArray<T> values, IEqualityComparer<T> comparer = null, int maxItemsToHash = int.MaxValue)
+        internal static int CombineValues<T>(ImmutableArray<T> values, IEqualityComparer<T>? comparer = null, int maxItemsToHash = int.MaxValue)
         {
             if (values.IsDefaultOrEmpty)
             {
@@ -71,7 +71,7 @@ namespace Roslyn.Utilities
             return hashCode;
         }
 
-        internal static int CombineValues<T>(IEnumerable<T> values, IEqualityComparer<T> comparer = null, int maxItemsToHash = int.MaxValue)
+        internal static int CombineValues<T>(IEnumerable<T> values, IEqualityComparer<T>? comparer = null, int maxItemsToHash = int.MaxValue)
         {
             if (values == null)
             {

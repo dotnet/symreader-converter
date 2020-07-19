@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -18,20 +20,18 @@ namespace Microsoft.DiaSymReader.Tools
         internal sealed class Args
         {
             public readonly string PEFilePath;
-            public readonly string PdbFilePathOpt;
-            public readonly string OutPdbFilePathOpt;
+            public readonly string? PdbFilePath;
+            public readonly string? OutPdbFilePath;
             public readonly PortablePdbConversionOptions Options;
             public readonly bool Extract;
             public readonly ImmutableArray<PdbDiagnosticId> SuppressedWarnings;
             public readonly bool SuppressAllWarnings;
 
-            public Args(string peFilePath, string pdbFilePathOpt, string outPdbFilePathOpt, PortablePdbConversionOptions options, ImmutableArray<PdbDiagnosticId> suppressedWarnings, bool suppressAllWarnings, bool extract)
+            public Args(string peFilePath, string? pdbFilePath, string? outPdbFilePath, PortablePdbConversionOptions options, ImmutableArray<PdbDiagnosticId> suppressedWarnings, bool suppressAllWarnings, bool extract)
             {
-                Debug.Assert(options != null);
-
                 PEFilePath = peFilePath;
-                PdbFilePathOpt = pdbFilePathOpt;
-                OutPdbFilePathOpt = outPdbFilePathOpt;
+                PdbFilePath = pdbFilePath;
+                OutPdbFilePath = outPdbFilePath;
                 Options = options;
                 Extract = extract;
                 SuppressAllWarnings = suppressAllWarnings;
@@ -68,11 +68,11 @@ namespace Microsoft.DiaSymReader.Tools
         // internal for testing
         internal static Args ParseArgs(string[] args)
         {
-            string peFile = null;
+            string? peFile = null;
             bool extract = false;
             bool sourceLink = false;
-            string inPdb = null;
-            string outPdb = null;
+            string? inPdb = null;
+            string? outPdb = null;
             bool suppressAllWarnings = false;
             var suppressedWarnings = new List<PdbDiagnosticId>();
             var srcSvrVariables = new List<KeyValuePair<string, string>>();
@@ -201,7 +201,7 @@ namespace Microsoft.DiaSymReader.Tools
         {
             bool success = true;
 
-            Action<PdbDiagnostic> reporter;
+            Action<PdbDiagnostic>? reporter;
             if (args.SuppressAllWarnings)
             {
                 reporter = null;
@@ -224,14 +224,14 @@ namespace Microsoft.DiaSymReader.Tools
             using (var peStream = new FileStream(args.PEFilePath, FileMode.Open, FileAccess.Read))
             using (var peReader = new PEReader(peStream, PEStreamOptions.LeaveOpen))
             {
-                string portablePdbFileCandidate = null;
+                string? portablePdbFileCandidate = null;
 
-                if (args.PdbFilePathOpt != null)
+                if (args.PdbFilePath != null)
                 {
                     Debug.Assert(!args.Extract);
-                    Debug.Assert(args.OutPdbFilePathOpt != null);
+                    NullableDebug.Assert(args.OutPdbFilePath != null);
 
-                    using (var srcPdbStreamOpt = OpenFileForRead(args.PdbFilePathOpt))
+                    using (var srcPdbStreamOpt = OpenFileForRead(args.PdbFilePath))
                     {
                         var outPdbStream = new MemoryStream();
                         if (PdbConverter.IsPortable(srcPdbStreamOpt))
@@ -243,7 +243,7 @@ namespace Microsoft.DiaSymReader.Tools
                             converter.ConvertWindowsToPortable(peReader, srcPdbStreamOpt, outPdbStream);
                         }
 
-                        WriteAllBytes(args.OutPdbFilePathOpt, outPdbStream);
+                        WriteAllBytes(args.OutPdbFilePath, outPdbStream);
                     }
                 }
                 else if (peReader.TryOpenAssociatedPortablePdb(args.PEFilePath, path => File.OpenRead(portablePdbFileCandidate = path), out var pdbReaderProvider, out _))
@@ -254,7 +254,7 @@ namespace Microsoft.DiaSymReader.Tools
                         if (args.Extract)
                         {
                             string pdbPath = 
-                                args.OutPdbFilePathOpt ??
+                                args.OutPdbFilePath ??
                                 GetPdbPathFromCodeViewEntry(peReader, args.PEFilePath, portable: true) ?? 
                                 Path.ChangeExtension(args.PEFilePath, "pdb");
 
@@ -262,11 +262,11 @@ namespace Microsoft.DiaSymReader.Tools
                         }
                         else
                         {
-                            Debug.Assert(args.OutPdbFilePathOpt != null);
+                            NullableDebug.Assert(args.OutPdbFilePath != null);
 
                             var dstPdbStream = new MemoryStream();
                             converter.ConvertPortableToWindows(peReader, pdbReader, dstPdbStream, args.Options);
-                            WriteAllBytes(args.OutPdbFilePathOpt, dstPdbStream);
+                            WriteAllBytes(args.OutPdbFilePath, dstPdbStream);
                         }
                     }
                 }
@@ -280,11 +280,11 @@ namespace Microsoft.DiaSymReader.Tools
                 }
                 else
                 {
-                    Debug.Assert(args.OutPdbFilePathOpt != null);
+                    NullableDebug.Assert(args.OutPdbFilePath != null);
 
                     // We don't have Portable PDB nor Embedded PDB. Try to find Windows PDB.
 
-                    string path = GetPdbPathFromCodeViewEntry(peReader, args.PEFilePath, portable: false);
+                    var path = GetPdbPathFromCodeViewEntry(peReader, args.PEFilePath, portable: false);
                     if (path == null)
                     {
                         throw new IOException(string.Format(Resources.NoAssociatedOrEmbeddedPdb, args.PEFilePath));
@@ -294,7 +294,7 @@ namespace Microsoft.DiaSymReader.Tools
                     {
                         var outPdbStream = new MemoryStream();
                         converter.ConvertWindowsToPortable(peReader, srcPdbStreamOpt, outPdbStream);
-                        WriteAllBytes(args.OutPdbFilePathOpt, outPdbStream);
+                        WriteAllBytes(args.OutPdbFilePath, outPdbStream);
                     }
                 }
             }
@@ -302,7 +302,7 @@ namespace Microsoft.DiaSymReader.Tools
             return success;
         }
 
-        private static string GetPdbPathFromCodeViewEntry(PEReader peReader, string peFilePath, bool portable)
+        private static string? GetPdbPathFromCodeViewEntry(PEReader peReader, string peFilePath, bool portable)
         {
             var directory = peReader.ReadDebugDirectory();
 

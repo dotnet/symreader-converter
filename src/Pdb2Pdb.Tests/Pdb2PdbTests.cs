@@ -44,8 +44,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         {
             var args = Pdb2Pdb.ParseArgs(new[] { "a.dll" });
             Assert.Equal("a.dll", args.PEFilePath);
-            Assert.Null(args.PdbFilePathOpt);
-            Assert.Equal("a.pdb2", args.OutPdbFilePathOpt);
+            Assert.Null(args.PdbFilePath);
+            Assert.Equal("a.pdb2", args.OutPdbFilePath);
             Assert.False(args.Extract);
             Assert.False(args.SuppressAllWarnings);
             Assert.Empty(args.SuppressedWarnings);
@@ -54,8 +54,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 
             args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/extract" });
             Assert.Equal("a.dll", args.PEFilePath);
-            Assert.Null(args.PdbFilePathOpt);
-            Assert.Null(args.OutPdbFilePathOpt);
+            Assert.Null(args.PdbFilePath);
+            Assert.Null(args.OutPdbFilePath);
             Assert.True(args.Extract);
             Assert.False(args.SuppressAllWarnings);
             Assert.Empty(args.SuppressedWarnings);
@@ -64,8 +64,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 
             args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/extract", "/out", "b.pdb" });
             Assert.Equal("a.dll", args.PEFilePath);
-            Assert.Null(args.PdbFilePathOpt);
-            Assert.Equal("b.pdb", args.OutPdbFilePathOpt);
+            Assert.Null(args.PdbFilePath);
+            Assert.Equal("b.pdb", args.OutPdbFilePath);
             Assert.True(args.Extract);
             Assert.False(args.SuppressAllWarnings);
             Assert.Empty(args.SuppressedWarnings);
@@ -74,8 +74,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 
             args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/sourcelink", "/pdb", "b.pdb", "/out", "c.pdb" });
             Assert.Equal("a.dll", args.PEFilePath);
-            Assert.Equal("b.pdb", args.PdbFilePathOpt);
-            Assert.Equal("c.pdb", args.OutPdbFilePathOpt);
+            Assert.Equal("b.pdb", args.PdbFilePath);
+            Assert.Equal("c.pdb", args.OutPdbFilePath);
             Assert.False(args.Extract);
             Assert.False(args.SuppressAllWarnings);
             Assert.Empty(args.SuppressedWarnings);
@@ -84,8 +84,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 
             args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/out", "c.pdb", "/nowarn", "*" });
             Assert.Equal("a.dll", args.PEFilePath);
-            Assert.Null(args.PdbFilePathOpt);
-            Assert.Equal("c.pdb", args.OutPdbFilePathOpt);
+            Assert.Null(args.PdbFilePath);
+            Assert.Equal("c.pdb", args.OutPdbFilePath);
             Assert.False(args.Extract);
             Assert.True(args.SuppressAllWarnings);
             Assert.Empty(args.SuppressedWarnings);
@@ -94,8 +94,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 
             args = Pdb2Pdb.ParseArgs(new[] { "a.dll", "/out", "c.pdb", "/nowarn", "1, 2, 1,3", "/srcsvrvar", "a=b", "/srcsvrvar", "c=d" });
             Assert.Equal("a.dll", args.PEFilePath);
-            Assert.Null(args.PdbFilePathOpt);
-            Assert.Equal("c.pdb", args.OutPdbFilePathOpt);
+            Assert.Null(args.PdbFilePath);
+            Assert.Equal("c.pdb", args.OutPdbFilePath);
             Assert.False(args.Extract);
             Assert.False(args.SuppressAllWarnings);
             AssertEx.Equal(new[] { (PdbDiagnosticId)1, (PdbDiagnosticId)2, (PdbDiagnosticId)1, (PdbDiagnosticId)3 }, args.SuppressedWarnings);
@@ -113,8 +113,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 
             Assert.True(Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
-                pdbFilePathOpt: pdb.Path,
-                outPdbFilePathOpt: outPdbPath,
+                pdbFilePath: pdb.Path,
+                outPdbFilePath: outPdbPath,
                 options: PortablePdbConversionOptions.Default,
                 suppressedWarnings: ImmutableArray.Create(PdbDiagnosticId.UnmappedDocumentName),
                 suppressAllWarnings: false,
@@ -171,8 +171,8 @@ SRCSRV: end ------------------------------------------------", srcsvr);
 
             Assert.True(Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
-                pdbFilePathOpt: null,
-                outPdbFilePathOpt: outPdb.Path,
+                pdbFilePath: null,
+                outPdbFilePath: outPdb.Path,
                 options: new PortablePdbConversionOptions(suppressSourceLinkConversion: true),
                 suppressedWarnings: ImmutableArray<PdbDiagnosticId>.Empty,
                 suppressAllWarnings: false,
@@ -196,8 +196,8 @@ SRCSRV: end ------------------------------------------------", srcsvr);
 
             Assert.True(Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
-                pdbFilePathOpt: null,
-                outPdbFilePathOpt: outPdb.Path,
+                pdbFilePath: null,
+                outPdbFilePath: outPdb.Path,
                 options: new PortablePdbConversionOptions(suppressSourceLinkConversion: true),
                 suppressedWarnings: ImmutableArray<PdbDiagnosticId>.Empty,
                 suppressAllWarnings: false, 
@@ -221,8 +221,8 @@ SRCSRV: end ------------------------------------------------", srcsvr);
 
             Assert.True(Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
-                pdbFilePathOpt: null,
-                outPdbFilePathOpt: null,
+                pdbFilePath: null,
+                outPdbFilePath: null,
                 options: PortablePdbConversionOptions.Default,                
                 suppressedWarnings: ImmutableArray<PdbDiagnosticId>.Empty,
                 suppressAllWarnings: false,
@@ -240,8 +240,8 @@ SRCSRV: end ------------------------------------------------", srcsvr);
 
             Assert.True(Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
-                pdbFilePathOpt: null,
-                outPdbFilePathOpt: outPdb.Path,
+                pdbFilePath: null,
+                outPdbFilePath: outPdb.Path,
                 options: PortablePdbConversionOptions.Default,
                 suppressedWarnings: ImmutableArray<PdbDiagnosticId>.Empty,
                 suppressAllWarnings: false,
@@ -261,8 +261,8 @@ SRCSRV: end ------------------------------------------------", srcsvr);
             Assert.Throws<IOException>(() =>
                 Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                     peFilePath: pe.Path,
-                    pdbFilePathOpt: null,
-                    outPdbFilePathOpt: outPdb.Path,
+                    pdbFilePath: null,
+                    outPdbFilePath: outPdb.Path,
                     options: PortablePdbConversionOptions.Default,
                     suppressedWarnings: ImmutableArray<PdbDiagnosticId>.Empty,
                     suppressAllWarnings: false,
@@ -281,8 +281,8 @@ SRCSRV: end ------------------------------------------------", srcsvr);
 
             Assert.True(Pdb2Pdb.Convert(new Pdb2Pdb.Args(
                 peFilePath: pe.Path,
-                pdbFilePathOpt: null,
-                outPdbFilePathOpt: outPdb.Path,
+                pdbFilePath: null,
+                outPdbFilePath: outPdb.Path,
                 options: PortablePdbConversionOptions.Default,
                 suppressedWarnings: ImmutableArray<PdbDiagnosticId>.Empty,
                 suppressAllWarnings: false,

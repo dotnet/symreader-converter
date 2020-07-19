@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -25,7 +27,7 @@ namespace Microsoft.DiaSymReader.Tools
 
         public PortablePdbConversionOptions(
             bool suppressSourceLinkConversion = false,
-            IEnumerable<KeyValuePair<string, string>> srcSvrVariables = null)
+            IEnumerable<KeyValuePair<string, string>>? srcSvrVariables = null)
         {
             var variables = srcSvrVariables?.ToImmutableArray() ?? ImmutableArray<KeyValuePair<string, string>>.Empty;
             PdbConverterPortableToWindows.ValidateSrcSvrVariables(variables, nameof(srcSvrVariables));
