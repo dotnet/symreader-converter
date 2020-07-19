@@ -144,25 +144,9 @@ SRCSRV: end ------------------------------------------------
    {
       ""1"": null,
       ""2"": {},
-      ""C:\\a*"": ""http://a/*"",
-      ""*C:\\x*"": ""http://a/*"",
-      ""C:\\x*"": ""*http://a/*"",
-      ""C:\\x"": ""*http://a/"",
-      ""C:\\x*"": ""http://a/""
    }
 }",
-@"
-SRCSRV: ini ------------------------------------------------
-VERSION=2
-SRCSRV: variables ------------------------------------------
-RAWURL=http://a//%var2%
-SRCSRVVERCTRL=http
-SRCSRVTRG=%RAWURL%
-SRCSRV: source files ---------------------------------------
-C:\a\1.cs*1.cs
-C:\a\2.cs*2.cs
-SRCSRV: end ------------------------------------------------
-",
+            null,
             new[]
             {
                 new PdbDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, new[] { ConverterResources.InvalidJsonDataFormat })
