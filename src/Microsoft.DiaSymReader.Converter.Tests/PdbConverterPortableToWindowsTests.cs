@@ -5,8 +5,7 @@ using System;
 using System.Collections.Generic;
 using Roslyn.Test.Utilities;
 using System.Text;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace Microsoft.DiaSymReader.Tools.UnitTests
 {
@@ -102,22 +101,33 @@ SRCSRV: end ------------------------------------------------
         [Fact]
         public void SourceLinkConversion_BadJson_Key()
         {
+            var json = @"
+{
+    ""documents"" : 
+    {
+        1: ""http://server/X/Y*"",
+    }
+}";
+
+            string error = null;
+            try
+            {
+                JsonDocument.Parse(json);
+            }
+            catch (JsonException e)
+            {
+                error = e.Message;
+            }
+
             ValidateSourceLinkConversion(new[]
             {
                 @"C:\a\1.cs"
             },            
-@"{
-   ""documents"" : 
-   {
-      1: ""http://server/X/Y*"",
-   }
-}",
+            json,
             null, 
             new[]
             {
-                new PdbDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, new[] { ConverterResources.InvalidJsonDataFormat }),
-                new PdbDiagnostic(PdbDiagnosticId.UnmappedDocumentName, 0, new[] { @"C:\a\1.cs" }),
-                new PdbDiagnostic(PdbDiagnosticId.NoSupportedUrlsFoundInSourceLink, 0, Array.Empty<object>())
+                new PdbDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, new[] { error })
             });
         }
 
@@ -134,25 +144,9 @@ SRCSRV: end ------------------------------------------------
    {
       ""1"": null,
       ""2"": {},
-      ""C:\\a*"": ""http://a/*"",
-      ""*C:\\x*"": ""http://a/*"",
-      ""C:\\x*"": ""*http://a/*"",
-      ""C:\\x"": ""*http://a/"",
-      ""C:\\x*"": ""http://a/""
    }
 }",
-@"
-SRCSRV: ini ------------------------------------------------
-VERSION=2
-SRCSRV: variables ------------------------------------------
-RAWURL=http://a//%var2%
-SRCSRVVERCTRL=http
-SRCSRVTRG=%RAWURL%
-SRCSRV: source files ---------------------------------------
-C:\a\1.cs*1.cs
-C:\a\2.cs*2.cs
-SRCSRV: end ------------------------------------------------
-",
+            null,
             new[]
             {
                 new PdbDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, new[] { ConverterResources.InvalidJsonDataFormat })
@@ -171,9 +165,9 @@ SRCSRV: end ------------------------------------------------
             Exception expectedException = null;
             try
             {
-                JObject.Parse(json);
+                _ = JsonDocument.Parse(json);
             }
-            catch (JsonReaderException e)
+            catch (JsonException e)
             {
                 expectedException = e;
             }
@@ -230,7 +224,7 @@ SRCSRV: end ------------------------------------------------",
         [Fact]
         public void SourceChecksumValidation()
         {
-            void ValidateSourceChecksum(Guid guid, Guid correctedGuid, byte[] checksum, string documentName, params PdbDiagnostic[] expectedErrors)
+            static void ValidateSourceChecksum(Guid guid, Guid correctedGuid, byte[] checksum, string documentName, params PdbDiagnostic[] expectedErrors)
             {
                 var actualErrors = new List<PdbDiagnostic>();
                 var converter = new PdbConverterPortableToWindows(actualErrors.Add);

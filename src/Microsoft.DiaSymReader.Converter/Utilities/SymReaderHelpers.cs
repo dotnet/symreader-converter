@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using System;
 using System.Collections.Immutable;
 using System.IO;
@@ -86,7 +88,7 @@ namespace Microsoft.DiaSymReader.Tools
             var codeViewEntry = peReader.ReadDebugDirectory().LastOrDefault(entry => entry.Type == DebugDirectoryEntryType.CodeView);
             if (codeViewEntry.DataSize == 0)
             {
-                id = default(BlobContentId);
+                id = default;
                 age = 0;
                 return false;
             }
@@ -123,10 +125,10 @@ namespace Microsoft.DiaSymReader.Tools
             Encoding.UTF8.GetString(data, size);
 #endif
 
-        public unsafe static string GetSourceLinkData(this ISymUnmanagedReader5 reader) => 
+        public unsafe static string? GetSourceLinkData(this ISymUnmanagedReader5 reader) => 
             TryGetSourceLinkData(reader, out byte* data, out int size) ? GetString(data, size) : null;
 
-        public unsafe static byte[] GetRawSourceLinkData(this ISymUnmanagedReader5 reader) =>
+        public unsafe static byte[]? GetRawSourceLinkData(this ISymUnmanagedReader5 reader) =>
             TryGetSourceLinkData(reader, out byte* data, out int size) ? GetBytes(data, size) : null;
 
         private unsafe static bool TryGetSourceLinkData(ISymUnmanagedReader5 reader, out byte* data, out int size)
@@ -136,14 +138,14 @@ namespace Microsoft.DiaSymReader.Tools
             return hr != HResult.S_FALSE;
         }
 
-        public unsafe static byte[] GetRawSourceServerData(this ISymUnmanagedReader reader)
+        public unsafe static byte[]? GetRawSourceServerData(this ISymUnmanagedReader reader)
         {
             if (!(reader is ISymUnmanagedSourceServerModule srcsrv))
             {
                 return null;
             }
 
-            int size = 0;
+            int size;
             byte* data = null;
             try
             {
@@ -159,14 +161,14 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        public unsafe static string GetSourceServerData(this ISymUnmanagedReader reader)
+        public unsafe static string? GetSourceServerData(this ISymUnmanagedReader reader)
         {
             if (!(reader is ISymUnmanagedSourceServerModule srcsrv))
             {
                 return null;
             }
 
-            int size = 0;
+            int size;
             byte* data = null;
             try
             {
@@ -182,7 +184,7 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        public static byte[] GetRawEmbeddedSource(this ISymUnmanagedDocument document)
+        public static byte[]? GetRawEmbeddedSource(this ISymUnmanagedDocument document)
         {
             Marshal.ThrowExceptionForHR(document.GetSourceLength(out int length));
             if (length == 0)

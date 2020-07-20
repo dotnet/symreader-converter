@@ -1145,7 +1145,7 @@ namespace Microsoft.DiaSymReader.Tools
         {
         }
 
-        private static XmlWriterSettings s_xmlWriterSettings = new XmlWriterSettings
+        private static readonly XmlWriterSettings s_xmlWriterSettings = new XmlWriterSettings
         {
             Encoding = Encoding.UTF8,
             Indent = true,

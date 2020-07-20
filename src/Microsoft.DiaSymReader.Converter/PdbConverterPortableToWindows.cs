@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -12,6 +14,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using Microsoft.CodeAnalysis.Collections;
 using Microsoft.CodeAnalysis.Debugging;
 using Microsoft.CodeAnalysis.PooledObjects;
@@ -22,16 +25,16 @@ namespace Microsoft.DiaSymReader.Tools
 {
     internal sealed class PdbConverterPortableToWindows
     {
-        private readonly Action<PdbDiagnostic> _diagnosticReporterOpt;
+        private readonly Action<PdbDiagnostic>? _diagnosticReporter;
 
-        public PdbConverterPortableToWindows(Action<PdbDiagnostic> diagnosticReporterOpt)
+        public PdbConverterPortableToWindows(Action<PdbDiagnostic>? diagnosticReporter)
         {
-            _diagnosticReporterOpt = diagnosticReporterOpt;
+            _diagnosticReporter = diagnosticReporter;
         }
 
         private void ReportDiagnostic(PdbDiagnosticId id, int token, params object[] args)
         {
-            _diagnosticReporterOpt?.Invoke(new PdbDiagnostic(id, token, args));
+            _diagnosticReporter?.Invoke(new PdbDiagnostic(id, token, args));
         }
 
         /// <summary>
@@ -49,7 +52,7 @@ namespace Microsoft.DiaSymReader.Tools
                 PdbGuids.LanguageVendor.Microsoft : default;
         }
 
-        private struct LocalScopeInfo
+        private readonly struct LocalScopeInfo
         {
             public readonly LocalScope? LocalScope;
 
@@ -70,11 +73,6 @@ namespace Microsoft.DiaSymReader.Tools
 
         internal void Convert(PEReader peReader, MetadataReader pdbReader, SymUnmanagedWriter pdbWriter, PortablePdbConversionOptions options)
         {
-            Debug.Assert(peReader != null);
-            Debug.Assert(pdbReader != null);
-            Debug.Assert(pdbWriter != null);
-            Debug.Assert(options != null);
-
             if (!SymReaderHelpers.TryReadPdbId(peReader, out var pePdbId, out int peAge))
             {
                 throw new InvalidDataException(ConverterResources.SpecifiedPEFileHasNoAssociatedPdb);
@@ -85,9 +83,9 @@ namespace Microsoft.DiaSymReader.Tools
                 throw new InvalidDataException(ConverterResources.PdbNotMatchingDebugDirectory);
             }
 
-            string vbDefaultNamespace = MetadataUtilities.GetVisualBasicDefaultNamespace(pdbReader);
+            string? vbDefaultNamespace = MetadataUtilities.GetVisualBasicDefaultNamespace(pdbReader);
             bool vbSemantics = vbDefaultNamespace != null;
-            string vbDefaultNamespaceImportString = string.IsNullOrEmpty(vbDefaultNamespace) ? null : "*" + vbDefaultNamespace;
+            string? vbDefaultNamespaceImportString = string.IsNullOrEmpty(vbDefaultNamespace) ? null : "*" + vbDefaultNamespace;
 
             var metadataReader = peReader.GetMetadataReader();
             var metadataModel = new MetadataModel(metadataReader, vbSemantics);
@@ -99,7 +97,7 @@ namespace Microsoft.DiaSymReader.Tools
             var importGroups = new List<int>();
             var cdiBuilder = new BlobBuilder();
             var dynamicLocals = new List<(string LocalName, byte[] Flags, int Count, int SlotIndex)>();
-            var tupleLocals = new List<(string LocalName, int SlotIndex, int ScopeStart, int ScopeEnd, ImmutableArray<string> Names)>();
+            var tupleLocals = new List<(string LocalName, int SlotIndex, int ScopeStart, int ScopeEnd, ImmutableArray<string?> Names)>();
             var openScopeEndOffsets = new Stack<int>();
 
             // state for calculating import string forwarding:
@@ -142,7 +140,7 @@ namespace Microsoft.DiaSymReader.Tools
             int localScopeRowNumber = 0;
             int localScopeCount = pdbReader.GetTableRowCount(TableIndex.LocalScope);
 
-            int CompareScopeRanges(int leftStart, int leftEnd, int rightStart, int rightEnd)
+            static int CompareScopeRanges(int leftStart, int leftEnd, int rightStart, int rightEnd)
             {
                 int result = leftStart.CompareTo(rightStart);
                 return (result != 0) ? result : rightEnd.CompareTo(leftEnd);
@@ -250,7 +248,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                     if (c >= 0 && nextHoistedScope != null)
                     {
-                        bool ScopeEquals(StateMachineHoistedLocalScope left, StateMachineHoistedLocalScope right)
+                        static bool ScopeEquals(StateMachineHoistedLocalScope left, StateMachineHoistedLocalScope right)
                             => left.StartOffset == right.StartOffset && left.EndOffset == right.EndOffset;
 
                         // determine all hoisted variables that have equal scopes:
@@ -318,7 +316,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                         if (currentLocalScope.IsLocalScope)
                         {
-                            var localScope = currentLocalScope.LocalScope.Value;
+                            var localScope = currentLocalScope.LocalScope!.Value;
                             OpenScope(localScope.StartOffset, localScope.EndOffset);
 
                             if (isFirstMethodLocalScope)
@@ -418,7 +416,7 @@ namespace Microsoft.DiaSymReader.Tools
                                 if (!metadataModel.TryGetStandaloneSignatureHandle(signature, out var constantSignatureHandle))
                                 {
                                     // Signature will be unspecified. At least we store the name and the value.
-                                    constantSignatureHandle = default(StandaloneSignatureHandle);
+                                    constantSignatureHandle = default;
                                 }
 
                                 pdbWriter.DefineLocalConstant(name, value, MetadataTokens.GetToken(constantSignatureHandle));
@@ -649,7 +647,7 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        private static string GetMethodNamespace(MetadataReader metadataReader, MethodDefinition methodDef)
+        private static string? GetMethodNamespace(MetadataReader metadataReader, MethodDefinition methodDef)
         {
             var typeDefHandle = methodDef.GetDeclaringType();
             if (typeDefHandle.IsNil)
@@ -756,8 +754,8 @@ namespace Microsoft.DiaSymReader.Tools
             MetadataModel metadataModel,
             ImportScopeHandle importScopeHandle,
             ImmutableArray<(AssemblyReferenceHandle, string)> aliasedAssemblyRefs,
-            string vbDefaultNamespaceImportStringOpt,
-            string vbCurrentMethodNamespaceOpt,
+            string? vbDefaultNamespaceImportString,
+            string? vbCurrentMethodNamespace,
             bool vbSemantics)
         {
             Debug.Assert(declaredExternAliases.Count == 0);
@@ -768,10 +766,10 @@ namespace Microsoft.DiaSymReader.Tools
                 var importScope = pdbReader.GetImportScope(importScopeHandle);
                 bool isProjectLevel = importScope.Parent.IsNil;
 
-                if (isProjectLevel && vbDefaultNamespaceImportStringOpt != null)
+                if (isProjectLevel && vbDefaultNamespaceImportString != null)
                 {
                     Debug.Assert(vbSemantics);
-                    importStrings.Add(vbDefaultNamespaceImportStringOpt);
+                    importStrings.Add(vbDefaultNamespaceImportString);
                 }
 
                 int importStringCount = 0;
@@ -794,10 +792,10 @@ namespace Microsoft.DiaSymReader.Tools
                     importStringCount++;
                 }
 
-                if (isProjectLevel && vbCurrentMethodNamespaceOpt != null)
+                if (isProjectLevel && vbCurrentMethodNamespace != null)
                 {
                     Debug.Assert(vbSemantics);
-                    importStrings.Add(vbCurrentMethodNamespaceOpt);
+                    importStrings.Add(vbCurrentMethodNamespace);
                 }
 
                 // Skip C# project-level scope if it doesn't include namespaces.
@@ -847,7 +845,7 @@ namespace Microsoft.DiaSymReader.Tools
                     select (import.TargetAssembly, pdbReader.GetStringUTF8(import.Alias))).ToImmutableArray();
         }
 
-        private string TryEncodeImport(
+        private string? TryEncodeImport(
             MetadataReader pdbReader, 
             MetadataModel metadataModel, 
             ImportScopeHandle importScopeHandle,
@@ -857,7 +855,8 @@ namespace Microsoft.DiaSymReader.Tools
             bool isProjectLevel,
             bool vbSemantics)
         {
-            string typeName, namespaceName;
+            string? typeName;
+            string namespaceName;
 
             // See Roslyn implementation: PdbWriter.TryEncodeImport, MetadataWriter.SerializeImport
             switch (import.Kind)
@@ -947,7 +946,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                     // The import string uses extern alias to represent an assembly reference.
                     // Find one that is declared within the current scope.
-                    string assemblyRefAlias = TryGetAssemblyReferenceAlias(import.TargetAssembly, declaredExternAliases, aliasedAssemblyRefs);
+                    string? assemblyRefAlias = TryGetAssemblyReferenceAlias(import.TargetAssembly, declaredExternAliases, aliasedAssemblyRefs);
                     if (assemblyRefAlias == null)
                     {
                         ReportDiagnostic(PdbDiagnosticId.UndefinedAssemblyReferenceAlias, MetadataTokens.GetToken(importScopeHandle), MetadataTokens.GetToken(import.TargetAssembly));
@@ -975,7 +974,7 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        private static string TryGetAssemblyReferenceAlias(
+        private static string? TryGetAssemblyReferenceAlias(
             AssemblyReferenceHandle targetAssembly, 
             HashSet<string> declaredExternAliases, 
             ImmutableArray<(AssemblyReferenceHandle, string)> aliasedAssemblyRefs)
@@ -1030,29 +1029,37 @@ namespace Microsoft.DiaSymReader.Tools
         // Avoid loading JSON dependency if not needed.
         // Internal for testing.
         [MethodImpl(MethodImplOptions.NoInlining)]
-        internal string ConvertSourceServerData(string sourceLink, IReadOnlyCollection<string> documentNames, PortablePdbConversionOptions options)
+        internal string? ConvertSourceServerData(string sourceLink, IReadOnlyCollection<string> documentNames, PortablePdbConversionOptions options)
         {
             if (documentNames.Count == 0)
             {
                 // no documents in the PDB
                 return null;
             }
-            
-            var builder = new StringBuilder();
 
-            var map = SourceLinkMap.Parse(sourceLink, errorMessage => ReportDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, errorMessage));
-            if (map == null)
+            SourceLinkMap map;
+            try
             {
-                // error already reported
+                map = SourceLinkMap.Parse(sourceLink);
+            }
+            catch (JsonException e)
+            {
+                ReportDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, e.Message);
+                return null;
+            }
+            catch (InvalidDataException)
+            {
+                ReportDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, ConverterResources.InvalidJsonDataFormat);
                 return null;
             }
 
+            var builder = new StringBuilder();
             var mapping = new List<(string name, string uri)>();
 
-            string commonScheme = null;
+            string? commonScheme = null;
             foreach (string documentName in documentNames)
             {
-                string uri = map.GetUri(documentName);
+                var uri = map.GetUri(documentName);
                 if (uri == null)
                 {
                     ReportDiagnostic(PdbDiagnosticId.UnmappedDocumentName, 0, documentName);

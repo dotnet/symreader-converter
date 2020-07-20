@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -30,7 +32,7 @@ namespace Microsoft.DiaSymReader.Tools
 
         private readonly MetadataReader _metadataReader;
         private readonly ISymUnmanagedReader3 _symReader;
-        private readonly MetadataReader _portablePdbMetadataOpt;
+        private readonly MetadataReader? _portablePdbMetadata;
         private readonly PdbToXmlOptions _options;
         private readonly XmlWriter _writer;
 
@@ -48,10 +50,10 @@ namespace Microsoft.DiaSymReader.Tools
             _metadataReader = metadataReader;
             _writer = writer;
             _options = options;
-            _portablePdbMetadataOpt = GetPortablePdbMetadata(symReader);
+            _portablePdbMetadata = GetPortablePdbMetadata(symReader);
         }
 
-        private unsafe static MetadataReader GetPortablePdbMetadata(ISymUnmanagedReader3 symReader)
+        private unsafe static MetadataReader? GetPortablePdbMetadata(ISymUnmanagedReader3 symReader)
         {
             if (symReader is ISymUnmanagedReader4 symReader4)
             {
@@ -71,28 +73,28 @@ namespace Microsoft.DiaSymReader.Tools
             ToXml(
                 writer,
                 deltaPdb,
-                metadataReaderOpt: null,
+                metadataReader: null,
                 options: PdbToXmlOptions.IncludeTokens,
                 methodHandles: methodTokens.Select(token => (MethodDefinitionHandle)MetadataTokens.Handle(token)));
 
             return writer.ToString();
         }
 
-        public static string ToXml(Stream pdbStream, Stream peStream, PdbToXmlOptions options = PdbToXmlOptions.ResolveTokens, string methodName = null)
+        public static string ToXml(Stream pdbStream, Stream peStream, PdbToXmlOptions options = PdbToXmlOptions.ResolveTokens, string? methodName = null)
         {
             var writer = new StringWriter();
             ToXml(writer, pdbStream, peStream, options, methodName);
             return writer.ToString();
         }
 
-        public static string ToXml(Stream pdbStream, byte[] peImage, PdbToXmlOptions options = PdbToXmlOptions.ResolveTokens, string methodName = null)
+        public static string ToXml(Stream pdbStream, byte[] peImage, PdbToXmlOptions options = PdbToXmlOptions.ResolveTokens, string? methodName = null)
         {
             var writer = new StringWriter();
             ToXml(writer, pdbStream, new MemoryStream(peImage), options, methodName);
             return writer.ToString();
         }
 
-        public static void ToXml(TextWriter xmlWriter, Stream pdbStream, Stream peStream, PdbToXmlOptions options = PdbToXmlOptions.Default, string methodName = null)
+        public static void ToXml(TextWriter xmlWriter, Stream pdbStream, Stream peStream, PdbToXmlOptions options = PdbToXmlOptions.Default, string? methodName = null)
         {
             IEnumerable<MethodDefinitionHandle> methodHandles;
 
@@ -139,31 +141,30 @@ namespace Microsoft.DiaSymReader.Tools
         /// Load the PDB given the parameters at the ctor and spew it out to the XmlWriter specified
         /// at the ctor.
         /// </summary>
-        private static void ToXml(TextWriter xmlWriter, Stream pdbStream, MetadataReader metadataReaderOpt, PdbToXmlOptions options, IEnumerable<MethodDefinitionHandle> methodHandles)
+        private static void ToXml(TextWriter xmlWriter, Stream pdbStream, MetadataReader? metadataReader, PdbToXmlOptions options, IEnumerable<MethodDefinitionHandle> methodHandles)
         {
-            Debug.Assert(pdbStream != null);
-            Debug.Assert((options & PdbToXmlOptions.ResolveTokens) == 0 || metadataReaderOpt != null);
-            Debug.Assert(methodHandles != null);
+            Debug.Assert((options & PdbToXmlOptions.ResolveTokens) == 0 || metadataReader != null);
 
             using var writer = XmlWriter.Create(xmlWriter, s_xmlWriterSettings);
 
             // metadata reader is on stack -> no owner needed
-            var symReader = CreateReader(pdbStream, metadataReaderOpt, useNativeReader: (options & PdbToXmlOptions.UseNativeReader) != 0);
+            var symReader = CreateReader(pdbStream, metadataReader, useNativeReader: (options & PdbToXmlOptions.UseNativeReader) != 0);
 
             try
             {
-                var converter = new PdbToXmlConverter(writer, symReader, metadataReaderOpt, options);
+                // TODO: possible NRE (https://github.com/dotnet/symreader-converter/issues/177)
+                var converter = new PdbToXmlConverter(writer, symReader, metadataReader!, options);
                 converter.WriteRoot(methodHandles);
             }
             finally
             {
-                ((ISymUnmanagedDispose)symReader).Destroy();
+                _ = ((ISymUnmanagedDispose)symReader).Destroy();
             }
         }
 
-        private static ISymUnmanagedReader3 CreateReader(Stream pdbStream, MetadataReader metadataReaderOpt, bool useNativeReader)
+        private static ISymUnmanagedReader3 CreateReader(Stream pdbStream, MetadataReader? metadataReader, bool useNativeReader)
         {
-            var metadataProvider = metadataReaderOpt != null ? new SymMetadataProvider(metadataReaderOpt) : DummySymReaderMetadataProvider.Instance;
+            var metadataProvider = (metadataReader != null) ? new SymMetadataProvider(metadataReader) : DummySymReaderMetadataProvider.Instance;
             var importer = SymUnmanagedReaderFactory.CreateSymReaderMetadataImport(metadataProvider);
 
             if (!useNativeReader && SymReaderHelpers.IsPortable(pdbStream))
@@ -215,7 +216,7 @@ namespace Microsoft.DiaSymReader.Tools
         {
             _writer.WriteStartElement("methods");
 
-            Dictionary<MethodDefinitionHandle, MethodDefinitionHandle> aggregateToRelativeMap = null;
+            Dictionary<MethodDefinitionHandle, MethodDefinitionHandle>? aggregateToRelativeMap = null;
             if (tokenMap.Length > 0)
             {
                 // maps aggregate handles to generation-relative method handles:
@@ -251,12 +252,12 @@ namespace Microsoft.DiaSymReader.Tools
             var portableCdi = ImmutableArray<(Guid kind, ImmutableArray<byte> data)>.Empty;
 
             var sequencePoints = ImmutableArray<SymUnmanagedSequencePoint>.Empty;
-            ISymUnmanagedAsyncMethod asyncMethod = null;
-            ISymUnmanagedScope rootScope = null;
+            ISymUnmanagedAsyncMethod? asyncMethod = null;
+            ISymUnmanagedScope? rootScope = null;
 
             if ((_options & PdbToXmlOptions.ExcludeCustomDebugInformation) == 0)
             {
-                if (_portablePdbMetadataOpt != null)
+                if (_portablePdbMetadata != null)
                 {
                     portableCdi = GetPortableCustomDebugInfo(generationMethodHandle);
                 }
@@ -313,7 +314,7 @@ namespace Microsoft.DiaSymReader.Tools
             _writer.WriteEndElement();
         }
 
-        private void WriteMethodCustomDebugInfo(byte[] windowsCdi, ImmutableArray<(Guid kind, ImmutableArray<byte> data)> portableCdi)
+        private void WriteMethodCustomDebugInfo(byte[]? windowsCdi, ImmutableArray<(Guid kind, ImmutableArray<byte> data)> portableCdi)
         {
             Debug.Assert(windowsCdi == null || portableCdi.IsEmpty);
 
@@ -401,7 +402,7 @@ namespace Microsoft.DiaSymReader.Tools
 
         private void WriteMethodCustomDebugInfo(ImmutableArray<(Guid kind, ImmutableArray<byte> data)> cdis)
         {
-            var mdReader = _portablePdbMetadataOpt;
+            var mdReader = _portablePdbMetadata;
             Debug.Assert(mdReader != null);
 
             foreach (var (kind, data) in cdis)
@@ -423,7 +424,7 @@ namespace Microsoft.DiaSymReader.Tools
 
         private void WriteModuleCustomDebugInfo()
         {
-            var mdReader = _portablePdbMetadataOpt;
+            var mdReader = _portablePdbMetadata;
             if (mdReader == null)
             {
                 return;
@@ -458,8 +459,8 @@ namespace Microsoft.DiaSymReader.Tools
 
         private ImmutableArray<(Guid kind, ImmutableArray<byte> data)> GetPortableCustomDebugInfo(EntityHandle handle)
         {
-            var mdReader = _portablePdbMetadataOpt;
-            Debug.Assert(mdReader != null);
+            var mdReader = _portablePdbMetadata;
+            NullableDebug.Assert(mdReader != null);
 
             var cdiHandles = mdReader.GetCustomDebugInformation(handle);
             if (cdiHandles.Count == 0)
@@ -890,10 +891,10 @@ namespace Microsoft.DiaSymReader.Tools
                 var fileName = TryReadUtf8NullTerminated(ref reader);
                 var aliases = TryReadUtf8NullTerminated(ref reader);
 
-                string flags = null;
-                string timeStamp = null;
-                string fileSize = null;
-                string mvid = null;
+                string? flags = null;
+                string? timeStamp = null;
+                string? fileSize = null;
+                string? mvid = null;
 
                 try { flags = ((MetadataReferenceFlags)reader.ReadByte()).ToString(); } catch { }
                 try { timeStamp = $"0x{reader.ReadUInt32():X8}"; } catch { }
@@ -946,7 +947,7 @@ namespace Microsoft.DiaSymReader.Tools
             _writer.WriteEndElement(); //compilationMetadataReferences
         }
 
-        private static string TryReadUtf8NullTerminated(ref BlobReader reader)
+        private static string? TryReadUtf8NullTerminated(ref BlobReader reader)
         {
             var terminatorIndex = reader.IndexOf(0);
             if (terminatorIndex == -1)
@@ -1005,7 +1006,7 @@ namespace Microsoft.DiaSymReader.Tools
             string rawName = @namespace.GetName();
 
             string alias;
-            string externAlias;
+            string? externAlias;
             string target;
             ImportTargetKind kind;
             VBImportScopeKind scope;
@@ -1407,7 +1408,7 @@ namespace Microsoft.DiaSymReader.Tools
             fixed (byte* sigPtr = signature.ToArray())
             {
                 var sigReader = new BlobReader(sigPtr, signature.Length);
-                var decoder = new SignatureDecoder<string, object>(ConstantSignatureVisualizer.Instance, _metadataReader, genericContext: null);
+                var decoder = new SignatureDecoder<string, object>(ConstantSignatureVisualizer.Instance, _metadataReader, genericContext: null!);
                 return decoder.DecodeType(ref sigReader, allowTypeSpecifications: true);
             }
         }
@@ -1494,43 +1495,25 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        private static Type GetConstantRuntimeType(byte[] signature)
+        private static Type? GetConstantRuntimeType(byte[] signature)
         {
-            switch ((SignatureTypeCode)signature[0])
+            return (SignatureTypeCode)signature[0] switch
             {
-                case SignatureTypeCode.Boolean:
-                case SignatureTypeCode.Byte:
-                case SignatureTypeCode.SByte:
-                case SignatureTypeCode.Int16:
-                    return typeof(short);
-
-                case SignatureTypeCode.Char:
-                case SignatureTypeCode.UInt16:
-                    return typeof(ushort);
-
-                case SignatureTypeCode.Int32:
-                    return typeof(int);
-
-                case SignatureTypeCode.UInt32:
-                    return typeof(uint);
-
-                case SignatureTypeCode.Int64:
-                    return typeof(long);
-
-                case SignatureTypeCode.UInt64:
-                    return typeof(ulong);
-
-                case SignatureTypeCode.Single:
-                    return typeof(float);
-
-                case SignatureTypeCode.Double:
-                    return typeof(double);
-
-                case SignatureTypeCode.String:
-                    return typeof(string);
-            }
-
-            return null;
+                SignatureTypeCode.Boolean => typeof(short),
+                SignatureTypeCode.Byte => typeof(short),
+                SignatureTypeCode.SByte => typeof(short),
+                SignatureTypeCode.Int16 => typeof(short),
+                SignatureTypeCode.Char => typeof(ushort),
+                SignatureTypeCode.UInt16 => typeof(ushort),
+                SignatureTypeCode.Int32 => typeof(int),
+                SignatureTypeCode.UInt32 => typeof(uint),
+                SignatureTypeCode.Int64 => typeof(long),
+                SignatureTypeCode.UInt64 => typeof(ulong),
+                SignatureTypeCode.Single => typeof(float),
+                SignatureTypeCode.Double => typeof(double),
+                SignatureTypeCode.String => typeof(string),
+                _ => null,
+            };
         }
 
         private void WriteSequencePoints(ImmutableArray<SymUnmanagedSequencePoint> sequencePoints, IReadOnlyDictionary<string, int> documentIndex)
@@ -1825,8 +1808,8 @@ namespace Microsoft.DiaSymReader.Tools
             var method = metadataReader.GetMethodDefinition(methodHandle);
             var containingTypeHandle = method.GetDeclaringType();
 
-            string fullTypeName = GetFullTypeName(metadataReader, containingTypeHandle);
-            string methodName = metadataReader.GetString(method.Name);
+            var fullTypeName = GetFullTypeName(metadataReader, containingTypeHandle);
+            var methodName = metadataReader.GetString(method.Name);
 
             return fullTypeName != null ? fullTypeName + "." + methodName : methodName;
         }
@@ -1863,7 +1846,7 @@ namespace Microsoft.DiaSymReader.Tools
             var memberRef = _metadataReader.GetMemberReference(memberRefHandle);
 
             // type name
-            string fullName = GetFullTypeName(_metadataReader, memberRef.Parent);
+            var fullName = GetFullTypeName(_metadataReader, memberRef.Parent);
             if (fullName != null)
             {
                 _writer.WriteAttributeString("declaringType", fullName);
@@ -1878,7 +1861,7 @@ namespace Microsoft.DiaSymReader.Tools
             return (flags & ((TypeAttributes)0x00000006)) != 0;
         }
 
-        private static string GetFullTypeName(MetadataReader metadataReader, EntityHandle handle)
+        private static string? GetFullTypeName(MetadataReader metadataReader, EntityHandle handle)
         {
             if (handle.IsNil)
             {
@@ -1922,7 +1905,7 @@ namespace Microsoft.DiaSymReader.Tools
 
         private void WriteSourceServerInformation()
         {
-            byte[] data = _symReader.GetRawSourceServerData();
+            var data = _symReader.GetRawSourceServerData();
             if (data != null)
             {
                 _writer.WriteStartElement("srcsvr");
@@ -1933,7 +1916,7 @@ namespace Microsoft.DiaSymReader.Tools
 
         private void WriteSourceLinkInformation()
         {
-            byte[] data = (_symReader as ISymUnmanagedReader5)?.GetRawSourceLinkData();
+            var data = (_symReader as ISymUnmanagedReader5)?.GetRawSourceLinkData();
             if (data != null)
             {
                 _writer.WriteStartElement("sourceLink");

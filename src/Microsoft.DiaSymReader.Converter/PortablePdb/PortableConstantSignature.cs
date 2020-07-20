@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using System;
 using System.Reflection.Metadata;
 
@@ -11,7 +13,7 @@ namespace Microsoft.DiaSymReader.PortablePdb
     {
         private static readonly object s_nullReferenceValue = 0;
 
-        public static (object Value, byte[] Signature) GetConstantValueAndSignature(MetadataReader mdReader, LocalConstantHandle handle, Func<EntityHandle, string> getQualifiedTypeName)
+        public static (object? Value, byte[] Signature) GetConstantValueAndSignature(MetadataReader mdReader, LocalConstantHandle handle, Func<EntityHandle, string?> getQualifiedTypeName)
         {
             var constant = mdReader.GetLocalConstant(handle);
 
@@ -39,13 +41,13 @@ namespace Microsoft.DiaSymReader.PortablePdb
                 sigWriter.Write(mdReader.GetBlobBytes(constant.Signature), 0, customModifiersLength);
             }
 
-            object translatedValue;
+            object? translatedValue;
             if (rawTypeCode == (int)MetadataUtilities.SignatureTypeCode_ValueType ||
                 rawTypeCode == (int)MetadataUtilities.SignatureTypeCode_Class)
             {
                 var typeHandle = sigReader.ReadTypeHandle();
 
-                string qualifiedName = getQualifiedTypeName(typeHandle);
+                string? qualifiedName = getQualifiedTypeName(typeHandle);
                 if (qualifiedName == "System.Decimal")
                 {
                     translatedValue = sigReader.ReadDecimal();

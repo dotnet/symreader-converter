@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -48,9 +50,9 @@ namespace Microsoft.DiaSymReader.PortablePdb
         }
         
         // Doesn't handle nested types.
-        public static string GetQualifiedTypeName(this MetadataReader reader, EntityHandle typeDefOrRef)
+        public static string? GetQualifiedTypeName(this MetadataReader reader, EntityHandle typeDefOrRef)
         {
-            string qualifiedName;
+            string? qualifiedName;
             if (typeDefOrRef.Kind == HandleKind.TypeDefinition)
             {
                 var typeDef = reader.GetTypeDefinition((TypeDefinitionHandle)typeDefOrRef);
@@ -96,10 +98,10 @@ namespace Microsoft.DiaSymReader.PortablePdb
                 }
             }
 
-            return default(BlobHandle);
+            return default;
         }
 
-        internal static string GetVisualBasicDefaultNamespace(MetadataReader reader)
+        internal static string? GetVisualBasicDefaultNamespace(MetadataReader reader)
         {
             foreach (var cdiHandle in reader.GetCustomDebugInformation(Handle.ModuleDefinition))
             {
@@ -146,7 +148,7 @@ namespace Microsoft.DiaSymReader.PortablePdb
             var blobHandle = GetCustomDebugInformation(reader, variableOrConstantHandle, PortableCustomDebugInfoKinds.DynamicLocalVariables);
             if (blobHandle.IsNil)
             {
-                return default(ImmutableArray<bool>);
+                return default;
             }
 
             return DecodeDynamicFlags(reader.GetBlobReader(blobHandle));
@@ -172,21 +174,21 @@ namespace Microsoft.DiaSymReader.PortablePdb
         // Copied from Roslyn EE. Share Portable PDB blob decoders.
        
         /// <exception cref="BadImageFormatException">Invalid data format.</exception>
-        public static ImmutableArray<string> ReadTupleCustomDebugInformation(MetadataReader reader, EntityHandle variableOrConstantHandle)
+        public static ImmutableArray<string?> ReadTupleCustomDebugInformation(MetadataReader reader, EntityHandle variableOrConstantHandle)
         {
             var blobHandle = GetCustomDebugInformation(reader, variableOrConstantHandle, PortableCustomDebugInfoKinds.TupleElementNames);
             if (blobHandle.IsNil)
             {
-                return default(ImmutableArray<string>);
+                return default;
             }
 
             return DecodeTupleElementNames(reader.GetBlobReader(blobHandle));
         }
 
         /// <exception cref="BadImageFormatException">Invalid data format.</exception>
-        private static ImmutableArray<string> DecodeTupleElementNames(BlobReader reader)
+        private static ImmutableArray<string?> DecodeTupleElementNames(BlobReader reader)
         {
-            var builder = ArrayBuilder<string>.GetInstance();
+            var builder = ArrayBuilder<string?>.GetInstance();
             while (reader.RemainingBytes > 0)
             {
                 int byteCount = reader.IndexOf(0);

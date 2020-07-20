@@ -463,7 +463,7 @@ namespace Roslyn.Test.Utilities
             Assert.NotNull(expected);
             Assert.NotNull(actual);
 
-            IEnumerable<string> GetLines(string str) => 
+            static IEnumerable<string> GetLines(string str) => 
                 str.Trim().Replace("\r\n", "\n").Split(new[] { '\r', '\n' }, StringSplitOptions.None);
 
             Equal(

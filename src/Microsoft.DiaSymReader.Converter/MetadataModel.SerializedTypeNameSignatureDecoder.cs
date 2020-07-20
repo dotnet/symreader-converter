@@ -1,5 +1,7 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using System;
 using System.Collections.Immutable;
 using System.Reflection.Metadata;
@@ -10,18 +12,18 @@ namespace Microsoft.DiaSymReader.Tools
 {
     internal sealed partial class MetadataModel
     {
-        private struct Name
+        private readonly struct Name
         {
-            public readonly PooledStringBuilder PooledBuilderOpt;
+            public readonly PooledStringBuilder? PooledBuilder;
             public readonly AssemblyReferenceHandle AssemblyReferenceOpt;
 
-            public Name(PooledStringBuilder pooledBuilder, AssemblyReferenceHandle assemblyReference)
+            public Name(PooledStringBuilder? pooledBuilder, AssemblyReferenceHandle assemblyReferenceOpt)
             {
-                PooledBuilderOpt = pooledBuilder;
-                AssemblyReferenceOpt = assemblyReference;
+                PooledBuilder = pooledBuilder;
+                AssemblyReferenceOpt = assemblyReferenceOpt;
             }
 
-            public StringBuilder BuilderOpt => PooledBuilderOpt?.Builder;
+            public StringBuilder? Builder => PooledBuilder?.Builder;
         }
 
         private sealed class SerializedTypeNameSignatureDecoder : ISignatureTypeProvider<Name, object>
@@ -37,16 +39,16 @@ namespace Microsoft.DiaSymReader.Tools
                 _nestedNameSeparator = nestedNameSeparator;
             }
 
-            public string GetSerializedTypeName(EntityHandle typeHandle)
+            public string? GetSerializedTypeName(EntityHandle typeHandle)
             {
                 AssemblyReferenceHandle assemblyQualifierOpt;
-                PooledStringBuilder pooled;
+                PooledStringBuilder? pooled;
                 switch (typeHandle.Kind)
                 {
                     case HandleKind.TypeDefinition:
                         pooled = PooledStringBuilder.GetInstance();
                         BuildQualifiedName(pooled.Builder, _model.Reader, (TypeDefinitionHandle)typeHandle, _nestedNameSeparator);
-                        assemblyQualifierOpt = default(AssemblyReferenceHandle);
+                        assemblyQualifierOpt = default;
                         break;
 
                     case HandleKind.TypeReference:
@@ -55,15 +57,15 @@ namespace Microsoft.DiaSymReader.Tools
 
                         if (!_useAssemblyQualification)
                         {
-                            assemblyQualifierOpt = default(AssemblyReferenceHandle);
+                            assemblyQualifierOpt = default;
                         }
 
                         break;
 
                     case HandleKind.TypeSpecification:
                         var typeSpec = _model.Reader.GetTypeSpecification((TypeSpecificationHandle)typeHandle);
-                        var name = typeSpec.DecodeSignature(this, genericContext: null);
-                        pooled = name.PooledBuilderOpt;
+                        var name = typeSpec.DecodeSignature(this, genericContext: null!);
+                        pooled = name.PooledBuilder;
                         if (pooled == null)
                         {
                             return null;
@@ -84,35 +86,35 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 var pooled = PooledStringBuilder.GetInstance();
                 pooled.Builder.Append(GetPrimitiveTypeQualifiedName(typeCode));
-                return new Name(pooled, _useAssemblyQualification ? _model._lazyCorlibAssemblyRef.Value : default(AssemblyReferenceHandle));
+                return new Name(pooled, _useAssemblyQualification ? _model._lazyCorlibAssemblyRef.Value : default);
             }
 
             public Name GetTypeFromDefinition(MetadataReader reader, TypeDefinitionHandle handle, byte rawTypeKind)
             {
                 var pooled = PooledStringBuilder.GetInstance();
                 BuildQualifiedName(pooled, reader, handle, _nestedNameSeparator);
-                return new Name(pooled, default(AssemblyReferenceHandle));
+                return new Name(pooled, default);
             }
 
             public Name GetTypeFromReference(MetadataReader reader, TypeReferenceHandle handle, byte rawTypeKind)
             {
                 var pooled = PooledStringBuilder.GetInstance();
                 BuildQualifiedName(pooled.Builder, reader, handle, _nestedNameSeparator, out var assemblyReferenceHandle);
-                return new Name(pooled, _useAssemblyQualification ? assemblyReferenceHandle : default(AssemblyReferenceHandle));
+                return new Name(pooled, _useAssemblyQualification ? assemblyReferenceHandle : default);
             }
 
             public Name GetSZArrayType(Name elementType)
             {
-                elementType.BuilderOpt?.Append("[]");
+                elementType.Builder?.Append("[]");
                 return elementType;
             }
 
             public Name GetArrayType(Name elementType, ArrayShape shape)
             {
-                var sb = elementType.BuilderOpt;
+                var sb = elementType.Builder;
                 if (sb == null)
                 {
-                    return default(Name);
+                    return default;
                 }
 
                 sb.Append('[');
@@ -130,17 +132,17 @@ namespace Microsoft.DiaSymReader.Tools
 
             public Name GetPointerType(Name elementType)
             {
-                elementType.BuilderOpt?.Append('*');
+                elementType.Builder?.Append('*');
                 return elementType;
             }
 
             public Name GetGenericInstantiation(Name genericType, ImmutableArray<Name> typeArguments)
             {
-                var sb = genericType.BuilderOpt;
+                var sb = genericType.Builder;
 
                 if (sb == null)
                 {
-                    return default(Name);
+                    return default;
                 }
 
                 sb.Append('[');
@@ -148,9 +150,9 @@ namespace Microsoft.DiaSymReader.Tools
                 bool first = true;
                 foreach (Name typeArgument in typeArguments)
                 {
-                    if (typeArgument.PooledBuilderOpt == null)
+                    if (typeArgument.PooledBuilder == null)
                     {
-                        return default(Name);
+                        return default;
                     }
 
                     if (first)
@@ -162,7 +164,7 @@ namespace Microsoft.DiaSymReader.Tools
                         sb.Append(',');
                     }
 
-                    string serializedArgName = typeArgument.PooledBuilderOpt.ToStringAndFree();
+                    string serializedArgName = typeArgument.PooledBuilder.ToStringAndFree();
                     
                     if (!typeArgument.AssemblyReferenceOpt.IsNil)
                     {
@@ -183,25 +185,25 @@ namespace Microsoft.DiaSymReader.Tools
             }
 
             public Name GetByReferenceType(Name elementType) =>
-                default(Name);
+                default;
 
             public Name GetFunctionPointerType(MethodSignature<Name> signature) =>
-                default(Name);
+                default;
 
             public Name GetModifiedType(Name modifier, Name unmodifiedType, bool isRequired) =>
-                default(Name);
+                default;
 
             public Name GetTypeFromSpecification(MetadataReader reader, object genericContext, TypeSpecificationHandle handle, byte rawTypeKind) =>
-                default(Name);
+                default;
 
             public Name GetPinnedType(Name elementType) =>
-                default(Name);
+                default;
 
             public Name GetGenericMethodParameter(object genericContext, int index) =>
-                default(Name);
+                default;
 
             public Name GetGenericTypeParameter(object genericContext, int index) =>
-                default(Name);
+                default;
         }
     }
 }

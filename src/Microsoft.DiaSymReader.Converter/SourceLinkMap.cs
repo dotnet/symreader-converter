@@ -1,11 +1,14 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 
 namespace Microsoft.DiaSymReader.Tools
 {
@@ -13,93 +16,79 @@ namespace Microsoft.DiaSymReader.Tools
     {
         private readonly List<(FilePathPattern key, UriPattern value)> _entries;
 
-        public SourceLinkMap(List<(FilePathPattern key, UriPattern value)> entries)
+        private SourceLinkMap(List<(FilePathPattern key, UriPattern value)> entries)
         {
-            Debug.Assert(entries != null);
             _entries = entries;
         }
 
-        internal struct FilePathPattern
+        private readonly struct FilePathPattern
         {
             public readonly string Path;
             public readonly bool IsPrefix;
 
             public FilePathPattern(string path, bool isPrefix)
             {
-                Debug.Assert(path != null);
-
                 Path = path;
                 IsPrefix = isPrefix;
             }
         }
 
-        internal struct UriPattern
+        private readonly struct UriPattern
         {
             public readonly string Prefix;
             public readonly string Suffix;
 
             public UriPattern(string prefix, string suffix)
             {
-                Debug.Assert(prefix != null);
-                Debug.Assert(suffix != null);
-
                 Prefix = prefix;
                 Suffix = suffix;
             }
         }
 
-        internal static SourceLinkMap Parse(string json, Action<string> reportDiagnostic)
+        /// <summary>
+        /// Parses Source Link JSON string.
+        /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="json"/> is null.</exception>
+        /// <exception cref="InvalidDataException">The JSON does not follow Source Link specification.</exception>
+        /// <exception cref="JsonException"><paramref name="json"/> is not valid JSON string.</exception>
+        public static SourceLinkMap Parse(string json)
         {
-            bool errorReported = false;
-            void ReportInvalidJsonDataOnce()
+            if (json is null)
             {
-                if (!errorReported)
-                {
-                    // Bad source link format
-                    reportDiagnostic(ConverterResources.InvalidJsonDataFormat);
-                }
-
-                errorReported = true;
+                throw new ArgumentNullException(nameof(json));
             }
 
             var list = new List<(FilePathPattern key, UriPattern value)>();
-            try
-            {
-                // trim BOM if present:
-                var root = JObject.Parse(json.TrimStart('\uFEFF'));
-                var documents = root["documents"];
 
-                if (documents.Type != JTokenType.Object)
+            var root = JsonDocument.Parse(json, new JsonDocumentOptions() { AllowTrailingCommas = true }).RootElement;
+            if (root.ValueKind != JsonValueKind.Object)
+            {
+                throw new InvalidDataException();
+            }
+
+            foreach (var rootEntry in root.EnumerateObject())
+            {
+                if (!rootEntry.NameEquals("documents"))
                 {
-                    ReportInvalidJsonDataOnce();
-                    return null;
+                    // potential future extensibility
+                    continue;
                 }
 
-                foreach (var token in documents)
+                if (rootEntry.Value.ValueKind != JsonValueKind.Object)
                 {
-                    if (!(token is JProperty property))
-                    {
-                        ReportInvalidJsonDataOnce();
-                        continue;
-                    }
+                    throw new InvalidDataException();
+                }
 
-                    string value = (property.Value.Type == JTokenType.String) ?
-                        property.Value.Value<string>() : null;
-
-                    if (value == null ||
-                        !TryParseEntry(property.Name, value, out var path, out var uri))
+                foreach (var documentsEntry in rootEntry.Value.EnumerateObject())
+                {
+                    if (documentsEntry.Value.ValueKind != JsonValueKind.String ||
+                        !TryParseEntry(documentsEntry.Name, documentsEntry.Value.GetString(), out var path, out var uri))
                     {
-                        ReportInvalidJsonDataOnce();
-                        continue;
+                        throw new InvalidDataException();
                     }
 
                     list.Add((path, uri));
                 }
-            }
-            catch (JsonReaderException e)
-            {
-                reportDiagnostic(e.Message);
-                return null;
             }
 
             // Sort the map by decreasing file path length. This ensures that the most specific paths will checked before the least specific
@@ -163,7 +152,7 @@ namespace Microsoft.DiaSymReader.Tools
             return true;
         }
 
-        public string GetUri(string path)
+        public string? GetUri(string path)
         {
             if (path.IndexOf('*') >= 0)
             {

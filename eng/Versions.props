@@ -5,7 +5,6 @@
     <PreReleaseVersionLabel>beta2</PreReleaseVersionLabel>
     <SemanticVersioningV1>true</SemanticVersioningV1>
     <UsingToolNuGetRepack>true</UsingToolNuGetRepack>
-    <UsingToolMicrosoftNetCompilers>true</UsingToolMicrosoftNetCompilers>
     <UsingToolSymbolUploader>true</UsingToolSymbolUploader>
     <!-- libs -->
     <MicrosoftCodeAnalysisPooledObjectsVersion>3.7.0-3.20308.2</MicrosoftCodeAnalysisPooledObjectsVersion>
@@ -14,10 +13,10 @@
     <MicrosoftDiaSymReaderNativeVersion>1.7.0</MicrosoftDiaSymReaderNativeVersion>
     <MicrosoftDiaSymReaderPortablePdbVersion>1.5.0</MicrosoftDiaSymReaderPortablePdbVersion>
     <MicrosoftMetadataVisualizerVersion>1.0.0-beta3.20308.3</MicrosoftMetadataVisualizerVersion>
-    <NewtonsoftJsonVersion>9.0.1</NewtonsoftJsonVersion>
-    <!-- CoreFX -->
+
+      <!-- CoreFX -->
     <SystemCollectionsImmutableVersion>1.5.0</SystemCollectionsImmutableVersion>
     <SystemReflectionMetadataVersion>1.6.0</SystemReflectionMetadataVersion>
-    <SystemValueTupleVersion>4.5.0</SystemValueTupleVersion>
+    <SystemTextJsonVersion>4.7.2</SystemTextJsonVersion>
   </PropertyGroup>
 </Project>

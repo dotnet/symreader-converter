@@ -1,11 +1,9 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable enable
+
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Microsoft.DiaSymReader.PortablePdb
 {
@@ -95,7 +93,7 @@ namespace Microsoft.DiaSymReader.PortablePdb
             var buffer = _buffer;
             Array.Resize(ref buffer, _position);
 
-            _buffer = null;
+            _buffer = null!;
             _position = -1;
             return buffer;
         }

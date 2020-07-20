@@ -1,7 +1,7 @@
 ﻿<!-- Copyright (c)  Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information. -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
     <RootNamespace>Microsoft.DiaSymReader.Tools</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -23,7 +23,6 @@
     <PackageReference Include="Microsoft.DiaSymReader.PortablePdb" Version="$(MicrosoftDiaSymReaderPortablePdbVersion)" />
     <PackageReference Include="System.Collections.Immutable" Version="$(SystemCollectionsImmutableVersion)" />
     <PackageReference Include="System.Reflection.Metadata" Version="$(SystemReflectionMetadataVersion)" />
-    <PackageReference Include="System.ValueTuple" Version="$(SystemValueTupleVersion)" />
     <PackageReference Include="Microsoft.CodeAnalysis.PooledObjects" Version="$(MicrosoftCodeAnalysisPooledObjectsVersion)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Debugging" Version="$(MicrosoftCodeAnalysisDebuggingVersion)" PrivateAssets="all" />
   </ItemGroup>
@@ -35,6 +34,7 @@
   <!-- Workaround for https://github.com/NuGet/Home/issues/4856 -->
   <ItemGroup>
     <Compile Include="..\Common\PdbGuids.cs" Link="Common\PdbGuids.cs" />
+    <Compile Include="..\Common\NullableAttributes.cs" Link="Common\NullableAttributes.cs" />
     <Compile Update="@(Compile)">
       <Link Condition="'%(NuGetPackageId)' != ''">%(NuGetPackageId)\%(Link)</Link>
     </Compile>
