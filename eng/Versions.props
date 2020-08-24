@@ -13,8 +13,7 @@
     <MicrosoftDiaSymReaderNativeVersion>1.7.0</MicrosoftDiaSymReaderNativeVersion>
     <MicrosoftDiaSymReaderPortablePdbVersion>1.5.0</MicrosoftDiaSymReaderPortablePdbVersion>
     <MicrosoftMetadataVisualizerVersion>1.0.0-beta3.20308.3</MicrosoftMetadataVisualizerVersion>
-
-      <!-- CoreFX -->
+    <!-- CoreFX -->
     <SystemCollectionsImmutableVersion>1.5.0</SystemCollectionsImmutableVersion>
     <SystemReflectionMetadataVersion>1.6.0</SystemReflectionMetadataVersion>
     <SystemTextJsonVersion>4.7.2</SystemTextJsonVersion>
