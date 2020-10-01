@@ -19,7 +19,7 @@
       </trans-unit>
       <trans-unit id="SpecifiedPEBuiltWithPortablePdb">
         <source>Specified PE was built with Portable PDB</source>
-        <target state="translated">El archivo PE especificado se creó con un PDB portátil.</target>
+        <target state="translated">El archivo PE especificado se creó con un PDB portable.</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedPEFileHasNoAssociatedPdb">
