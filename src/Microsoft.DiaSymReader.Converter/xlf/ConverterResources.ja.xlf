@@ -19,7 +19,7 @@
       </trans-unit>
       <trans-unit id="SpecifiedPEBuiltWithPortablePdb">
         <source>Specified PE was built with Portable PDB</source>
-        <target state="translated">指定された PE は、ポータブル PDB でビルドされました</target>
+        <target state="translated">指定された PE は、移植可能な PDB でビルドされました</target>
         <note />
       </trans-unit>
       <trans-unit id="SpecifiedPEFileHasNoAssociatedPdb">
