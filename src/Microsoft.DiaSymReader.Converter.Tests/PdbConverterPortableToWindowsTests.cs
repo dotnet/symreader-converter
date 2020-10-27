@@ -35,7 +35,6 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             var actualSrcSvr = converter.ConvertSourceServerData(sourceLink, documents, PortablePdbConversionOptions.Default);
 
             AssertEx.Equal(expectedErrors ?? Array.Empty<PdbDiagnostic>(), actualErrors);
-            Assert.NotNull(actualSrcSvr);
             AssertEx.AssertLinesEqual(expectedSrcSvr, actualSrcSvr!);
         }
 
