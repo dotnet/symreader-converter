@@ -18,7 +18,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             PdbConverterPortableToWindows.ValidateSrcSvrVariable("AZaz09_", "", "");
             PdbConverterPortableToWindows.ValidateSrcSvrVariable("ABC", "", "");
 
-            Assert.Throws<ArgumentException>(() => PdbConverterPortableToWindows.ValidateSrcSvrVariable(null, "", ""));
+            Assert.Throws<ArgumentException>(() => PdbConverterPortableToWindows.ValidateSrcSvrVariable(null!, "", ""));
             Assert.Throws<ArgumentException>(() => PdbConverterPortableToWindows.ValidateSrcSvrVariable("", "", ""));
             Assert.Throws<ArgumentException>(() => PdbConverterPortableToWindows.ValidateSrcSvrVariable("-", "", ""));
             Assert.Throws<ArgumentException>(() => PdbConverterPortableToWindows.ValidateSrcSvrVariable("ABC_[", "", ""));
@@ -28,14 +28,14 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             Assert.Throws<ArgumentException>(() => PdbConverterPortableToWindows.ValidateSrcSvrVariable("A", "a\0", ""));
         }
 
-        private void ValidateSourceLinkConversion(string[] documents, string sourceLink, string expectedSrcSvr, PdbDiagnostic[] expectedErrors = null)
+        private void ValidateSourceLinkConversion(string[] documents, string sourceLink, string expectedSrcSvr, PdbDiagnostic[]? expectedErrors = null)
         {
             var actualErrors = new List<PdbDiagnostic>();
             var converter = new PdbConverterPortableToWindows(actualErrors.Add);
             var actualSrcSvr = converter.ConvertSourceServerData(sourceLink, documents, PortablePdbConversionOptions.Default);
 
             AssertEx.Equal(expectedErrors ?? Array.Empty<PdbDiagnostic>(), actualErrors);
-            AssertEx.AssertLinesEqual(expectedSrcSvr, actualSrcSvr);
+            AssertEx.AssertLinesEqual(expectedSrcSvr, actualSrcSvr!);
         }
 
         [Fact]
@@ -48,7 +48,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
       ""C:\\a*"": ""http://server/1/a*"",
    }
 }",
-            null);
+            null!);
         }
 
         [Fact]
@@ -90,7 +90,7 @@ SRCSRV: end ------------------------------------------------
    {
    }
 }",
-            null,
+            null!,
             new[]
             {
                 new PdbDiagnostic(PdbDiagnosticId.UnmappedDocumentName, 0, new[] { @"C:\a\1.cs" }),
@@ -109,7 +109,7 @@ SRCSRV: end ------------------------------------------------
     }
 }";
 
-            string error = null;
+            string? error = null;
             try
             {
                 JsonDocument.Parse(json);
@@ -124,10 +124,10 @@ SRCSRV: end ------------------------------------------------
                 @"C:\a\1.cs"
             },            
             json,
-            null, 
+            null!, 
             new[]
             {
-                new PdbDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, new[] { error })
+                new PdbDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, new[] { error! })
             });
         }
 
@@ -146,7 +146,7 @@ SRCSRV: end ------------------------------------------------
       ""2"": {},
    }
 }",
-            null,
+            null!,
             new[]
             {
                 new PdbDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, new[] { ConverterResources.InvalidJsonDataFormat })
@@ -162,7 +162,7 @@ SRCSRV: end ------------------------------------------------
       1: ""http://server/X/Y*"",
 };";
 
-            Exception expectedException = null;
+            Exception? expectedException = null;
             try
             {
                 _ = JsonDocument.Parse(json);
@@ -177,10 +177,10 @@ SRCSRV: end ------------------------------------------------
                 @"C:\a\1.cs"
             },
             json,
-            null,
+            null!,
             new[]
             {
-                new PdbDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, new[] { expectedException.Message })
+                new PdbDiagnostic(PdbDiagnosticId.InvalidSourceLink, 0, new[] { expectedException!.Message })
             });
         }
 

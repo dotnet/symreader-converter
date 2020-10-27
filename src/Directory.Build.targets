@@ -1,4 +1,24 @@
 <!-- Copyright (c)  Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information. -->
 <Project>
   <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+
+  <!-- 
+    Workaround for https://github.com/NuGet/Home/issues/6754: cyclic dependency.
+  -->
+  <PropertyGroup>
+    <_ProjectDefinedPackageId>$(PackageId)</_ProjectDefinedPackageId>
+    <PackageId>*fake_packageid_for_project_$(MSBuildProjectName)*</PackageId>
+  </PropertyGroup>
+
+  <!--
+     Workaround for cyclic package reference. PackageId is set to ain invalid value above (in evaluation phase to be picked up by Restore),
+     then updated to the actual value before Pack target and SourceLink source package generation target.
+  -->
+  <Target Name="_UpdatePackageId" BeforeTargets="$(PackDependsOn);InitializeSourceControlInformation" >
+    <PropertyGroup>
+      <PackageId>$(_ProjectDefinedPackageId)</PackageId>
+      <PackageId Condition="'$(PackageId)' == ''">$(AssemblyName)</PackageId>
+      <PackageId Condition="'$(PackageId)' == ''">$(MSBuildProjectName)</PackageId>
+    </PropertyGroup>
+  </Target>
 </Project>

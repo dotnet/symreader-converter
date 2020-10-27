@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -370,7 +368,13 @@ namespace Microsoft.DiaSymReader.Tools
                             return default;
                         }
 
-                        string serializedName = (string)fixedArgs[0].Value;
+                        var serializedName = fixedArgs[0].Value as string;
+                        if (serializedName == null)
+                        {
+                            // TODO: report error
+                            return default;
+                        }
+
                         int nameIndex = serializedName.LastIndexOf('+');
                         if (nameIndex < 0)
                         {

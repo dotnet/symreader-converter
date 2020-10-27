@@ -31,7 +31,9 @@ function Write-PipelineTelemetryError {
 
         $PSBoundParameters.Remove('Category') | Out-Null
 
-        $Message = "(NETCORE_ENGINEERING_TELEMETRY=$Category) $Message"
+        if($Force -Or ((Test-Path variable:ci) -And $ci)) {
+            $Message = "(NETCORE_ENGINEERING_TELEMETRY=$Category) $Message"
+        }
         $PSBoundParameters.Remove('Message') | Out-Null
         $PSBoundParameters.Add('Message', $Message)
         Write-PipelineTaskError @PSBoundParameters
@@ -65,12 +67,12 @@ function Write-PipelineTaskError {
     }
 
     if(($Type -ne 'error') -and ($Type -ne 'warning')) {
-    Write-Host $Message
-    return
+        Write-Host $Message
+        return
     }
     $PSBoundParameters.Remove('Force') | Out-Null      
     if(-not $PSBoundParameters.ContainsKey('Type')) {
-    $PSBoundParameters.Add('Type', 'error')
+        $PSBoundParameters.Add('Type', 'error')
     }
     Write-LogIssue @PSBoundParameters
   }
@@ -85,7 +87,7 @@ function Write-PipelineTaskError {
       [switch]$AsOutput,
       [bool]$IsMultiJobVariable=$true)
 
-      if(-Not (Test-Path variable:ci) -Or !$ci) {
+      if((Test-Path variable:ci) -And $ci) {
         Write-LoggingCommand -Area 'task' -Event 'setvariable' -Data $Value -Properties @{
           'variable' = $Name
           'isSecret' = $Secret
@@ -101,7 +103,7 @@ function Write-PipelineTaskError {
       [string]$Path,
       [switch]$AsOutput)
 
-      if(-Not (Test-Path variable:ci) -Or !$ci) {
+      if((Test-Path variable:ci) -And $ci) {
         Write-LoggingCommand -Area 'task' -Event 'prependpath' -Data $Path -AsOutput:$AsOutput
       }
   }

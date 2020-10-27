@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -46,7 +47,7 @@ namespace Roslyn.Test.Utilities
                 return s_instance.Equals(left, right);
             }
 
-            bool IEqualityComparer<T>.Equals(T x, T y)
+            bool IEqualityComparer<T>.Equals(T? x, T? y)
             {
                 if (CanBeNull())
                 {
@@ -59,6 +60,11 @@ namespace Roslyn.Test.Utilities
                     {
                         return false;
                     }
+                }
+
+                if (x is null || y is null)
+                {
+                    return x is null == y is null;
                 }
 
                 if (x.GetType() != y.GetType())
@@ -120,7 +126,7 @@ namespace Roslyn.Test.Utilities
 
         #endregion
 
-        public static void AreEqual<T>(T expected, T actual, string message = null, IEqualityComparer<T> comparer = null)
+        public static void AreEqual<T>(T expected, T actual, string? message = null, IEqualityComparer<T>? comparer = null)
         {
             if (ReferenceEquals(expected, actual))
             {
@@ -149,7 +155,7 @@ namespace Roslyn.Test.Utilities
             }
         }
 
-        public static void Equal<T>(ImmutableArray<T> expected, IEnumerable<T> actual, Func<T, T, bool> comparer = null, string message = null)
+        public static void Equal<T>(ImmutableArray<T> expected, IEnumerable<T> actual, Func<T, T, bool>? comparer = null, string? message = null)
         {
             if (actual == null || expected.IsDefault)
             {
@@ -161,7 +167,7 @@ namespace Roslyn.Test.Utilities
             }
         }
 
-        public static void Equal<T>(IEnumerable<T> expected, ImmutableArray<T> actual, Func<T, T, bool> comparer = null, string message = null, string itemSeparator = null)
+        public static void Equal<T>(IEnumerable<T> expected, ImmutableArray<T> actual, Func<T, T, bool>? comparer = null, string? message = null, string? itemSeparator = null)
         {
             if (expected == null || actual.IsDefault)
             {
@@ -173,13 +179,13 @@ namespace Roslyn.Test.Utilities
             }
         }
 
-        public static void Equal<T>(ImmutableArray<T> expected, ImmutableArray<T> actual, Func<T, T, bool> comparer = null, string message = null, string itemSeparator = null)
+        public static void Equal<T>(ImmutableArray<T>? expected, ImmutableArray<T>? actual, Func<T, T, bool>? comparer = null, string? message = null, string? itemSeparator = null)
         {
-            Equal(expected, (IEnumerable<T>)actual, comparer, message, itemSeparator);
+            Equal(expected, (IEnumerable<T>?)actual, comparer, message, itemSeparator);
         }
 
-        public static void Equal<T>(IEnumerable<T> expected, IEnumerable<T> actual, Func<T, T, bool> comparer = null, string message = null,
-            string itemSeparator = null, Func<T, string> itemInspector = null)
+        public static void Equal<T>(IEnumerable<T>? expected, IEnumerable<T>? actual, Func<T, T, bool>? comparer = null, string? message = null,
+            string? itemSeparator = null, Func<T, string>? itemInspector = null)
         {
             if (ReferenceEquals(expected, actual))
             {
@@ -207,7 +213,7 @@ namespace Roslyn.Test.Utilities
             }
         }
 
-        private static bool SequenceEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual, Func<T, T, bool> comparer = null)
+        private static bool SequenceEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual, Func<T, T, bool>? comparer = null)
         {
             var enumerator1 = expected.GetEnumerator();
             var enumerator2 = actual.GetEnumerator();
@@ -239,7 +245,7 @@ namespace Roslyn.Test.Utilities
             return true;
         }
 
-        public static void SetEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual, IEqualityComparer<T> comparer = null, string message = null, string itemSeparator = "\r\n")
+        public static void SetEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual, IEqualityComparer<T>? comparer = null, string? message = null)
         {
             var expectedSet = new HashSet<T>(expected, comparer);
             var result = expected.Count() == actual.Count() && expectedSet.SetEquals(actual);
@@ -289,16 +295,16 @@ namespace Roslyn.Test.Utilities
             }
         }
 
-        public static string ToString(object o)
+        public static string? ToString(object? o)
         {
             return Convert.ToString(o);
         }
 
-        public static string ToString<T>(IEnumerable<T> list, string separator = ", ", Func<T, string> itemInspector = null)
+        public static string ToString<T>(IEnumerable<T> list, string separator = ", ", Func<T, string>? itemInspector = null)
         {
             if (itemInspector == null)
             {
-                itemInspector = i => Convert.ToString(i);
+                itemInspector = i => Convert.ToString(i) ?? "<null>";
             }
 
             return string.Join(separator, list.Select(itemInspector));
@@ -312,16 +318,6 @@ namespace Roslyn.Test.Utilities
         public static void Fail(string format, params object[] args)
         {
             Assert.False(true, string.Format(format, args));
-        }
-
-        public static void Null<T>(T @object, string message = null)
-        {
-            Assert.True(AssertEqualityComparer<T>.IsNull(@object), message);
-        }
-
-        public static void NotNull<T>(T @object, string message = null)
-        {
-            Assert.False(AssertEqualityComparer<T>.IsNull(@object), message);
         }
 
         public static void ThrowsArgumentNull(string parameterName, Action del)
@@ -398,20 +394,18 @@ namespace Roslyn.Test.Utilities
             return output.ToString();
         }
 
-        public static string GetAssertMessage<T>(IEnumerable<T> expected, IEnumerable<T> actual, bool escapeQuotes, string expectedValueSourcePath = null, int expectedValueSourceLine = 0)
+        public static string GetAssertMessage<T>(IEnumerable<T> expected, IEnumerable<T> actual, bool escapeQuotes)
         {
-            Func<T, string> itemInspector = escapeQuotes ? new Func<T, string>(t => t.ToString().Replace("\"", "\"\"")) : null;
-            return GetAssertMessage(expected, actual, itemInspector: itemInspector, itemSeparator: "\r\n", expectedValueSourcePath: expectedValueSourcePath, expectedValueSourceLine: expectedValueSourceLine);
+            Func<T, string>? itemInspector = escapeQuotes ? new Func<T, string>(t => t?.ToString()?.Replace("\"", "\"\"") ?? "") : null;
+            return GetAssertMessage(expected, actual, itemInspector: itemInspector, itemSeparator: "\r\n");
         }
 
         public static string GetAssertMessage<T>(
             IEnumerable<T> expected,
             IEnumerable<T> actual,
-            Func<T, T, bool> comparer = null,
-            Func<T, string> itemInspector = null,
-            string itemSeparator = null,
-            string expectedValueSourcePath = null,
-            int expectedValueSourceLine = 0)
+            Func<T, T, bool>? comparer = null,
+            Func<T, string>? itemInspector = null,
+            string? itemSeparator = null)
         {
             if (itemInspector == null)
             {
@@ -421,7 +415,7 @@ namespace Roslyn.Test.Utilities
                 }
                 else
                 {
-                    itemInspector = new Func<T, string>(obj => (obj != null) ? obj.ToString() : "<null>");
+                    itemInspector = new Func<T, string>(obj => obj?.ToString() ?? "<null>");
                 }
             }
 
@@ -453,7 +447,7 @@ namespace Roslyn.Test.Utilities
             return message.ToString();
         }
 
-        public static void AssertLinesEqual(string expected, string actual, string message = null, Func<string, string, bool> comparer = null)
+        public static void AssertLinesEqual(string? expected, string? actual, string? message = null, Func<string, string, bool>? comparer = null)
         {
             if (expected == actual)
             {
@@ -467,8 +461,8 @@ namespace Roslyn.Test.Utilities
                 str.Trim().Replace("\r\n", "\n").Split(new[] { '\r', '\n' }, StringSplitOptions.None);
 
             Equal(
-                GetLines(expected), 
-                GetLines(actual),
+                GetLines(expected!), 
+                GetLines(actual!),
                 message: message,
                 comparer: comparer ?? new Func<string, string, bool>((left, right) => left.Trim() == right.Trim()),
                 itemInspector: line => line.Replace("\"", "\"\""),

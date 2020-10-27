@@ -1,5 +1,10 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+#nullable disable
+#pragma warning disable IDE0018 // Inline variable declaration
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
+#pragma warning disable IDE0060 // Remove unused parameter
+
 using System;
 using System.Collections.Generic;
 using System.IO;

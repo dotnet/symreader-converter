@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -19,6 +17,7 @@ using Microsoft.CodeAnalysis.Collections;
 using Microsoft.CodeAnalysis.Debugging;
 using Microsoft.CodeAnalysis.PooledObjects;
 using Microsoft.DiaSymReader.PortablePdb;
+using Microsoft.SourceLink.Tools;
 using Roslyn.Utilities;
 
 namespace Microsoft.DiaSymReader.Tools
@@ -78,7 +77,7 @@ namespace Microsoft.DiaSymReader.Tools
                 throw new InvalidDataException(ConverterResources.SpecifiedPEFileHasNoAssociatedPdb);
             }
 
-            if (!new BlobContentId(pdbReader.DebugMetadataHeader.Id).Equals(pePdbId))
+            if (pdbReader.DebugMetadataHeader == null || !new BlobContentId(pdbReader.DebugMetadataHeader.Id).Equals(pePdbId))
             {
                 throw new InvalidDataException(ConverterResources.PdbNotMatchingDebugDirectory);
             }
@@ -1059,8 +1058,7 @@ namespace Microsoft.DiaSymReader.Tools
             string? commonScheme = null;
             foreach (string documentName in documentNames)
             {
-                var uri = map.GetUri(documentName);
-                if (uri == null)
+                if (!map.TryGetUri(documentName, out var uri))
                 {
                     ReportDiagnostic(PdbDiagnosticId.UnmappedDocumentName, 0, documentName);
                     continue;

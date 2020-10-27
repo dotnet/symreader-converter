@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -419,7 +417,6 @@ namespace Microsoft.DiaSymReader.Tools
                             tupleConstants,
                             dynamicVariables,
                             dynamicConstants,
-                            vbSemantics,
                             lastLocalVariableHandle: ref lastLocalVariableHandle,
                             lastLocalConstantHandle: ref lastLocalConstantHandle);
                     }
@@ -993,7 +990,6 @@ namespace Microsoft.DiaSymReader.Tools
             Dictionary<(string, int, int), TupleElementNamesInfo> tupleConstants,
             Dictionary<int, DynamicLocalInfo> dynamicVariables,
             Dictionary<string, List<DynamicLocalInfo>> dynamicConstants,
-            bool vbSemantics,
             ref LocalVariableHandle lastLocalVariableHandle,
             ref LocalConstantHandle lastLocalConstantHandle)
         {
