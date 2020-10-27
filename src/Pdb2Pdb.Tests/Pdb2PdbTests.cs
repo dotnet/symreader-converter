@@ -125,7 +125,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             {
                 var symReader = SymReaderHelpers.CreateWindowsPdbReader(pdbStream);
 
-                string sourceLink = symReader.GetSourceLinkData();
+                var sourceLink = symReader.GetSourceLinkData();
                 AssertEx.AssertLinesEqual(
 @"{
   ""documents"": {
@@ -136,7 +136,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
   }
 }", sourceLink);
 
-                string srcsvr = symReader.GetSourceServerData();
+                var srcsvr = symReader.GetSourceServerData();
                 AssertEx.AssertLinesEqual(
 @"SRCSRV: ini ------------------------------------------------
 VERSION=2
@@ -203,13 +203,11 @@ SRCSRV: end ------------------------------------------------", srcsvr);
                 suppressAllWarnings: false, 
                 extract: false)));
 
-            using (var peStream = File.OpenRead(pe.Path))
-            using (var pdbStream = File.OpenRead(outPdb.Path))
-            {
-                var symReader = SymReaderHelpers.CreateWindowsPdbReader(pdbStream);
-                AssertEx.Equal(TestResources.SourceLink.SourceLinkJson, symReader.GetRawSourceLinkData());
-                Assert.Null(symReader.GetSourceServerData());
-            }
+            using var peStream = File.OpenRead(pe.Path);
+            using var pdbStream = File.OpenRead(outPdb.Path);
+            var symReader = SymReaderHelpers.CreateWindowsPdbReader(pdbStream);
+            AssertEx.Equal(TestResources.SourceLink.SourceLinkJson, symReader.GetRawSourceLinkData());
+            Assert.Null(symReader.GetSourceServerData());
         }
 
         [Fact]

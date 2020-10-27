@@ -4,6 +4,8 @@
 
   <PropertyGroup>
     <LangVersion>Preview</LangVersion>
+    <Nullable>annotations</Nullable>
+    <Nullable Condition="'$(TargetFramework)' != 'net472'">enable</Nullable>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 </Project>

@@ -56,8 +56,8 @@ namespace Microsoft.DiaSymReader.Tools
         // internal for testing
         internal static Args ParseArgs(string[] args)
         {
-            string inputPath = null;
-            string outputPath = null;
+            string? inputPath = null;
+            string? outputPath = null;
             bool delta = false;
             var options = PdbToXmlOptions.ResolveTokens | PdbToXmlOptions.IncludeModuleDebugInfo;
 
@@ -139,8 +139,8 @@ namespace Microsoft.DiaSymReader.Tools
 
         public static void Convert(Args args)
         {
-            string peFile;
-            string pdbFile;
+            string? peFile;
+            string? pdbFile;
 
             if (args.Delta)
             {
@@ -165,33 +165,31 @@ namespace Microsoft.DiaSymReader.Tools
 
             if (args.Delta)
             {
-                GenXmlFromDeltaPdb(pdbFile, args.OutputPath, args.Options);
+                GenXmlFromDeltaPdb(pdbFile, args.OutputPath);
             }
             else
             {
-                GenXmlFromPdb(peFile, pdbFile, args.OutputPath, args.Options);
+                GenXmlFromPdb(peFile!, pdbFile, args.OutputPath, args.Options);
             }
         }
 
         public static void GenXmlFromPdb(string exePath, string pdbPath, string outPath, PdbToXmlOptions options)
         {
-            using (var peStream = new FileStream(exePath, FileMode.Open, FileAccess.Read))
-            using (var pdbStream = new FileStream(pdbPath, FileMode.Open, FileAccess.Read))
-            using (var dstFileStream = new FileStream(outPath, FileMode.Create, FileAccess.ReadWrite))
-            using (var sw = new StreamWriter(dstFileStream, Encoding.UTF8))
-            {
-                PdbToXmlConverter.ToXml(sw, pdbStream, peStream, options);
-            }
+            using var peStream = new FileStream(exePath, FileMode.Open, FileAccess.Read);
+            using var pdbStream = new FileStream(pdbPath, FileMode.Open, FileAccess.Read);
+            using var dstFileStream = new FileStream(outPath, FileMode.Create, FileAccess.ReadWrite);
+            using var sw = new StreamWriter(dstFileStream, Encoding.UTF8);
+
+            PdbToXmlConverter.ToXml(sw, pdbStream, peStream, options);
         }
 
-        public static void GenXmlFromDeltaPdb(string pdbPath, string outPath, PdbToXmlOptions options)
+        public static void GenXmlFromDeltaPdb(string pdbPath, string outPath)
         {
-            using (var deltaPdb = new FileStream(pdbPath, FileMode.Open, FileAccess.Read))
-            {
-                // There is no easy way to enumerate all method tokens that are present in the PDB.
-                // So dump the first 255 method tokens (the ones that are not present will be skipped):
-                File.WriteAllText(outPath, PdbToXmlConverter.DeltaPdbToXml(deltaPdb, Enumerable.Range(0x06000001, 255)));
-            }
+            using var deltaPdb = new FileStream(pdbPath, FileMode.Open, FileAccess.Read);
+
+            // There is no easy way to enumerate all method tokens that are present in the PDB.
+            // So dump the first 255 method tokens (the ones that are not present will be skipped):
+            File.WriteAllText(outPath, PdbToXmlConverter.DeltaPdbToXml(deltaPdb, Enumerable.Range(0x06000001, 255)));
         }
     }
 }

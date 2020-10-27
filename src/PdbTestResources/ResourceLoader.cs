@@ -23,26 +23,17 @@ namespace TestResources
 
         private static byte[] GetResourceBlob(string name)
         {
-            using (var stream = GetResourceStream(name))
+            using var stream = GetResourceStream(name);
+            var bytes = new byte[stream.Length];
+            using (var memoryStream = new MemoryStream(bytes))
             {
-                var bytes = new byte[stream.Length];
-                using (var memoryStream = new MemoryStream(bytes))
-                {
-                    stream.CopyTo(memoryStream);
-                }
-
-                return bytes;
-            }
-        }
-
-        public static byte[] GetOrCreateResource(ref byte[] resource, string name)
-        {
-            if (resource == null)
-            {
-                resource = GetResourceBlob(name);
+                stream.CopyTo(memoryStream);
             }
 
-            return resource;
+            return bytes;
         }
+
+        public static byte[] GetOrCreateResource(ref byte[]? resource, string name)
+            => resource ??= GetResourceBlob(name);
     }
 }

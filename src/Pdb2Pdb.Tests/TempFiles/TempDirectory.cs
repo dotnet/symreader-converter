@@ -18,9 +18,6 @@ namespace Microsoft.CodeAnalysis.Test.Utilities
 
         private TempDirectory(string path, TempRoot root)
         {
-            Debug.Assert(path != null);
-            Debug.Assert(root != null);
-
             _path = path;
             _root = root;
         }
