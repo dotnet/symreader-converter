@@ -69,20 +69,18 @@
 
 /extract and /pdb are mutually exclusive.
 </source>
-        <target state="translated">Uso: Pdb2Pdb &lt;ruta de acceso de dll/exe&gt; [/pdb &lt;ruta de acceso&gt;] [/out &lt;ruta de acceso&gt;] [/extract]
+        <target state="translated">Uso: Pdb2Pdb &lt;ruta de acceso dll/exe&gt; [/pdb &lt;ruta de acceso&gt;] [/out &lt;ruta de acceso&gt;] [/extract]
 
-/pdb &lt;ruta de acceso&gt;     Ruta de acceso al archivo PDB que se debe convertir.
-                                 Si no se especifica de forma explícita, se usa el archivo PDB
-                                  insertado o al que se hace referencia en el archivo DLL o EXE.
-/out &lt;ruta de acceso&gt;     Ruta de acceso del archivo PDB de salida.
+/pdb &lt;ruta de acceso&gt;                Ruta de acceso al archivo PDB que se debe convertir. Si no se especifica de forma explícita, 
+                           se usa el archivo PDB insertado o al que se hace referencia en el archivo DLL o EXE.
+/out &lt;ruta de acceso&gt;                Ruta de acceso del archivo PDB de salida.
 /extract                   Extrae el archivo PDB insertado en el archivo DLL o EXE. 
-/sourcelink             En la conversión a PDB de Windows, SourceLink no se convierte
-                                 al formato srcsrv. De forma predeterminada, se incluyen los dos
-                                 (SourceLink y srcsrv) en el archivo PDB convertido.
+/sourcelink                En la conversión a PDB de Windows, SourceLink no se convierte al formato srcsrv.
+                           De forma predeterminada, se incluyen los dos (SourceLink y srcsrv) en el archivo PDB convertido.
 /nowarn *                  Suprime todas las advertencias. Todas las advertencias se notifican de manera predeterminada.
 /nowarn &lt;n1,n2,...&gt;        Suprime la advertencia especificada.
-/srcsvrvar &lt;name&gt;=&lt;value&gt;  Agrega la variable especificada al flujo srcsvr. Solo aplicable 
-                           al convertir a Windows PDB y si /sourcelink no se ha
+/srcsvrvar &lt;nombre&gt;=&lt;valor&gt;  Agrega la variable especificada al flujo srcsvr. Solo aplicable 
+                           al convertir a PDB de Windows y si /sourcelink no se ha
                            especificado.
 
 /extract y /pdb se excluyen mutuamente.
