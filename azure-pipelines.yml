@@ -1,11 +1,9 @@
 # Branches that trigger a build on commit
 trigger:
-- master
 - main
 
 # Branches that trigger builds on PR
 pr:
-- master
 - main
 
 variables:
