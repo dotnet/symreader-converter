@@ -26,6 +26,9 @@ indent_size = 2
 
 #### .NET Coding Conventions ####
 
+[*.{cs}]
+file_header_template = Licensed to the.NET Foundation under one or more agreements.\nThe.NET Foundation licenses this file to you under the MIT license.\nSee the License.txt file in the project root for more information.
+
 # this. and Me. preferences
 dotnet_style_qualification_for_event = false:warning
 dotnet_style_qualification_for_field = false:warning
@@ -152,7 +155,3 @@ csharp_space_between_square_brackets = false
 # Wrapping preferences
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
-
-
-[*.{cs}]
-file_header_template = Licensed to the.NET Foundation under one or more agreements.\nThe.NET Foundation licenses this file to you under the MIT license.\nSee the License.txt file in the project root for more information.
