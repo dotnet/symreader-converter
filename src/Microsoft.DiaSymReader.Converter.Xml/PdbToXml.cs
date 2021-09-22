@@ -68,13 +68,16 @@ namespace Microsoft.DiaSymReader.Tools
         }
 
         public static string DeltaPdbToXml(Stream deltaPdb, IEnumerable<int> methodTokens)
+            => DeltaPdbToXml(deltaPdb, methodTokens, PdbToXmlOptions.IncludeTokens);
+
+        public static string DeltaPdbToXml(Stream deltaPdb, IEnumerable<int> methodTokens, PdbToXmlOptions options)
         {
             var writer = new StringWriter();
             ToXml(
                 writer,
                 deltaPdb,
                 metadataReader: null,
-                options: PdbToXmlOptions.IncludeTokens,
+                options: options,
                 methodHandles: methodTokens.Select(token => (MethodDefinitionHandle)MetadataTokens.Handle(token)));
 
             return writer.ToString();
