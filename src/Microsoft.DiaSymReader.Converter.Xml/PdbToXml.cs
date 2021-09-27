@@ -455,6 +455,17 @@ namespace Microsoft.DiaSymReader.Tools
                 {
                     WriteCompilationOptions(reader);
                 }
+                else if (kind == PortableCustomDebugInfoKinds.DefaultNamespace)
+                {
+                    WriteDefaultNamespace(reader);
+                }
+                else
+                {
+                    _writer.WriteStartElement("unknown");
+                    _writer.WriteAttributeString("kind", kind.ToString());
+                    _writer.WriteAttributeString("data", BitConverter.ToString(reader.ReadBytes(reader.RemainingBytes)));
+                    _writer.WriteEndElement();
+                }
             }
 
             _writer.WriteEndElement();
@@ -948,6 +959,15 @@ namespace Microsoft.DiaSymReader.Tools
             }
             
             _writer.WriteEndElement(); //compilationMetadataReferences
+        }
+
+        private void WriteDefaultNamespace(BlobReader reader)
+        {
+            var name = TryReadUtf8NullTerminated(ref reader);
+        
+            _writer.WriteStartElement("defaultnamespace");
+            _writer.WriteAttributeString("name", name);
+            _writer.WriteEndElement();
         }
 
         private static string? TryReadUtf8NullTerminated(ref BlobReader reader)
