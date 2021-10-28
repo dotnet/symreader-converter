@@ -4,6 +4,8 @@
 
 using Xunit;
 using System.Collections.Generic;
+using System;
+using System.IO;
 
 namespace Microsoft.DiaSymReader.Tools.UnitTests
 {
@@ -11,16 +13,44 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 
     public class PortableToWindowsTests
     {
-        [Fact]
-        public void Convert_Documents()
+        [Theory]
+        [InlineData("4.1.0-abc.21511.14+x", 4, 100, 21, 51114)]
+        [InlineData("4.1.0-1.21511.14+c09d760509f00afadf0fa9b6ee7d0c53b70943ca", 4, 100, 21, 51114)]
+        public void TryConvertCompilerVersionToFileVersion(string version, int major, int minor, int build, int revision)
         {
+            Assert.True(PdbConverterPortableToWindows.TryConvertCompilerVersionToFileVersion(version, out var fileMajor, out var fileMinor, out var fileBuild, out var fileRevision));
+            Assert.Equal(major, fileMajor);
+            Assert.Equal(minor, fileMinor);
+            Assert.Equal(build, fileBuild);
+            Assert.Equal(revision, fileRevision);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("4.1.0")]
+        [InlineData("4.1.0-dev")]
+        [InlineData("4.1.0-dev+123")]
+        [InlineData("2.8.2-beta6-62916-08. Commit Hash: 2ad4aabc7a9dada097e54e544ebba48ab1c05074")]
+        [InlineData("99999.1.0-1.1.1+c09d760509f00afadf0fa9b6ee7d0c53b70943ca")]
+        [InlineData("1.99999.0-1.1.1+c09d760509f00afadf0fa9b6ee7d0c53b70943ca")]
+        [InlineData("1.1.99999-1.1.1+c09d760509f00afadf0fa9b6ee7d0c53b70943ca")]
+        [InlineData("1.1.1-1.99999.1+c09d760509f00afadf0fa9b6ee7d0c53b70943ca")]
+        [InlineData("1.1.1-1.1.99999+c09d760509f00afadf0fa9b6ee7d0c53b70943ca")]
+        public void TryConvertCompilerVersionToFileVersion_Unsupported(string version)
+        {
+            Assert.False(PdbConverterPortableToWindows.TryConvertCompilerVersionToFileVersion(version, out _, out _, out _, out _));
+        }
+
+        [Fact]
+        public void Convert_Documents_CompilerInfo()
+        {            
             VerifyWindowsPdb(
                 TestResources.Documents.DllAndPdb(portable: true),
                 TestResources.Documents.DllAndPdb(portable: false),
 @"<?xml version=""1.0"" encoding=""utf-16""?>
 <symbols>
   <files>
-    <file id=""1"" name=""/_/Documents.cs"" language=""C#"" checksumAlgorithm=""SHA256"" checksum=""46-E0-DA-8D-C6-03-94-AE-09-FA-AD-1C-D8-6F-60-19-64-BE-4E-5A-B0-D8-D9-60-0D-79-E8-92-50-16-04-06"" />
+    <file id=""1"" name=""C:\Documents.cs"" language=""C#"" checksumAlgorithm=""SHA1"" checksum=""DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE"" />
     <file id=""2"" name=""C:\a\b\c\d\1.cs"" language=""C#"" />
     <file id=""3"" name=""C:\a\b\c\D\2.cs"" language=""C#"" />
     <file id=""4"" name=""C:\a\b\C\d\3.cs"" language=""C#"" />
@@ -33,6 +63,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
     <file id=""11"" name="":6.cs"" language=""C#"" />
     <file id=""12"" name=""C:\a\b\X.cs"" language=""C#"" />
     <file id=""13"" name=""C:\a\B\x.cs"" language=""C#"" />
+    <file id=""14"" name=""/Documents.cs"" language=""C#"" checksumAlgorithm=""SHA256"" checksum=""5E-65-DD-E1-B0-DD-1D-BD-33-14-19-BB-B9-25-D9-BA-8E-3A-2D-94-CA-64-01-E0-02-A1-00-04-73-F6-B4-AA"" />
   </files>
   <methods>
     <method containingType=""C"" name=""M"">
@@ -42,7 +73,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         </using>
       </customDebugInfo>
       <sequencePoints>
-        <entry offset=""0x0"" startLine=""6"" startColumn=""5"" endLine=""6"" endColumn=""6"" document=""1"" />
+        <entry offset=""0x0"" startLine=""7"" startColumn=""5"" endLine=""7"" endColumn=""6"" document=""1"" />
         <entry offset=""0x1"" startLine=""10"" startColumn=""9"" endLine=""10"" endColumn=""30"" document=""2"" />
         <entry offset=""0x8"" startLine=""20"" startColumn=""9"" endLine=""20"" endColumn=""30"" document=""3"" />
         <entry offset=""0xf"" startLine=""30"" startColumn=""9"" endLine=""30"" endColumn=""30"" document=""4"" />
@@ -63,7 +94,16 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
         <namespace name=""System"" />
       </scope>
     </method>
+    <method containingType=""C"" name=""F"">
+      <customDebugInfo>
+        <encLambdaMap>
+          <methodOrdinal>1</methodOrdinal>
+          <lambda offset=""39"" />
+        </encLambdaMap>
+      </customDebugInfo>
+    </method>
   </methods>
+  <compilerInfo version=""4.0.21.52102"" name=""C# - 4.0.0-6.21521.2+68d3c0e77ff8607adca62a883197a5637a596438"" />
 </symbols>
 ");
         }

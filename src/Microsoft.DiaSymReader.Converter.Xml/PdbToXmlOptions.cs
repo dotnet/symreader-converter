@@ -31,5 +31,21 @@ namespace Microsoft.DiaSymReader.Tools
         UseNativeReader = 1 << 14,
 
         IncludeModuleDebugInfo = 1 << 15,
+
+        /// <summary>
+        /// Use alternate directory for loading Microsoft.DiaSymReader.Native.*.dll library.
+        /// </summary>
+        /// <remarks>
+        /// See <see cref="SymUnmanagedReaderCreationOptions.UseAlternativeLoadPath"/>.
+        /// </remarks>
+        SymReaderLoadPolicyUseAlternateDirectory = 1 << 29,
+
+        /// <summary>
+        /// Do not use COM registry to locate an implementation of the reader.
+        /// </summary>
+        /// <remarks>
+        /// See <see cref="SymUnmanagedReaderCreationOptions.UseComRegistry"/>.
+        /// </remarks>
+        SymReaderLoadPolicyIgnoreComRegistry = 1 << 30,
     }
 }

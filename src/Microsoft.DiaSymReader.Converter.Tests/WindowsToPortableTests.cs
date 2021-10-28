@@ -17,31 +17,119 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             VerifyPortablePdb(
                 TestResources.Documents.DllAndPdb(portable: true),
                 TestResources.Documents.DllAndPdb(portable: false), @"
-Document (index: 0x30, size: 104): 
+«
+Document (index: 0x30, size: 112): 
 =================================================================================================================================================
-   Name               Language  HashAlgorithm  Hash                                                         
+   Name               Language  HashAlgorithm  Hash                                                                                             
 =================================================================================================================================================
-1: '/_/Documents.cs'  C#        SHA-256        46-E0-DA-8D-C6-03-94-AE-09-FA-AD-1C-D8-6F-60-19-64-BE-4E-5A-B0-D8-D9-60-0D-79-E8-92-50-16-04-06  
-2: 'C:\a\b\c\d\1.cs'  C#        nil            nil                                                          
-3: 'C:\a\b\c\D\2.cs'  C#        nil            nil                                                          
-4: 'C:\a\b\C\d\3.cs'  C#        nil            nil                                                          
-5: 'C:\a\b\c\d\x.cs'  C#        nil            nil                                                          
-6: 'C:\A\b\c\x.cs'    C#        nil            nil                                                          
-7: 'C:\a\b\x.cs'      C#        nil            nil                                                          
-8: 'C:\a\B\3.cs'      C#        nil            nil                                                          
-9: 'C:\a\B\c\4.cs'    C#        nil            nil                                                          
-a: 'C:\*\5.cs'        C#        nil            nil                                                          
-b: ':6.cs'            C#        nil            nil                                                          
-c: 'C:\a\b\X.cs'      C#        nil            nil                                                          
-d: 'C:\a\B\x.cs'      C#        nil            nil                                                          
+1: '/Documents.cs'    C#        SHA-256        5E-65-DD-E1-B0-DD-1D-BD-33-14-19-BB-B9-25-D9-BA-8E-3A-2D-94-CA-64-01-E0-02-A1-00-04-73-F6-B4-AA  
+2: 'C:\Documents.cs'  C#        SHA-1          DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE                                      
+3: 'C:\a\b\c\d\1.cs'  C#        nil            nil                                                                                              
+4: 'C:\a\b\c\D\2.cs'  C#        nil            nil                                                                                              
+5: 'C:\a\b\C\d\3.cs'  C#        nil            nil                                                                                              
+6: 'C:\a\b\c\d\x.cs'  C#        nil            nil                                                                                              
+7: 'C:\A\b\c\x.cs'    C#        nil            nil                                                                                              
+8: 'C:\a\b\x.cs'      C#        nil            nil                                                                                              
+9: 'C:\a\B\3.cs'      C#        nil            nil                                                                                              
+a: 'C:\a\B\c\4.cs'    C#        nil            nil                                                                                              
+b: 'C:\*\5.cs'        C#        nil            nil                                                                                              
+c: ':6.cs'            C#        nil            nil                                                                                              
+d: 'C:\a\b\X.cs'      C#        nil            nil                                                                                              
+e: 'C:\a\B\x.cs'      C#        nil            nil    
 
-MethodDebugInformation (index: 0x31, size: 8): 
-===============================================
+MethodDebugInformation (index: 0x31, size: 24): 
+================================================
    IL   
-===============================================
-1:
+================================================
+1:      
 {
-  IL_0000: (6, 5) - (6, 6) [#1]
+  IL_0000: (7, 5) - (7, 6) [#2]
+  IL_0001: (10, 9) - (10, 30) [#3]
+  IL_0008: (20, 9) - (20, 30) [#4]
+  IL_000F: (30, 9) - (30, 30) [#5]
+  IL_0016: (40, 9) - (40, 30) [#5]
+  IL_001D: <hidden>
+  IL_0023: (50, 9) - (50, 30) [#6]
+  IL_002A: (60, 9) - (60, 30) [#7]
+  IL_0031: (70, 9) - (70, 30) [#8]
+  IL_0038: (80, 9) - (80, 30) [#9]
+  IL_003F: (90, 9) - (90, 30) [#a]
+  IL_0046: (100, 9) - (100, 30) [#b]
+  IL_004D: (110, 9) - (110, 30) [#c]
+  IL_0054: (120, 9) - (120, 30) [#d]
+  IL_005B: (130, 9) - (130, 30) [#e]
+  IL_0062: (131, 5) - (131, 6) [#e]
+}
+2: nil  
+3: nil  
+4: nil  
+5: nil  
+6: nil
+
+LocalScope (index: 0x32, size: 16): 
+===================================================================================================
+   Method                  ImportScope               Variables  Constants  StartOffset  Length  
+===================================================================================================
+1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       99
+
+ImportScope (index: 0x35, size: 8): 
+======================================
+   Parent                    Imports   
+======================================
+1: nil (ImportScope)         nil       
+2: 0x35000001 (ImportScope)  'System'
+
+CustomDebugInformation (index: 0x37, size: 24): 
+========================================================================================================================================================================
+   Parent                  Kind                                    Value                                                                                                
+========================================================================================================================================================================
+1: 0x00000001 (Module)     Compilation Options                     76-65-72-73-69-6F-6E-00-32-00-63-6F-6D-70-69-6C-65-72-2D-76-65-72-73-69-6F-6E-00-34-2E-30-2E-30-...  
+{
+  version: 2
+  compiler-version: 4.0.0-6.21521.2+68d3c0e77ff8607adca62a883197a5637a596438
+  language: C#
+  source-file-count: 1
+  output-kind: DynamicallyLinkedLibrary
+  platform: AnyCpu
+  runtime-version: 4.8.4300.0
+  language-version: 10.0
+}
+2: 0x00000001 (Module)     Compilation Metadata References         6D-73-63-6F-72-6C-69-62-2E-64-6C-6C-00-00-01-F6-60-7E-5F-00-C0-56-00-AB-2A-0F-22-1D-ED-38-47-94-...  
+{
+  -------------------------------------------------------------------------------------------------------
+     FileName        Aliases  Flags     TimeStamp   FileSize    MVID                                  
+  -------------------------------------------------------------------------------------------------------
+  0: 'mscorlib.dll'  ''       Assembly  0x5F7E60F6  0x0056C000  220f2aab-ed1d-4738-94a8-8b65aaf6c105  
+}
+3: 0x06000002 (MethodDef)  EnC Lambda and Closure Map              02-01-00-28-01                                                                                       
+4: 0x02000002 (TypeDef)    {932e74bc-dba9-4478-8d46-0f32a7bab3d3}  01
+»«
+Document (index: 0x30, size: 112): 
+=================================================================================================================================================
+   Name               Language  HashAlgorithm  Hash                                                                                             
+=================================================================================================================================================
+1: 'C:\Documents.cs'  C#        SHA-1          DB-EB-2A-06-7B-2F-0E-0D-67-8A-00-2C-58-7A-28-06-05-6C-3D-CE                                      
+2: 'C:\a\b\c\d\1.cs'  C#        nil            nil                                                                                              
+3: 'C:\a\b\c\D\2.cs'  C#        nil            nil                                                                                              
+4: 'C:\a\b\C\d\3.cs'  C#        nil            nil                                                                                              
+5: 'C:\a\b\c\d\x.cs'  C#        nil            nil                                                                                              
+6: 'C:\A\b\c\x.cs'    C#        nil            nil                                                                                              
+7: 'C:\a\b\x.cs'      C#        nil            nil                                                                                              
+8: 'C:\a\B\3.cs'      C#        nil            nil                                                                                              
+9: 'C:\a\B\c\4.cs'    C#        nil            nil                                                                                              
+a: 'C:\*\5.cs'        C#        nil            nil                                                                                              
+b: ':6.cs'            C#        nil            nil                                                                                              
+c: 'C:\a\b\X.cs'      C#        nil            nil                                                                                              
+d: 'C:\a\B\x.cs'      C#        nil            nil                                                                                              
+e: '/Documents.cs'    C#        SHA-256        5E-65-DD-E1-B0-DD-1D-BD-33-14-19-BB-B9-25-D9-BA-8E-3A-2D-94-CA-64-01-E0-02-A1-00-04-73-F6-B4-AA  
+
+MethodDebugInformation (index: 0x31, size: 24): 
+================================================
+   IL   
+================================================
+1:      
+{
+  IL_0000: (7, 5) - (7, 6) [#1]
   IL_0001: (10, 9) - (10, 30) [#2]
   IL_0008: (20, 9) - (20, 30) [#3]
   IL_000F: (30, 9) - (30, 30) [#4]
@@ -58,13 +146,18 @@ MethodDebugInformation (index: 0x31, size: 8):
   IL_005B: (130, 9) - (130, 30) [#d]
   IL_0062: (131, 5) - (131, 6) [#d]
 }
-2: nil
+2: nil  
+3: nil  
+4: nil  
+5: nil  
+6: nil
 
-LocalScope (index: 0x32, size: 16): 
+LocalScope (index: 0x32, size: 32):
 ===================================================================================================
    Method                  ImportScope               Variables  Constants  StartOffset  Length  
 ===================================================================================================
 1: 0x06000001 (MethodDef)  0x35000002 (ImportScope)  nil        nil        0x0000       99      
+2: 0x06000002 (MethodDef)  nil (ImportScope)         nil        nil        0x0000       30
 
 ImportScope (index: 0x35, size: 8): 
 ======================================
@@ -72,32 +165,13 @@ ImportScope (index: 0x35, size: 8):
 ======================================
 1: nil (ImportScope)         nil       
 2: 0x35000001 (ImportScope)  'System'
-«
-CustomDebugInformation (index: 0x37, size: 12): 
-==============================================================================================================================================================
-    Parent               Kind                             Value                                                                                                
-==============================================================================================================================================================
-1: 0x00000001 (Module)  Compilation Options              63-6F-6D-70-69-6C-65-72-2D-76-65-72-73-69-6F-6E-00-33-2E-37-2E-30-2D-64-65-76-00-6C-61-6E-67-75-...  
-{
-  compiler-version: 3.7.0-dev
-  language: C#
-  portability-policy: 0
-  runtime-version: 4.8.4180.0
-  optimization: debug
-  checked: False
-  nullable: Disable
-  unsafe: False
-  language-version: 8.0
-}
-2: 0x00000001 (Module)  Compilation Metadata References  6D-73-63-6F-72-6C-69-62-2E-64-6C-6C-00-00-01-D3-20-7D-5E-00-00-53-00-B5-26-EC-4B-C7-CB-15-47-84-...  
-{
-  -------------------------------------------------------------------------------------------------------
-      FileName        Aliases  Flags     TimeStamp   FileSize    MVID                                  
-  -------------------------------------------------------------------------------------------------------
-  0: 'mscorlib.dll'  ''       Assembly  0x5E7D20D3  0x00530000  4bec26b5-cbc7-4715-8442-f1499e984732  
-}
-»«»
-");
+
+CustomDebugInformation (index: 0x37, size: 6): 
+=======================================================================
+   Parent                  Kind                        Value           
+=======================================================================
+1: 0x06000002 (MethodDef)  EnC Lambda and Closure Map  02-01-00-28-01
+»");
         }
 
         [Fact]

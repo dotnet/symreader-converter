@@ -79,6 +79,23 @@ namespace Microsoft.DiaSymReader.Tools
         /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
         /// <exception cref="ObjectDisposedException">Stream has been disposed while reading/writing.</exception>
         public void ConvertWindowsToPortable(PEReader peReader, Stream sourcePdbStream, Stream targetPdbStream)
+            => ConvertWindowsToPortable(peReader, sourcePdbStream, targetPdbStream, options: null);
+
+        /// <summary>
+        /// Converts Windows PDB stream to Portable PDB.
+        /// </summary>
+        /// <param name="peReader">PE image stream (.dll or .exe)</param>
+        /// <param name="sourcePdbStream">Source stream of Windows PDB data. Must be readable.</param>
+        /// <param name="targetPdbStream">Target stream of Portable PDB data. Must be writable.</param>
+        /// <param name="options">Conversion options.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="peReader"/>, <paramref name="sourcePdbStream"/>, or <paramref name="targetPdbStream"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="sourcePdbStream"/> does not support reading.</exception>
+        /// <exception cref="ArgumentException"><paramref name="targetPdbStream"/> does not support writing.</exception>
+        /// <exception cref="BadImageFormatException">The format of the PE image or the PDB stream is invalid.</exception>
+        /// <exception cref="InvalidDataException">The PDB doesn't match the CodeView Debug Directory record in the PE image.</exception>
+        /// <exception cref="IOException">IO error while reading from or writing to a stream.</exception>
+        /// <exception cref="ObjectDisposedException">Stream has been disposed while reading/writing.</exception>
+        public void ConvertWindowsToPortable(PEReader peReader, Stream sourcePdbStream, Stream targetPdbStream, WindowsPdbConversionOptions? options)
         {
             if (peReader == null)
             {
@@ -90,7 +107,7 @@ namespace Microsoft.DiaSymReader.Tools
 
             try
             {
-                new PdbConverterWindowsToPortable(_diagnosticReporter).Convert(peReader, sourcePdbStream, targetPdbStream);
+                new PdbConverterWindowsToPortable(_diagnosticReporter).Convert(peReader, sourcePdbStream, targetPdbStream, (options ?? WindowsPdbConversionOptions.Default).ReaderCreationOptions);
             }
             catch (COMException e)
             {
@@ -116,10 +133,8 @@ namespace Microsoft.DiaSymReader.Tools
         public void ConvertPortableToWindows(Stream peStream, Stream sourcePdbStream, Stream targetPdbStream, PortablePdbConversionOptions? options = null)
         {
             StreamUtilities.ValidateStream(peStream, nameof(peStream), readRequired: true, seekRequired: true);
-            using (var peReader = new PEReader(peStream, PEStreamOptions.LeaveOpen))
-            {
-                ConvertPortableToWindows(peReader, sourcePdbStream, targetPdbStream, options);
-            }
+            using var peReader = new PEReader(peStream, PEStreamOptions.LeaveOpen);
+            ConvertPortableToWindows(peReader, sourcePdbStream, targetPdbStream, options);
         }
 
         /// <summary>
@@ -140,10 +155,8 @@ namespace Microsoft.DiaSymReader.Tools
         {
             StreamUtilities.ValidateStream(sourcePdbStream, nameof(sourcePdbStream), readRequired: true);
 
-            using (var pdbReaderProvider = MetadataReaderProvider.FromPortablePdbStream(sourcePdbStream, MetadataStreamOptions.LeaveOpen))
-            {
-                ConvertPortableToWindows(peReader, pdbReaderProvider.GetMetadataReader(), targetPdbStream, options);
-            }
+            using var pdbReaderProvider = MetadataReaderProvider.FromPortablePdbStream(sourcePdbStream, MetadataStreamOptions.LeaveOpen);
+            ConvertPortableToWindows(peReader, pdbReaderProvider.GetMetadataReader(), targetPdbStream, options);
         }
 
         /// <summary>
@@ -168,11 +181,9 @@ namespace Microsoft.DiaSymReader.Tools
 
             StreamUtilities.ValidateStream(targetPdbStream, nameof(targetPdbStream), writeRequired: true);
 
-            using (var pdbWriter = SymUnmanagedWriterFactory.CreateWriter(new SymMetadataProvider(peReader.GetMetadataReader()), SymUnmanagedWriterCreationOptions.Deterministic))
-            {
-                ConvertPortableToWindows(peReader, pdbReader, pdbWriter, options);
-                pdbWriter.WriteTo(targetPdbStream);
-            }
+            using var pdbWriter = SymUnmanagedWriterFactory.CreateWriter(new SymMetadataProvider(peReader.GetMetadataReader()), (options ?? PortablePdbConversionOptions.Default).WriterCreationOptions);
+            ConvertPortableToWindows(peReader, pdbReader, pdbWriter, options);
+            pdbWriter.WriteTo(targetPdbStream);
         }
 
         /// <summary>

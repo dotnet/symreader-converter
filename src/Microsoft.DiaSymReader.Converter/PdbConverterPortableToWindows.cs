@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,6 +16,7 @@ using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis.Collections;
 using Microsoft.CodeAnalysis.Debugging;
 using Microsoft.CodeAnalysis.PooledObjects;
@@ -593,8 +595,89 @@ namespace Microsoft.DiaSymReader.Tools
                 }
             }
 
+            var compilerOptions = ReadCompilationOptions(pdbReader).ToImmutableDictionary();
+            if (compilerOptions.TryGetValue("compiler-version", out var compilerVersionString) &&
+                compilerOptions.TryGetValue("language", out var language) &&
+                language is "C#" or "Visual Basic" or "F#" &&
+                TryConvertCompilerVersionToFileVersion(compilerVersionString, out var fileMajor, out var fileMinor, out var fileBuild, out var fileRevision))
+            {
+                pdbWriter.AddCompilerInfo(fileMajor, fileMinor, fileBuild, fileRevision, $"{language} - {compilerVersionString}");
+            }
+
             SymReaderHelpers.GetWindowsPdbSignature(pdbReader.DebugMetadataHeader.Id, out var guid, out var stamp, out var age);
             pdbWriter.UpdateSignature(guid, stamp, age);
+        }
+
+        private static IEnumerable<KeyValuePair<string, string>> ReadCompilationOptions(MetadataReader reader)
+        {
+            var compilerOptions = reader.GetCustomDebugInformation(EntityHandle.ModuleDefinition, PortableCustomDebugInfoKinds.CompilationOptions);
+            if (compilerOptions.IsNil)
+            {
+                yield break;
+            }
+
+            var blobReader = reader.GetBlobReader(compilerOptions);
+
+            // Compiler flag bytes are UTF-8 null-terminated key-value pairs
+            var nullIndex = blobReader.IndexOf(0);
+            while (nullIndex >= 0)
+            {
+                var key = blobReader.ReadUTF8(nullIndex);
+
+                // Skip the null terminator
+                blobReader.ReadByte();
+
+                nullIndex = blobReader.IndexOf(0);
+                var value = blobReader.ReadUTF8(nullIndex);
+
+                yield return new KeyValuePair<string, string>(key, value);
+
+                // Skip the null terminator
+                blobReader.ReadByte();
+                nullIndex = blobReader.IndexOf(0);
+            }
+        }
+
+        /// <summary>
+        /// Roslyn compilers use version in AssemblyFileVersionAttribute for the numeric version and
+        /// the semantic version stored in AssemblyInformationalVersionAttribute for the version string.
+        /// The latter is also stored in compiler-version, but the former is not stored in compiler options.
+        /// We calculate it based on the version scheme used by Roslyn build infrastructure.
+        /// See https://github.com/dotnet/arcade/blob/release/6.0/Documentation/CorePackages/Versioning.md
+        /// </summary>
+        internal static bool TryConvertCompilerVersionToFileVersion(string str, out ushort fileMajor, out ushort fileMinor, out ushort fileBuild, out ushort fileRevision)
+        {
+            // assumes format: major.minor.revision-labels.SHORT_DATE.REVISION+CommitSha
+            var match = Regex.Match(str, "([0-9]+)[.]([0-9]+)[.]([0-9]+)-[^.]+[.]([0-9]+)[.]([0-9]+).*");
+            if (match.Success &&
+                ushort.TryParse(match.Groups[1].Value, out var major) &&
+                ushort.TryParse(match.Groups[2].Value, out var minor) &&
+                ushort.TryParse(match.Groups[3].Value, out var build) &&
+                ushort.TryParse(match.Groups[4].Value, out var shortDate) &&
+                ushort.TryParse(match.Groups[5].Value, out var revision))
+            {
+                var dd = shortDate % 50;
+                var mm = (shortDate / 50) % 20;
+                var yy = shortDate / 1000;
+
+                fileMajor = major;
+                try
+                {
+                    checked
+                    {
+                        fileMinor = (ushort)(minor * 100 + build / 100);
+                        fileBuild = (ushort)((build % 100) * 100 + yy);
+                        fileRevision = (ushort)((50 * mm + dd) * 100 + revision);
+                        return true;
+                    }
+                }
+                catch (OverflowException)
+                {
+                }
+            }
+
+            fileMajor = fileMinor = fileBuild = fileRevision = 0;
+            return false;
         }
 
         // internal for testing

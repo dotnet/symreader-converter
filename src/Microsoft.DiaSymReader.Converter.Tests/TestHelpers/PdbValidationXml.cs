@@ -17,7 +17,16 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 {
     internal static class PdbValidationXml
     {
-        private const PdbToXmlOptions Options = PdbToXmlOptions.IncludeSourceServerInformation | PdbToXmlOptions.IncludeEmbeddedSources | PdbToXmlOptions.ResolveTokens;
+        static PdbValidationXml()
+        {
+            // Make sure we load DSRN from the directory containing the unit tests and not from a runtime directory on .NET 5+.
+            Environment.SetEnvironmentVariable("MICROSOFT_DIASYMREADER_NATIVE_ALT_LOAD_PATH", Path.GetDirectoryName(typeof(PdbValidationXml).Assembly.Location));
+            Environment.SetEnvironmentVariable("MICROSOFT_DIASYMREADER_NATIVE_USE_ALT_LOAD_PATH_ONLY", "1");
+        }
+
+        private const PdbToXmlOptions Options = PdbToXmlOptions.IncludeSourceServerInformation | PdbToXmlOptions.IncludeEmbeddedSources | PdbToXmlOptions.ResolveTokens | PdbToXmlOptions.IncludeModuleDebugInfo | PdbToXmlOptions.SymReaderLoadPolicyUseAlternateDirectory;
+        private const SymUnmanagedReaderCreationOptions ReaderCreationOptions = SymUnmanagedReaderCreationOptions.UseAlternativeLoadPath;
+        private const SymUnmanagedWriterCreationOptions WriterCreationOptions = SymUnmanagedWriterCreationOptions.UseAlternativeLoadPath | SymUnmanagedWriterCreationOptions.Deterministic;
 
         public static void VerifyWindowsPdb(TestResource portable, TestResource windows, string expectedXml, PdbDiagnostic[]? expectedDiagnostics = null, PortablePdbConversionOptions? options = null)
         {
@@ -94,6 +103,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             var actualDiagnostics = new List<PdbDiagnostic>();
 
             var converter = new PdbConverter(actualDiagnostics.Add);
+            options ??= new PortablePdbConversionOptions(writerCreationOptions: WriterCreationOptions);
             converter.ConvertPortableToWindows(portablePEStream, portablePdbStream, convertedWindowsPdbStream1, options);
             AssertEx.Equal(expectedDiagnostics ?? Array.Empty<PdbDiagnostic>(), actualDiagnostics, itemInspector: InspectDiagnostic);
 
@@ -132,7 +142,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
                 SymReaderHelpers.GetWindowsPdbSignature(provider.GetMetadataReader().DebugMetadataHeader!.Id, out guid, out stamp, out age);
             }
 
-            var symReader = SymReaderHelpers.CreateWindowsPdbReader(windowsPdbStream);
+            var symReader = SymReaderHelpers.CreateWindowsPdbReader(windowsPdbStream, ReaderCreationOptions);
             try
             {
                 Marshal.ThrowExceptionForHR(symReader.MatchesModule(guid, stamp, age, out bool result));
