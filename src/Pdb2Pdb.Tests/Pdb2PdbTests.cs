@@ -17,7 +17,8 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 {
     public class Pdb2PdbTests
     {
-        private readonly TempRoot _temp = new TempRoot();
+        private readonly TempRoot _temp = new();
+        private readonly SymUnmanagedReaderCreationOptions ReaderCreationOptions = SymUnmanagedReaderCreationOptions.Default;
 
         [Fact]
         public void ParseArgs_Errors()
@@ -125,7 +126,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             using (var peStream = File.OpenRead(pe.Path))
             using (var pdbStream = File.OpenRead(outPdbPath))
             {
-                var symReader = SymReaderHelpers.CreateWindowsPdbReader(pdbStream);
+                var symReader = SymReaderHelpers.CreateWindowsPdbReader(pdbStream, ReaderCreationOptions);
 
                 var sourceLink = symReader.GetSourceLinkData();
                 AssertEx.AssertLinesEqual(
@@ -180,13 +181,12 @@ SRCSRV: end ------------------------------------------------", srcsvr);
                 suppressAllWarnings: false,
                 extract: false)));
 
-            using (var peStream = File.OpenRead(pe.Path))
-            using (var pdbStream = File.OpenRead(outPdb.Path))
-            {
-                var symReader = SymReaderHelpers.CreateWindowsPdbReader(pdbStream);
-                AssertEx.Equal(TestResources.SourceLink.SourceLinkJson, symReader.GetRawSourceLinkData());
-                Assert.Null(symReader.GetSourceServerData());
-            }
+            using var peStream = File.OpenRead(pe.Path);
+            using var pdbStream = File.OpenRead(outPdb.Path);
+
+            var symReader = SymReaderHelpers.CreateWindowsPdbReader(pdbStream, ReaderCreationOptions);
+            AssertEx.Equal(TestResources.SourceLink.SourceLinkJson, symReader.GetRawSourceLinkData());
+            Assert.Null(symReader.GetSourceServerData());
         }
 
         [Fact]
@@ -207,7 +207,7 @@ SRCSRV: end ------------------------------------------------", srcsvr);
 
             using var peStream = File.OpenRead(pe.Path);
             using var pdbStream = File.OpenRead(outPdb.Path);
-            var symReader = SymReaderHelpers.CreateWindowsPdbReader(pdbStream);
+            var symReader = SymReaderHelpers.CreateWindowsPdbReader(pdbStream, ReaderCreationOptions);
             AssertEx.Equal(TestResources.SourceLink.SourceLinkJson, symReader.GetRawSourceLinkData());
             Assert.Null(symReader.GetSourceServerData());
         }

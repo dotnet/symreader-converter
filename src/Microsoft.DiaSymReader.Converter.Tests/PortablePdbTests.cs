@@ -11,7 +11,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
     public class PortablePdbTests
     {
         [Fact]
-        public void CompilationOptions()
+        public void CompilationOptions_Portable()
         {
             VerifyPortablePdb(
                 TestResources.Documents.DllAndPdb(portable: true),
@@ -19,18 +19,17 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 <symbols>
   <customDebugInfo>
     <compilationOptions>
-      <option name=""compiler-version"" value=""3.7.0-dev"" />
+      <option name=""version"" value=""2"" />
+      <option name=""compiler-version"" value=""4.0.0-6.21521.2+68d3c0e77ff8607adca62a883197a5637a596438"" />
       <option name=""language"" value=""C#"" />
-      <option name=""portability-policy"" value=""0"" />
-      <option name=""runtime-version"" value=""4.8.4180.0"" />
-      <option name=""optimization"" value=""debug"" />
-      <option name=""checked"" value=""False"" />
-      <option name=""nullable"" value=""Disable"" />
-      <option name=""unsafe"" value=""False"" />
-      <option name=""language-version"" value=""8.0"" />
+      <option name=""source-file-count"" value=""1"" />
+      <option name=""output-kind"" value=""DynamicallyLinkedLibrary"" />
+      <option name=""platform"" value=""AnyCpu"" />
+      <option name=""runtime-version"" value=""4.8.4300.0"" />
+      <option name=""language-version"" value=""10.0"" />
     </compilationOptions>
     <compilationMetadataReferences>
-      <reference fileName=""mscorlib.dll"" flags=""Assembly"" timeStamp=""0x5E7D20D3"" fileSize=""0x00530000"" mvid=""4bec26b5-cbc7-4715-8442-f1499e984732"" />
+      <reference fileName=""mscorlib.dll"" flags=""Assembly"" timeStamp=""0x5F7E60F6"" fileSize=""0x0056C000"" mvid=""220f2aab-ed1d-4738-94a8-8b65aaf6c105"" />
     </compilationMetadataReferences>
   </customDebugInfo>
 </symbols>
@@ -42,7 +41,29 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             PdbToXmlOptions.ExcludeNamespaces |
             PdbToXmlOptions.ExcludeAsyncInfo |
             PdbToXmlOptions.ExcludeCustomDebugInformation |
-            PdbToXmlOptions.IncludeModuleDebugInfo);
+            PdbToXmlOptions.IncludeModuleDebugInfo |
+            PdbToXmlOptions.SymReaderLoadPolicyUseAlternateDirectory);
+        }
+
+        [Fact]
+        public void CompilationOptions_Windows()
+        {
+            VerifyPortablePdb(
+                TestResources.Documents.DllAndPdb(portable: false),
+@"<?xml version=""1.0"" encoding=""utf-16""?>
+<symbols>
+  <compilerInfo version=""4.0.21.52102"" name=""C# - 4.0.0-6.21521.2+68d3c0e77ff8607adca62a883197a5637a596438"" />
+</symbols>
+",
+            PdbToXmlOptions.ExcludeDocuments |
+            PdbToXmlOptions.ExcludeMethods |
+            PdbToXmlOptions.ExcludeSequencePoints |
+            PdbToXmlOptions.ExcludeScopes |
+            PdbToXmlOptions.ExcludeNamespaces |
+            PdbToXmlOptions.ExcludeAsyncInfo |
+            PdbToXmlOptions.ExcludeCustomDebugInformation |
+            PdbToXmlOptions.IncludeModuleDebugInfo |
+            PdbToXmlOptions.SymReaderLoadPolicyUseAlternateDirectory);
         }
     }
 }

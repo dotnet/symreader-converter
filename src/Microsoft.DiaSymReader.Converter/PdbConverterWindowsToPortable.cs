@@ -36,7 +36,7 @@ namespace Microsoft.DiaSymReader.Tools
 
         /// <exception cref="COMException">Invalid PDB format.</exception>
         /// <exception cref="InvalidDataException">The content of <paramref name="sourcePdbStream"/> doesn't match the CodeView Debug Directory record in the PE image.</exception>
-        public void Convert(PEReader peReader, Stream sourcePdbStream, Stream targetPdbStream)
+        public void Convert(PEReader peReader, Stream sourcePdbStream, Stream targetPdbStream, SymUnmanagedReaderCreationOptions readerCreationOptions)
         {
             if (!SymReaderHelpers.TryReadPdbId(peReader, out var pdbId, out int age))
             {
@@ -46,7 +46,7 @@ namespace Microsoft.DiaSymReader.Tools
             ISymUnmanagedReader5? symReader = null;
             try
             {
-                symReader = SymReaderHelpers.CreateWindowsPdbReader(sourcePdbStream, peReader);
+                symReader = SymReaderHelpers.CreateWindowsPdbReader(sourcePdbStream, peReader, readerCreationOptions);
 
                 Marshal.ThrowExceptionForHR(symReader.MatchesModule(pdbId.Guid, pdbId.Stamp, age, out bool isMatching));
                 if (!isMatching)

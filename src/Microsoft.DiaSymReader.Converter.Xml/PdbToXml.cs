@@ -151,7 +151,11 @@ namespace Microsoft.DiaSymReader.Tools
             using var writer = XmlWriter.Create(xmlWriter, s_xmlWriterSettings);
 
             // metadata reader is on stack -> no owner needed
-            var symReader = CreateReader(pdbStream, metadataReader, useNativeReader: (options & PdbToXmlOptions.UseNativeReader) != 0);
+            var symReader = CreateReader(
+                pdbStream,
+                metadataReader,
+                GetCreationOptions(options),
+                useNativeReader: options.HasFlag(PdbToXmlOptions.UseNativeReader));
 
             try
             {
@@ -165,7 +169,11 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        private static ISymUnmanagedReader3 CreateReader(Stream pdbStream, MetadataReader? metadataReader, bool useNativeReader)
+        private static SymUnmanagedReaderCreationOptions GetCreationOptions(PdbToXmlOptions options)
+            => (options.HasFlag(PdbToXmlOptions.SymReaderLoadPolicyUseAlternateDirectory) ? SymUnmanagedReaderCreationOptions.UseAlternativeLoadPath : 0) |
+               (options.HasFlag(PdbToXmlOptions.SymReaderLoadPolicyIgnoreComRegistry) ? 0 : SymUnmanagedReaderCreationOptions.UseComRegistry);
+
+        private static ISymUnmanagedReader3 CreateReader(Stream pdbStream, MetadataReader? metadataReader, SymUnmanagedReaderCreationOptions creationOptions, bool useNativeReader)
         {
             var metadataProvider = (metadataReader != null) ? new SymMetadataProvider(metadataReader) : DummySymReaderMetadataProvider.Instance;
             var importer = SymUnmanagedReaderFactory.CreateSymReaderMetadataImport(metadataProvider);
@@ -176,7 +184,7 @@ namespace Microsoft.DiaSymReader.Tools
             }
             else
             {
-                return SymUnmanagedReaderFactory.CreateReaderWithMetadataImport<ISymUnmanagedReader3>(pdbStream, importer, SymUnmanagedReaderCreationOptions.UseComRegistry);
+                return SymUnmanagedReaderFactory.CreateReaderWithMetadataImport<ISymUnmanagedReader3>(pdbStream, importer, creationOptions);
             }
         }
 
@@ -210,6 +218,7 @@ namespace Microsoft.DiaSymReader.Tools
             if ((_options & PdbToXmlOptions.IncludeModuleDebugInfo) != 0)
             {
                 WriteModuleCustomDebugInfo();
+                WriteWindowsCompilerInfo();
             }
 
             _writer.WriteEndElement();
@@ -468,6 +477,20 @@ namespace Microsoft.DiaSymReader.Tools
                 }
             }
 
+            _writer.WriteEndElement();
+        }
+
+        private void WriteWindowsCompilerInfo()
+        {
+            if (_symReader is not ISymUnmanagedCompilerInfoReader infoReader ||
+                !infoReader.TryGetCompilerInfo(out var version, out var name))
+            {
+                return;
+            }
+
+            _writer.WriteStartElement("compilerInfo");
+            _writer.WriteAttributeString("version", version.ToString());
+            _writer.WriteAttributeString("name", name);
             _writer.WriteEndElement();
         }
 
@@ -1149,7 +1172,11 @@ namespace Microsoft.DiaSymReader.Tools
                     else
                     {
                         _writer.WriteStartElement("namespace");
-                        if (externAlias != null) _writer.WriteAttributeString("qualifier", externAlias);
+                        if (externAlias != null)
+                        {
+                            _writer.WriteAttributeString("qualifier", externAlias);
+                        }
+
                         _writer.WriteAttributeString("name", target);
                         WriteScopeAttribute(scope);
                         _writer.WriteEndElement();

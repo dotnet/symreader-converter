@@ -28,20 +28,14 @@ namespace Microsoft.DiaSymReader.Tools
             return isPortable;
         }
 
-        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream)
-        {
-            return SymUnmanagedReaderFactory.CreateReader<ISymUnmanagedReader5>(pdbStream, DummySymReaderMetadataProvider.Instance);
-        }
+        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream, SymUnmanagedReaderCreationOptions options)
+            => SymUnmanagedReaderFactory.CreateReader<ISymUnmanagedReader5>(pdbStream, DummySymReaderMetadataProvider.Instance, options);
 
-        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream, PEReader peReader)
-        {
-            return CreateWindowsPdbReader(pdbStream, peReader.GetMetadataReader());
-        }
+        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream, PEReader peReader, SymUnmanagedReaderCreationOptions options)
+            => CreateWindowsPdbReader(pdbStream, peReader.GetMetadataReader(), options);
 
-        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream, MetadataReader metadataReader)
-        {
-            return SymUnmanagedReaderFactory.CreateReader<ISymUnmanagedReader5>(pdbStream, new SymMetadataProvider(metadataReader));
-        }
+        public static ISymUnmanagedReader5 CreateWindowsPdbReader(Stream pdbStream, MetadataReader metadataReader, SymUnmanagedReaderCreationOptions options)
+            => SymUnmanagedReaderFactory.CreateReader<ISymUnmanagedReader5>(pdbStream, new SymMetadataProvider(metadataReader), options);
 
         public static ImmutableArray<string> GetImportStrings(ISymUnmanagedReader reader, int methodToken, int methodVersion)
         {
