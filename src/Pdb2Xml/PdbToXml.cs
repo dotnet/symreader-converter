@@ -184,9 +184,14 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        public static bool ProcessEmbeddedPdb(string assemblyFilePath, string outputPath, PdbToXmlOptions options)
+        public static bool ProcessEmbeddedPdb(string? assemblyFilePath, string outputPath, PdbToXmlOptions options)
         {
-            MemoryStream pdbStream = null;
+            if (assemblyFilePath == null)
+            {
+                return false;
+            }
+
+            MemoryStream? pdbStream = null;
 
             using (var stream = File.OpenRead(assemblyFilePath))
             {
