@@ -3,8 +3,12 @@
 // See the License.txt file in the project root for more information.
 
 using System;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 using System.Text;
 
 namespace Microsoft.DiaSymReader.Tools
@@ -162,7 +166,12 @@ namespace Microsoft.DiaSymReader.Tools
 
             if (!File.Exists(pdbFile))
             {
-                throw new FileNotFoundException($"PDB File not found: {pdbFile}");
+                if (!ProcessEmbeddedPdb(peFile, args.OutputPath, args.Options))
+                {
+                    throw new FileNotFoundException($"PDB File not found: {pdbFile}");
+                }
+
+                return;
             }
 
             if (args.Delta)
@@ -173,6 +182,47 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 GenXmlFromPdb(peFile!, pdbFile, args.OutputPath, args.Options);
             }
+        }
+
+        public static bool ProcessEmbeddedPdb(string assemblyFilePath, string outputPath, PdbToXmlOptions options)
+        {
+            MemoryStream pdbStream = null;
+
+            using (var stream = File.OpenRead(assemblyFilePath))
+            {
+                var reader = new PEReader(stream);
+                var metadataReader = reader.GetMetadataReader();
+                var debugDirectory = reader.ReadDebugDirectory();
+                foreach (var entry in debugDirectory)
+                {
+                    if (entry.Type == DebugDirectoryEntryType.EmbeddedPortablePdb && entry.DataSize > 0)
+                    {
+                        var embeddedProvider = reader.ReadEmbeddedPortablePdbDebugDirectoryData(entry);
+                        var memoryBlock = embeddedProvider.GetType().GetMethod("GetMetadataBlock", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(embeddedProvider, null);
+                        var memoryBlockType = memoryBlock.GetType();
+                        var size = (int)memoryBlockType.GetProperty("Size").GetValue(memoryBlock);
+                        var bytes = (ImmutableArray<byte>)memoryBlockType.GetMethod("GetContentUnchecked").Invoke(memoryBlock, new object[] { 0, size });
+                        pdbStream = new MemoryStream(bytes.ToArray());
+                        break;
+                    }
+                }
+            }
+
+            if (pdbStream == null)
+            {
+                return false;
+            }
+
+            using (var stream = File.OpenRead(assemblyFilePath))
+            {
+                var xmlText = PdbToXmlConverter.ToXml(pdbStream, stream, options);
+
+                outputPath = Path.GetFullPath(outputPath);
+                Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+                File.WriteAllText(outputPath, xmlText);
+            }
+
+            return true;
         }
 
         public static void GenXmlFromPdb(string exePath, string pdbPath, string outPath, PdbToXmlOptions options)
