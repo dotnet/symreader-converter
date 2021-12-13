@@ -18,6 +18,6 @@
     <!-- CoreFX -->
     <SystemCollectionsImmutableVersion>5.0.0</SystemCollectionsImmutableVersion>
     <SystemReflectionMetadataVersion>5.0.0</SystemReflectionMetadataVersion>
-    <SystemTextJsonVersion>5.0.0</SystemTextJsonVersion>
+    <SystemTextJsonVersion>5.0.2</SystemTextJsonVersion>
   </PropertyGroup>
 </Project>
