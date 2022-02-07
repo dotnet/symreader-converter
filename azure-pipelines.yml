@@ -1,10 +1,21 @@
-# Branches that trigger a build on commit
-trigger:
-- main
-
 # Branches that trigger builds on PR
 pr:
-- main
+  branches:
+    include:
+    - main
+    - release/*
+  paths:
+    exclude:
+    - README.md
+    - docs/*
+
+# Run official build every day at midnight, if code has changed since the last run.
+schedules:
+- cron: "0 0 * * *"
+  displayName: Daily Official Build
+  branches:
+    include:
+    - main
 
 variables:
   - name: _TeamName
@@ -37,11 +48,10 @@ stages:
       - job: Windows
         pool:
           ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
-            name: NetCore1ESPool-Public
-            demands: ImageOverride -equals Build.Windows.10.Amd64.VS2017.Open
+            vmImage: 'windows-latest'
           ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
             name: NetCore1ESPool-Internal
-            demands: ImageOverride -equals Build.Windows.10.Amd64.VS2017
+            demands: ImageOverride -equals Build.Windows.10.Amd64.VS2019
         variables:
         # Only enable publishing in official builds
         - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
@@ -50,7 +60,7 @@ stages:
           - group: DotNet-Blob-Feed
           - group: Publish-Build-Assets
           - name: _OfficialBuildArgs
-            value: /p:DotNetSignType=$(_SignType) 
+            value: /p:DotNetSignType=$(_SignType)
                   /p:TeamName=$(_TeamName)
                   /p:DotNetPublishBlobFeedKey=$(dotnetfeed-storage-access-key-1)
                   /p:DotNetPublishBlobFeedUrl=https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json
@@ -64,11 +74,12 @@ stages:
             value: ''
         strategy:
           matrix:
-            Debug:
-              _BuildConfig: Debug
-              _SignType: test
-              _DotNetPublishToBlobFeed: false
-              _BuildArgs: ''
+            ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
+              Debug:
+                _BuildConfig: Debug
+                _SignType: test
+                _DotNetPublishToBlobFeed: false
+                _BuildArgs: ''
             Release:
               _BuildConfig: Release
               # PRs or external builds are not signed.
@@ -90,3 +101,6 @@ stages:
   - template: eng\common\templates\post-build\post-build.yml
     parameters:
       publishingInfraVersion: 3
+      # Symbol validation isn't being very reliable lately. This should be enabled back
+      # once this issue is resolved: https://github.com/dotnet/arcade/issues/2871
+      enableSymbolValidation: false
