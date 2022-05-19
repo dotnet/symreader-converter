@@ -551,6 +551,7 @@ namespace Microsoft.DiaSymReader.Tools
                 // the following blobs map 1:1
                 CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, PortableCustomDebugInfoKinds.EncLocalSlotMap, CustomDebugInfoKind.EditAndContinueLocalSlotMap);
                 CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, PortableCustomDebugInfoKinds.EncLambdaAndClosureMap, CustomDebugInfoKind.EditAndContinueLambdaMap);
+                CopyCustomDebugInfoRecord(ref cdiEncoder, pdbReader, methodDefHandle, SymReaderHelpers.EncStateMachineSuspensionPoints, SymReaderHelpers.CustomDebugInfoKind_EncStateMachineSuspensionPoints);
 
                 if (cdiEncoder.RecordCount > 0)
                 {

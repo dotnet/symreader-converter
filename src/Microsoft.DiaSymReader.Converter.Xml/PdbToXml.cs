@@ -395,6 +395,9 @@ namespace Microsoft.DiaSymReader.Tools
                         case CustomDebugInfoKind.EditAndContinueLambdaMap:
                             WriteEditAndContinueLambdaAndClosureMap(data);
                             break;
+                        case SymReaderHelpers.CustomDebugInfoKind_EncStateMachineSuspensionPoints:
+                            WriteEditAndContinueStateMachineSuspensionPoints(data);
+                            break;
                         default:
                             WriteUnknownCustomDebugInfo(record);
                             break;
@@ -410,6 +413,7 @@ namespace Microsoft.DiaSymReader.Tools
             {PortableCustomDebugInfoKinds.StateMachineHoistedLocalScopes, 0},
             {PortableCustomDebugInfoKinds.EncLocalSlotMap, 1},
             {PortableCustomDebugInfoKinds.EncLambdaAndClosureMap, 2},
+            {SymReaderHelpers.EncStateMachineSuspensionPoints, 3},
         };
 
         private void WriteMethodCustomDebugInfo(ImmutableArray<(Guid kind, ImmutableArray<byte> data)> cdis)
@@ -430,6 +434,10 @@ namespace Microsoft.DiaSymReader.Tools
                 else if (kind == PortableCustomDebugInfoKinds.EncLocalSlotMap)
                 {
                     WriteEditAndContinueLocalSlotMap(data);
+                }
+                else if (kind == SymReaderHelpers.EncStateMachineSuspensionPoints)
+                {
+                    WriteEditAndContinueStateMachineSuspensionPoints(data);
                 }
             }
         }
@@ -909,6 +917,58 @@ namespace Microsoft.DiaSymReader.Tools
             finally
             {
                 _writer.WriteEndElement(); //encLocalSlotMap
+            }
+        }
+
+        private unsafe void WriteEditAndContinueStateMachineSuspensionPoints(ImmutableArray<byte> data)
+        {
+            _writer.WriteStartElement("encStateMachineSuspensionPoints");
+            try
+            {
+                if (data.Length == 0)
+                {
+                    return;
+                }
+
+                fixed (byte* ptr = data.ToArray())
+                {
+                    var blobReader = new BlobReader(ptr, data.Length);
+
+                    if (!blobReader.TryReadCompressedInteger(out var count))
+                    {
+                        _writer.WriteAttributeString("count", BadMetadataStr);
+                        return;
+                    }
+
+                    while (count > 0)
+                    {
+                        _writer.WriteStartElement("resume");
+
+                        if (!blobReader.TryReadCompressedInteger(out var ordinal))
+                        {
+                            _writer.WriteAttributeString("state", BadMetadataStr);
+                            return;
+                        }
+
+                        _writer.WriteAttributeString("state", CultureInvariantToString(ordinal));
+                        
+                        if (!blobReader.TryReadCompressedInteger(out var syntaxOffset))
+                        {
+                            _writer.WriteAttributeString("offset", BadMetadataStr);
+                            return;
+                        }
+
+                        _writer.WriteAttributeString("offset", CultureInvariantToString(syntaxOffset));
+
+                        _writer.WriteEndElement();
+
+                        count--;
+                    }
+                }
+            }
+            finally
+            {
+                _writer.WriteEndElement(); // encStateMachineSuspensionPoints
             }
         }
 
