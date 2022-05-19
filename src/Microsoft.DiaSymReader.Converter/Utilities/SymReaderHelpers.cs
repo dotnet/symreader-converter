@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the License.txt file in the project root for more information.
 
+using Microsoft.CodeAnalysis.Debugging;
 using System;
 using System.Collections.Immutable;
 using System.IO;
@@ -15,7 +16,9 @@ namespace Microsoft.DiaSymReader.Tools
 {
     internal static class SymReaderHelpers
     {
-        internal static readonly Guid VisualBasicLanguageGuid = new Guid("3a12d0b8-c26c-11d0-b442-00a0244a1dd2");
+        internal static readonly Guid EncStateMachineSuspensionPoints = new("8B78CD68-2EDE-420B-980B-E15884B8AAA3");
+        internal static readonly Guid VisualBasicLanguageGuid = new("3a12d0b8-c26c-11d0-b442-00a0244a1dd2");
+        internal const CustomDebugInfoKind CustomDebugInfoKind_EncStateMachineSuspensionPoints = (CustomDebugInfoKind)9;
 
         internal static bool IsPortable(Stream pdbStream)
         {

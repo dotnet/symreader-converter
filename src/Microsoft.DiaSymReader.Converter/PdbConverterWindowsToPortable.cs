@@ -375,6 +375,13 @@ namespace Microsoft.DiaSymReader.Tools
                                     kind: metadataBuilder.GetOrAddGuid(PortableCustomDebugInfoKinds.EncLambdaAndClosureMap),
                                     value: metadataBuilder.GetOrAddBlob(record.Data));
                                 break;
+
+                            case SymReaderHelpers.CustomDebugInfoKind_EncStateMachineSuspensionPoints:
+                                metadataBuilder.AddCustomDebugInformation(
+                                    parent: methodHandle,
+                                    kind: metadataBuilder.GetOrAddGuid(SymReaderHelpers.EncStateMachineSuspensionPoints),
+                                    value: metadataBuilder.GetOrAddBlob(record.Data));
+                                break;
                         }
                     }
                 }
