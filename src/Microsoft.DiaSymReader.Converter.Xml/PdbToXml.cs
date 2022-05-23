@@ -396,7 +396,7 @@ namespace Microsoft.DiaSymReader.Tools
                             WriteEditAndContinueLambdaAndClosureMap(data);
                             break;
                         case SymReaderHelpers.CustomDebugInfoKind_EncStateMachineSuspensionPoints:
-                            WriteEditAndContinueStateMachineSuspensionPoints(data);
+                            WriteEditAndContinueStateMachineStateMap(data);
                             break;
                         default:
                             WriteUnknownCustomDebugInfo(record);
@@ -437,7 +437,7 @@ namespace Microsoft.DiaSymReader.Tools
                 }
                 else if (kind == SymReaderHelpers.EncStateMachineSuspensionPoints)
                 {
-                    WriteEditAndContinueStateMachineSuspensionPoints(data);
+                    WriteEditAndContinueStateMachineStateMap(data);
                 }
             }
         }
@@ -920,9 +920,9 @@ namespace Microsoft.DiaSymReader.Tools
             }
         }
 
-        private unsafe void WriteEditAndContinueStateMachineSuspensionPoints(ImmutableArray<byte> data)
+        private unsafe void WriteEditAndContinueStateMachineStateMap(ImmutableArray<byte> data)
         {
-            _writer.WriteStartElement("encStateMachineSuspensionPoints");
+            _writer.WriteStartElement("encStateMachineStateMap");
             try
             {
                 if (data.Length == 0)
@@ -942,15 +942,15 @@ namespace Microsoft.DiaSymReader.Tools
 
                     while (count > 0)
                     {
-                        _writer.WriteStartElement("resume");
+                        _writer.WriteStartElement("state");
 
-                        if (!blobReader.TryReadCompressedInteger(out var ordinal))
+                        if (!blobReader.TryReadCompressedSignedInteger(out var stateNumber))
                         {
-                            _writer.WriteAttributeString("state", BadMetadataStr);
+                            _writer.WriteAttributeString("number", BadMetadataStr);
                             return;
                         }
 
-                        _writer.WriteAttributeString("state", CultureInvariantToString(ordinal));
+                        _writer.WriteAttributeString("number", CultureInvariantToString(stateNumber));
                         
                         if (!blobReader.TryReadCompressedInteger(out var syntaxOffset))
                         {
@@ -960,7 +960,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                         _writer.WriteAttributeString("offset", CultureInvariantToString(syntaxOffset));
 
-                        _writer.WriteEndElement();
+                        _writer.WriteEndElement(); // state
 
                         count--;
                     }
@@ -968,7 +968,7 @@ namespace Microsoft.DiaSymReader.Tools
             }
             finally
             {
-                _writer.WriteEndElement(); // encStateMachineSuspensionPoints
+                _writer.WriteEndElement(); // encStateMachineStateMap
             }
         }
 
