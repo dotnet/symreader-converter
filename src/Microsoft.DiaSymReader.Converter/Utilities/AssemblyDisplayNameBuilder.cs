@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.PooledObjects;
 
 namespace Roslyn.Utilities
 {
-    public static class AssemblyDisplayNameBuilder
+    internal static class AssemblyDisplayNameBuilder
     {
         internal static string GetAssemblyDisplayName(MetadataReader reader, AssemblyReference assemblyRef)
         {
