@@ -940,29 +940,40 @@ namespace Microsoft.DiaSymReader.Tools
                         return;
                     }
 
-                    while (count > 0)
+                    if (count > 0)
                     {
-                        _writer.WriteStartElement("state");
-
-                        if (!blobReader.TryReadCompressedSignedInteger(out var stateNumber))
+                        if (!blobReader.TryReadCompressedInteger(out var syntaxOffsetBaseline))
                         {
-                            _writer.WriteAttributeString("number", BadMetadataStr);
+                            _writer.WriteAttributeString("syntaxOffsetBaseline", BadMetadataStr);
                             return;
                         }
 
-                        _writer.WriteAttributeString("number", CultureInvariantToString(stateNumber));
-                        
-                        if (!blobReader.TryReadCompressedInteger(out var syntaxOffset))
+                        syntaxOffsetBaseline = -syntaxOffsetBaseline;
+
+                        while (count > 0)
                         {
-                            _writer.WriteAttributeString("offset", BadMetadataStr);
-                            return;
+                            _writer.WriteStartElement("state");
+
+                            if (!blobReader.TryReadCompressedSignedInteger(out var stateNumber))
+                            {
+                                _writer.WriteAttributeString("number", BadMetadataStr);
+                                return;
+                            }
+
+                            _writer.WriteAttributeString("number", CultureInvariantToString(stateNumber));
+
+                            if (!blobReader.TryReadCompressedSignedInteger(out var syntaxOffset))
+                            {
+                                _writer.WriteAttributeString("offset", BadMetadataStr);
+                                return;
+                            }
+
+                            _writer.WriteAttributeString("offset", CultureInvariantToString(syntaxOffset) + syntaxOffsetBaseline);
+
+                            _writer.WriteEndElement(); // state
+
+                            count--;
                         }
-
-                        _writer.WriteAttributeString("offset", CultureInvariantToString(syntaxOffset));
-
-                        _writer.WriteEndElement(); // state
-
-                        count--;
                     }
                 }
             }
