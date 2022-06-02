@@ -962,7 +962,7 @@ namespace Microsoft.DiaSymReader.Tools
 
                             _writer.WriteAttributeString("number", CultureInvariantToString(stateNumber));
 
-                            if (!blobReader.TryReadCompressedSignedInteger(out var syntaxOffset))
+                            if (!blobReader.TryReadCompressedInteger(out var syntaxOffset))
                             {
                                 _writer.WriteAttributeString("offset", BadMetadataStr);
                                 return;
