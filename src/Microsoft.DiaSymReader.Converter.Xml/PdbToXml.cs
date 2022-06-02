@@ -968,7 +968,7 @@ namespace Microsoft.DiaSymReader.Tools
                                 return;
                             }
 
-                            _writer.WriteAttributeString("offset", CultureInvariantToString(syntaxOffset) + syntaxOffsetBaseline);
+                            _writer.WriteAttributeString("offset", CultureInvariantToString(syntaxOffset + syntaxOffsetBaseline));
 
                             _writer.WriteEndElement(); // state
 
