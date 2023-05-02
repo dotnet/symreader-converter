@@ -664,9 +664,22 @@ namespace Microsoft.DiaSymReader.Tools
         {
             _writer.WriteStartElement("forwardIterator");
 
-            string name = CustomDebugInfoReader.DecodeForwardIteratorRecord(data);
+            string? name;
+            try
+            {
+                name = CustomDebugInfoReader.DecodeForwardIteratorRecord(data);
+            }
+            catch
+            {
+                name = null;
+            }
 
-            _writer.WriteAttributeString("name", name);
+            _writer.WriteAttributeString("name", name ?? BadMetadataStr);
+
+            if (name == null)
+            {
+                _writer.WriteAttributeString("payload", BitConverter.ToString(data.ToArray()));
+            }
 
             _writer.WriteEndElement(); //forwardIterator
         }
