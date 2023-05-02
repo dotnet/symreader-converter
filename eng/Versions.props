@@ -5,12 +5,13 @@
     <VersionPrefix>1.1.0</VersionPrefix>
     <PreReleaseVersionLabel>beta2</PreReleaseVersionLabel>
     <SemanticVersioningV1>true</SemanticVersioningV1>
+    <!-- Opt-in/out repo features -->
+    <UsingToolPdbConverter>false</UsingToolPdbConverter>
     <UsingToolNuGetRepack>true</UsingToolNuGetRepack>
-    <UsingToolSymbolUploader>true</UsingToolSymbolUploader>
     <!-- libs -->
     <MicrosoftCodeAnalysisPooledObjectsVersion>4.1.0-1.21523.2</MicrosoftCodeAnalysisPooledObjectsVersion>
     <MicrosoftCodeAnalysisDebuggingVersion>4.1.0-1.21523.2</MicrosoftCodeAnalysisDebuggingVersion>
-    <MicrosoftDiaSymReaderVersion>1.4.0-beta2-21528-01</MicrosoftDiaSymReaderVersion>
+    <MicrosoftDiaSymReaderVersion>2.0.0</MicrosoftDiaSymReaderVersion>
     <MicrosoftDiaSymReaderNativeVersion>17.0.0-beta1.21524.1</MicrosoftDiaSymReaderNativeVersion>
     <MicrosoftDiaSymReaderPortablePdbVersion>1.7.0-beta-21525-03</MicrosoftDiaSymReaderPortablePdbVersion>
     <MicrosoftMetadataVisualizerVersion>1.0.0-beta3.21151.2</MicrosoftMetadataVisualizerVersion>
