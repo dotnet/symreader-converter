@@ -34,7 +34,7 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
             var convertedPortablePdbStream1 = new MemoryStream();
             var convertedPortablePdbStream2 = new MemoryStream();
 
-            var converter = new PdbConverter(d => Assert.False(true, d.ToString()));
+            var converter = new PdbConverter(d => Assert.Fail(d.ToString()));
             converter.ConvertWindowsToPortable(windowsPEStream, windowsPdbStream, convertedPortablePdbStream1);
 
             convertedPortablePdbStream1.Position = 0;
