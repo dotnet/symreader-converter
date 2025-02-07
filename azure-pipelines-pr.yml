@@ -50,7 +50,7 @@ stages:
 
         - task: UseDotNet@2
           inputs:
-            installationPath: "$(Agent.BuildDirectory)"
+            installationPath: $(Agent.BuildDirectory)/.dotnet
             useGlobalJson: true
 
         - script: eng\common\cibuild.cmd -configuration $(_BuildConfig) -prepareMachine $(_BuildArgs)
