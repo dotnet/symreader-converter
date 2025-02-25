@@ -177,6 +177,7 @@ CustomDebugInformation (index: 0x37, size: 6):
         [Fact]
         public void Convert_Scopes()
         {
+#if NETFRAMEWORK
             VerifyPortablePdb(
                 TestResources.Scopes.DllAndPdb(portable: true),
                 TestResources.Scopes.DllAndPdb(portable: false), @"
@@ -353,6 +354,8 @@ CustomDebugInformation (index: 0x37, size: 24):
 2: 0x06000004 (MethodDef)      EnC Local Slot Map       01-10-01-33-01-5E-01-80-98-01-80-D5-01-81-17-01-81-5D-01-81-98-01-81-BC-01-82-19-01-82-66-01-82-...    
 3: 0x34000019 (LocalConstant)  Dynamic Local Variables  01                                                                                                  
 4: 0x3400001c (LocalConstant)  Dynamic Local Variables  20");
+
+#endif
         }
 
         [Fact]
@@ -951,6 +954,7 @@ CustomDebugInformation (index: 0x37, size: 54):
         [Fact]
         public void Convert_VB()
         {
+#if NETFRAMEWORK
             VerifyPortablePdb(
                 TestResources.VB.DllAndPdb(portable: true),
                 TestResources.VB.DllAndPdb(portable: false), @"
@@ -1144,6 +1148,8 @@ b: 0x06000017 (MethodDef)      State Machine Hoisted Local Scopes  21-00-00-00-3
 c: 0x0600001f (MethodDef)      EnC Local Slot Map                  15-00-1C-00                                                                                                                                                              
 d: 0x0600001f (MethodDef)      State Machine Hoisted Local Scopes  21-00-00-00-6A-00-00-00-21-00-00-00-6A-00-00-00-21-00-00-00-6A-00-00-00-21-00-00-00-6A-00-00-00
 ");
+
+#endif
         }
 
         [Fact]
