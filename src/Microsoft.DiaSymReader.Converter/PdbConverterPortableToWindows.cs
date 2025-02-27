@@ -1077,6 +1077,15 @@ namespace Microsoft.DiaSymReader.Tools
                 }
             }
 
+            // no alias defined in scope for given assembly -> must be a 'global' using, use the first defined alias
+            foreach (var (assemblyRefHandle, alias) in aliasedAssemblyRefs)
+            {
+                if (targetAssembly == assemblyRefHandle)
+                {
+                    return alias;
+                }
+            }
+
             return null;
         }
 
