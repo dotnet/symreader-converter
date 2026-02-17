@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="src/Microsoft.DiaSymReader.Converter.Tests/Microsoft.DiaSymReader.Converter.UnitTests.csproj" />
+  <Project Path="src/Microsoft.DiaSymReader.Converter.Xml/Microsoft.DiaSymReader.Converter.Xml.csproj" />
+  <Project Path="src/Microsoft.DiaSymReader.Converter/Microsoft.DiaSymReader.Converter.csproj" />
+  <Project Path="src/Pdb2Pdb.Tests/Pdb2Pdb.UnitTests.csproj" />
+  <Project Path="src/Pdb2Pdb/Pdb2Pdb.csproj" />
+  <Project Path="src/Pdb2Xml/Pdb2Xml.csproj" />
+  <Project Path="src/PdbTestResources/PdbTestResources.csproj" />
+  <Project Path="src/TestUtilities/TestUtilities.csproj" />
+</Solution>
