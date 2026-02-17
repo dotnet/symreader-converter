@@ -9,13 +9,18 @@
   <PropertyGroup>
     <_ProjectDefinedPackageId>$(PackageId)</_ProjectDefinedPackageId>
     <PackageId>*fake_packageid_for_project_$(MSBuildProjectName)*</PackageId>
+    <BeforePack>$(BeforePack);_UpdatePackageId</BeforePack>
   </PropertyGroup>
 
   <!--
-     Workaround for cyclic package reference. PackageId is set to ain invalid value above (in evaluation phase to be picked up by Restore),
-     then updated to the actual value before Pack target and SourceLink source package generation target.
+     Workaround for cyclic package reference. PackageId is set to an invalid value above (in evaluation phase to be picked up by Restore),
+     then updated to the actual value before Pack target.
+
+     Note: $(BeforePack) is used instead of BeforeTargets="$(PackDependsOn)" because PackDependsOn now includes
+     _GetRestoreProjectStyle (NuGet/NuGet.Client#6712), which would cause this target to run during Restore and
+     undo the fake PackageId before the restore graph is built.
   -->
-  <Target Name="_UpdatePackageId" BeforeTargets="$(PackDependsOn);InitializeSourceControlInformation" >
+  <Target Name="_UpdatePackageId">
     <PropertyGroup>
       <PackageId>$(_ProjectDefinedPackageId)</PackageId>
       <PackageId Condition="'$(PackageId)' == ''">$(AssemblyName)</PackageId>
