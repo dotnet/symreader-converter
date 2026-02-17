@@ -1,16 +1,15 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<!-- Licensed to the .NET Foundation under one or more agreements. The .NET Foundation licenses this file to you under the MIT license. See the License.txt file in the project root for more information. -->
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFrameworks>$(NetCurrent);net472</TargetFrameworks>
+    <TargetFrameworks>$(BundledNETCoreAppTargetFramework);$(NetFrameworkMinimum)</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <!-- 
       We would need to download 32bit dotnet cli, which would add extra time to PR runs 
       Testing 64bit only on Desktop suffixiently covers our interop code paths.  
     -->
-    <TestArchitectures Condition="'$(TargetFramework)' == 'net472'">x64;x86</TestArchitectures>
-
+    <TestArchitectures Condition="'$(TargetFramework)' == '$(NetFrameworkMinimum)'">x64;x86</TestArchitectures>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Metadata.Visualizer" Version="$(MicrosoftMetadataVisualizerVersion)" />
     <PackageReference Include="Microsoft.DiaSymReader.PortablePdb" Version="$(MicrosoftDiaSymReaderPortablePdbVersion)" />
@@ -21,4 +20,5 @@
   </ItemGroup>
 
   <Import Project="$(RepositoryEngineeringDir)DiaSymReaderNative.targets" />
+
 </Project>

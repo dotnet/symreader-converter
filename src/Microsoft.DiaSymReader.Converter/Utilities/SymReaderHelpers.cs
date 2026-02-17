@@ -116,11 +116,7 @@ namespace Microsoft.DiaSymReader.Tools
         }
 
         private unsafe static string GetString(byte* data, int size) =>
-#if NET45
-            new string((sbyte*)data, 0, size, Encoding.UTF8);
-#else
             Encoding.UTF8.GetString(data, size);
-#endif
 
         public unsafe static string? GetSourceLinkData(this ISymUnmanagedReader5 reader) => 
             TryGetSourceLinkData(reader, out byte* data, out int size) ? GetString(data, size) : null;
