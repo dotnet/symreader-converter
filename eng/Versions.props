@@ -10,14 +10,13 @@
     <!-- libs -->
     <MicrosoftCodeAnalysisPooledObjectsVersion>4.1.0-1.21523.2</MicrosoftCodeAnalysisPooledObjectsVersion>
     <MicrosoftCodeAnalysisDebuggingVersion>4.1.0-1.21523.2</MicrosoftCodeAnalysisDebuggingVersion>
-    <MicrosoftDiaSymReaderVersion>1.4.0-beta2-21528-01</MicrosoftDiaSymReaderVersion>
-    <MicrosoftDiaSymReaderNativeVersion>17.0.0-beta1.21524.1</MicrosoftDiaSymReaderNativeVersion>
-    <MicrosoftDiaSymReaderPortablePdbVersion>1.7.0-beta-21525-03</MicrosoftDiaSymReaderPortablePdbVersion>
-    <MicrosoftMetadataVisualizerVersion>1.0.0-beta3.21151.2</MicrosoftMetadataVisualizerVersion>
-    <MicrosoftSourceLinkToolsVersion>1.1.0-beta-20527-03</MicrosoftSourceLinkToolsVersion>
-    <!-- CoreFX -->
-    <SystemCollectionsImmutableVersion>5.0.0</SystemCollectionsImmutableVersion>
-    <SystemReflectionMetadataVersion>5.0.0</SystemReflectionMetadataVersion>
-    <SystemTextJsonVersion>5.0.0</SystemTextJsonVersion>
+    <MicrosoftDiaSymReaderVersion>2.2.0-beta.24327.2</MicrosoftDiaSymReaderVersion>
+    <MicrosoftDiaSymReaderNativeVersion>17.10.0-beta1.24272.1</MicrosoftDiaSymReaderNativeVersion>
+    <MicrosoftDiaSymReaderPortablePdbVersion>2.0.0-beta-24358-01</MicrosoftDiaSymReaderPortablePdbVersion>
+    <MicrosoftMetadataVisualizerVersion>1.0.0-beta3.22519.1</MicrosoftMetadataVisualizerVersion>
+    <MicrosoftSourceLinkToolsVersion>8.0.0-beta.23221.1</MicrosoftSourceLinkToolsVersion>
+    <SystemCollectionsImmutableVersion>6.0.0</SystemCollectionsImmutableVersion>
+    <SystemReflectionMetadataVersion>6.0.1</SystemReflectionMetadataVersion>
+    <SystemTextJsonVersion>6.0.9</SystemTextJsonVersion>
   </PropertyGroup>
 </Project>
