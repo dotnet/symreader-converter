@@ -1818,6 +1818,8 @@ namespace Microsoft.DiaSymReader.Tools
         private static string GetHashAlgorithmName(Guid guid)
             => (guid == PdbGuids.HashAlgorithm.SHA1) ? "SHA1" : 
                (guid == PdbGuids.HashAlgorithm.SHA256) ? "SHA256" :
+               (guid == PdbGuids.HashAlgorithm.SHA384) ? "SHA384" :
+               (guid == PdbGuids.HashAlgorithm.SHA512) ? "SHA512" :
                guid.ToString();
 
         private void WriteEmbeddedSource(ISymUnmanagedDocument doc)
