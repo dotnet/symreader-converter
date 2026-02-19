@@ -36,3 +36,4 @@ _ReSharper*/
 # NCrunch
 *.ncrunch*
 .*crunch*.local.xml
+.nuget/nuget.exe
