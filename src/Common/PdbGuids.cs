@@ -19,6 +19,8 @@ namespace Microsoft.DiaSymReader.Tools
         {
             public static readonly Guid SHA1 = new Guid("ff1816ec-aa5e-4d10-87f7-6f4963833460");
             public static readonly Guid SHA256 = new Guid("8829d00f-11b8-4213-878b-770e8597ac16");
+            public static readonly Guid SHA384 = new Guid("d99cfeb1-8c43-444a-8a6c-b61269d2a0bf");
+            public static readonly Guid SHA512 = new Guid("ef2d1afc-6550-46d6-b14b-d70afe9a5566");
         }
 
         public static class LanguageVendor

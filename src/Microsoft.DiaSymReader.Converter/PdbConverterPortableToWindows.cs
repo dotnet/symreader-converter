@@ -686,6 +686,8 @@ namespace Microsoft.DiaSymReader.Tools
         {
             const int SizeOfSHA1 = 20;
             const int SizeOfSHA256 = 32;
+            const int SizeOfSHA384 = 48;
+            const int SizeOfSHA512 = 64;
 
             int expectedSize;
             string algorithmName;
@@ -704,6 +706,16 @@ namespace Microsoft.DiaSymReader.Tools
             {
                 expectedSize = SizeOfSHA256;
                 algorithmName = nameof(PdbGuids.HashAlgorithm.SHA256);
+            }
+            else if (algorithmId == PdbGuids.HashAlgorithm.SHA384)
+            {
+                expectedSize = SizeOfSHA384;
+                algorithmName = nameof(PdbGuids.HashAlgorithm.SHA384);
+            }
+            else if (algorithmId == PdbGuids.HashAlgorithm.SHA512)
+            {
+                expectedSize = SizeOfSHA512;
+                algorithmName = nameof(PdbGuids.HashAlgorithm.SHA512);
             }
             else
             {
@@ -726,6 +738,14 @@ namespace Microsoft.DiaSymReader.Tools
 
                         case SizeOfSHA256:
                             algorithmId = PdbGuids.HashAlgorithm.SHA256;
+                            break;
+
+                        case SizeOfSHA384:
+                            algorithmId = PdbGuids.HashAlgorithm.SHA384;
+                            break;
+
+                        case SizeOfSHA512:
+                            algorithmId = PdbGuids.HashAlgorithm.SHA512;
                             break;
                     }
                 }

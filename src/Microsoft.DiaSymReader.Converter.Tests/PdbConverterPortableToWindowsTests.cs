@@ -240,6 +240,8 @@ SRCSRV: end ------------------------------------------------",
 
             var sha1 = new Guid("ff1816ec-aa5e-4d10-87f7-6f4963833460");
             var sha256 = new Guid("8829d00f-11b8-4213-878b-770e8597ac16");
+            var sha384 = new Guid("d99cfeb1-8c43-444a-8a6c-b61269d2a0bf");
+            var sha512 = new Guid("ef2d1afc-6550-46d6-b14b-d70afe9a5566");
             var unknown = new Guid("11111111-1111-1111-1111-111111111111");
 
             // SHA1
@@ -271,6 +273,30 @@ SRCSRV: end ------------------------------------------------",
                 new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { ConverterResources.None, "doc1.cs" }));
 
             ValidateSourceChecksum(sha256, sha256, new byte[32], "doc1.cs");
+
+            // SHA384
+            ValidateSourceChecksum(sha384, sha384, Array.Empty<byte>(), "doc1.cs",
+                new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { "SHA384", "doc1.cs" }));
+
+            ValidateSourceChecksum(sha384, sha384, new byte[32], "doc1.cs",
+                new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { "SHA384", "doc1.cs" }));
+
+            ValidateSourceChecksum(default, sha384, new byte[48], "doc1.cs",
+                new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { ConverterResources.None, "doc1.cs" }));
+
+            ValidateSourceChecksum(sha384, sha384, new byte[48], "doc1.cs");
+
+            // SHA512
+            ValidateSourceChecksum(sha512, sha512, Array.Empty<byte>(), "doc1.cs",
+                new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { "SHA512", "doc1.cs" }));
+
+            ValidateSourceChecksum(sha512, sha512, new byte[48], "doc1.cs",
+                new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { "SHA512", "doc1.cs" }));
+
+            ValidateSourceChecksum(default, sha512, new byte[64], "doc1.cs",
+                new PdbDiagnostic(PdbDiagnosticId.SourceChecksumAlgorithmSizeMismatch, 0, new[] { ConverterResources.None, "doc1.cs" }));
+
+            ValidateSourceChecksum(sha512, sha512, new byte[64], "doc1.cs");
 
             // unknown
             ValidateSourceChecksum(unknown, unknown, new byte[0], "doc1.cs");
