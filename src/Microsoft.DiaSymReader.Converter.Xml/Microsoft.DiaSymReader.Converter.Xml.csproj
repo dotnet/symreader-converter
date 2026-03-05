@@ -1,8 +1,7 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<!-- Licensed to the .NET Foundation under one or more agreements. The .NET Foundation licenses this file to you under the MIT license. See the License.txt file in the project root for more information. -->
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net472</TargetFrameworks>
+    <TargetFrameworks>$(NetMinimum);$(NetFrameworkMinimum)</TargetFrameworks>
     <RootNamespace>Microsoft.DiaSymReader.Tools</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -16,6 +15,7 @@
     <!-- Workaround for https://github.com/dotnet/sdk/issues/11270 -->
     <GenerateDependencyFile>false</GenerateDependencyFile>
   </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="..\Microsoft.DiaSymReader.Converter\Utilities\HResult.cs" Link="Utilities\HResult.cs" />
     <Compile Include="..\Microsoft.DiaSymReader.Converter\Utilities\StreamUtilities.cs" Link="Utilities\StreamUtilities.cs" />
@@ -23,6 +23,7 @@
     <Compile Include="..\Microsoft.DiaSymReader.Converter\Utilities\SymMetadataProvider.cs" Link="Utilities\SymMetadataProvider.cs" />
     <Compile Include="..\Microsoft.DiaSymReader.Converter\Utilities\DummySymReaderMetadataProvider.cs" Link="Utilities\DummySymReaderMetadataProvider.cs" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.DiaSymReader" Version="$(MicrosoftDiaSymReaderVersion)" />
     <PackageReference Include="Microsoft.DiaSymReader.Native" Version="$(MicrosoftDiaSymReaderNativeVersion)" />
@@ -32,6 +33,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.PooledObjects" Version="$(MicrosoftCodeAnalysisPooledObjectsVersion)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Debugging" Version="$(MicrosoftCodeAnalysisDebuggingVersion)" PrivateAssets="all" />
   </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Update="PdbToXmlResources.resx" GenerateSource="true" />
     <EmbeddedResource Update="ConverterResources.resx" GenerateSource="true" />
@@ -45,4 +47,5 @@
       <Link Condition="'%(NuGetPackageId)' != ''">%(NuGetPackageId)\%(Link)</Link>
     </Compile>
   </ItemGroup>
+
 </Project>
