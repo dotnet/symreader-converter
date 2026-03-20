@@ -1,30 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!-- Licensed to the .NET Foundation under one or more agreements. The .NET Foundation licenses this file to you under the MIT license. See the License.txt file in the project root for more information. -->
 <Project>
   <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
-
-  <!-- 
-    Workaround for https://github.com/NuGet/Home/issues/6754: cyclic dependency.
-  -->
-  <PropertyGroup>
-    <_ProjectDefinedPackageId>$(PackageId)</_ProjectDefinedPackageId>
-    <PackageId>*fake_packageid_for_project_$(MSBuildProjectName)*</PackageId>
-    <BeforePack>$(BeforePack);_UpdatePackageId</BeforePack>
-  </PropertyGroup>
-
-  <!--
-     Workaround for cyclic package reference. PackageId is set to an invalid value above (in evaluation phase to be picked up by Restore),
-     then updated to the actual value before Pack target.
-
-     Note: $(BeforePack) is used instead of BeforeTargets="$(PackDependsOn)" because PackDependsOn now includes
-     _GetRestoreProjectStyle (NuGet/NuGet.Client#6712), which would cause this target to run during Restore and
-     undo the fake PackageId before the restore graph is built.
-  -->
-  <Target Name="_UpdatePackageId">
-    <PropertyGroup>
-      <PackageId>$(_ProjectDefinedPackageId)</PackageId>
-      <PackageId Condition="'$(PackageId)' == ''">$(AssemblyName)</PackageId>
-      <PackageId Condition="'$(PackageId)' == ''">$(MSBuildProjectName)</PackageId>
-    </PropertyGroup>
-  </Target>
 </Project>
