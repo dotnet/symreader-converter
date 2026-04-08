@@ -77,7 +77,11 @@ namespace Microsoft.DiaSymReader.Tools
             internal void FillBuffer(Stream stream, int capacity)
             {
                 MinCapacity(capacity);
+#if NET
+                stream.ReadExactly(_buffer, 0, capacity);
+#else
                 stream.Read(_buffer, 0, capacity);
+#endif
                 _offset = 0;
             }
 
@@ -90,7 +94,11 @@ namespace Microsoft.DiaSymReader.Tools
                     Array.Copy(_buffer, newBuffer, _buffer.Length);
                     _buffer = newBuffer;
                 }
+#if NET
+                stream.ReadExactly(_buffer, _offset, count);
+#else
                 stream.Read(_buffer, _offset, count);
+#endif
                 _offset += count;
             }
 
@@ -389,14 +397,14 @@ namespace Microsoft.DiaSymReader.Tools
 
             // The hash table data.
             // This cannot be serialized
-            private struct bucket
+            private struct Bucket
             {
                 internal int key;
                 internal int hash_coll;   // Store hash code; sign bit means there was a collision.
-                internal Object val;
+                internal object val;
             }
 
-            private bucket[] _buckets;
+            private Bucket[] _buckets;
 
             // The total number of entries in the hash table.
             private int _count;
@@ -428,7 +436,7 @@ namespace Microsoft.DiaSymReader.Tools
                 _loadFactorPerc = (loadFactorPerc * 72) / 100;
 
                 int hashsize = GetPrime((int)(capacity / _loadFactorPerc));
-                _buckets = new bucket[hashsize];
+                _buckets = new Bucket[hashsize];
 
                 _loadsize = (int)(_loadFactorPerc * hashsize) / 100;
                 if (_loadsize >= hashsize)
@@ -466,11 +474,11 @@ namespace Microsoft.DiaSymReader.Tools
                     uint seed;
                     uint incr;
                     // Take a snapshot of buckets, in case another thread does a resize
-                    bucket[] lbuckets = _buckets;
+                    Bucket[] lbuckets = _buckets;
                     uint hashcode = InitHash(key, lbuckets.Length, out seed, out incr);
                     int ntry = 0;
 
-                    bucket b;
+                    Bucket b;
                     do
                     {
                         int bucketNumber = (int)(seed % (uint)lbuckets.Length);
@@ -513,13 +521,13 @@ namespace Microsoft.DiaSymReader.Tools
                 //      at all times
                 //   2) Protect against an OutOfMemoryException while allocating this
                 //      new bucket[].
-                bucket[] newBuckets = new bucket[newsize];
+                Bucket[] newBuckets = new Bucket[newsize];
 
                 // rehash table into new buckets
                 int nb;
                 for (nb = 0; nb < _buckets.Length; nb++)
                 {
-                    bucket oldb = _buckets[nb];
+                    Bucket oldb = _buckets[nb];
                     if (oldb.val != null)
                     {
                         putEntry(newBuckets, oldb.key, oldb.val, oldb.hash_coll & 0x7FFFFFFF);
@@ -646,7 +654,7 @@ namespace Microsoft.DiaSymReader.Tools
                 throw new InvalidOperationException("InvalidOperation_HashInsertFailed");
             }
 
-            private void putEntry(bucket[] newBuckets, int key, Object nvalue, int hashcode)
+            private void putEntry(Bucket[] newBuckets, int key, Object nvalue, int hashcode)
             {
                 uint seed = (uint)hashcode;
                 uint incr = (uint)(1 + (((seed >> 5) + 1) % ((uint)newBuckets.Length - 1)));
@@ -867,7 +875,11 @@ namespace Microsoft.DiaSymReader.Tools
 
             internal void Read(byte[] bytes, int offset, int count)
             {
+#if NET
+                reader.ReadExactly(bytes, offset, count);
+#else
                 reader.Read(bytes, offset, count);
+#endif
             }
 
             internal int PagesFromSize(int size)
