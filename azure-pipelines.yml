@@ -73,12 +73,13 @@ extends:
           enablePublishBuildArtifacts: true
           enablePublishTestResults: true
           enablePublishBuildAssets: true
-          enablePublishUsingPipelines: true
+          publishingVersion: 4
           enableTelemetry: true
           enableSourceBuild: false
           helixRepo: dotnet/symreader
           jobs:
           - job: Windows
+            enablePublishing: ${{ and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}
             pool:
               ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
                 vmImage: 'windows-latest'
@@ -93,7 +94,7 @@ extends:
               - name: _OfficialBuildArgs
                 value: /p:DotNetSignType=$(_SignType) 
                   /p:TeamName=$(TeamName)
-                  /p:DotNetPublishUsingPipelines=true
+                 
                   /p:DotNetArtifactsCategory=true
                   /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
             # else
@@ -170,5 +171,5 @@ extends:
     - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
       - template: /eng/common/templates-official/post-build/post-build.yml@self
         parameters:
-          publishingInfraVersion: 3
+          publishingInfraVersion: 4
           enableSymbolValidation: false

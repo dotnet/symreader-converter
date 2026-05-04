@@ -17,8 +17,6 @@ trigger:
 
 variables:
   - template: /eng/common/templates/variables/pool-providers.yml
-  - name: _PublishUsingPipelines
-    value: true
 
 stages:
 - stage: build
@@ -30,7 +28,6 @@ stages:
       enablePublishBuildArtifacts: true
       enablePublishTestResults: true
       enablePublishBuildAssets: true
-      enablePublishUsingPipelines: $(_PublishUsingPipelines)
       enableTelemetry: true
       helixRepo: dotnet/symreader
       jobs:
