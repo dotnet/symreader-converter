@@ -122,16 +122,35 @@ extends:
             - script: eng\common\cibuild.cmd -configuration $(_BuildConfig) -prepareMachine $(_BuildArgs)
               displayName: Build and Test
             - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-              - task: 1ES.PublishNuget@1
-                displayName: Publish CoreXT Packages
+              # Authenticate to the DevDiv VS (CoreXT) feed via WIF service connection.
+              # A WIF (workloadidentityuser) service connection cannot be used with
+              # 1ES.PublishNuget@1's nuGetFeedType: external, so we set up ambient
+              # credentials here and push with 'dotnet nuget push' below.
+              - task: NuGetAuthenticate@1
+                displayName: Authenticate to DevDiv VS feed (WIF)
                 inputs:
-                  command: push
-                  packagesToPush: '$(Build.SourcesDirectory)\artifacts\packages\$(_BuildConfig)\Shipping\*.nupkg'
-                  packageParentPath: $(Build.SourcesDirectory)\artifacts\packages\$(_BuildConfig)\Shipping\
-                  allowPackageConflicts: true
-                  nuGetFeedType: external
-                  publishFeedCredentials: 'dnceng-devdiv-vs-feed-push'
+                  azureDevOpsServiceConnection: dnceng-devdiv-vs-feed-push
+                  feedUrl: https://pkgs.dev.azure.com/devdiv/_packaging/VS/nuget/v3/index.json
+              # Publish CoreXT packages to the DevDiv/VS feed using the ambient
+              # credentials established by NuGetAuthenticate@1 above.
+              - task: PowerShell@2
+                displayName: Publish CoreXT Packages
                 condition: succeeded()
+                inputs:
+                  targetType: inline
+                  script: |
+                    $feedUrl = "https://pkgs.dev.azure.com/devdiv/_packaging/VS/nuget/v3/index.json"
+                    $packages = Get-ChildItem -Path "$(Build.SourcesDirectory)\artifacts\packages\$(_BuildConfig)\Shipping" -Recurse -Filter "*.nupkg"
+                    Write-Host "Found $($packages.Count) packages to push"
+                    foreach ($pkg in $packages) {
+                      Write-Host "Pushing $($pkg.Name)..."
+                      & dotnet nuget push $pkg.FullName --source $feedUrl --api-key AzureDevOps --skip-duplicate
+                      if ($LASTEXITCODE -ne 0) {
+                        Write-Error "Failed to push $($pkg.Name)"
+                        exit 1
+                      }
+                    }
+                    Write-Host "Successfully pushed $($packages.Count) packages"
           - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
             - job: MacOS
               displayName: 'MacOS'
