@@ -20,22 +20,18 @@
     out. This logic is responsible for doing that.
   -->
   <ItemGroup Condition="'$(DotNetBuildFromSource)' != 'true'">
-    <DiaSymReaderNativePackage
-      Include="Microsoft.DiaSymReader.Native"
-      PackageVersion="@(PackageVersion->WithMetadataValue('Identity', 'Microsoft.DiaSymReader.Native')->Metadata('Version'))"
-      PackagePath="$(NuGetPackageRoot)\microsoft.diasymreader.native\%(PackageVersion)\" />
-
-    <Content Include="@(DiaSymReaderNativePackage->'%(PackagePath)runtimes\win\native\Microsoft.DiaSymReader.Native.x86.dll')">
+    <Content Include="$(PkgMicrosoft_DiaSymReader_Native)\runtimes\win\native\Microsoft.DiaSymReader.Native.x86.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
       <Pack>false</Pack>
     </Content>
-    <Content Include="@(DiaSymReaderNativePackage->'%(PackagePath)runtimes\win\native\Microsoft.DiaSymReader.Native.amd64.dll')">
+    <Content Include="$(PkgMicrosoft_DiaSymReader_Native)\runtimes\win\native\Microsoft.DiaSymReader.Native.amd64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
       <Pack>false</Pack>
     </Content>
 
-    <PackageDownload Include="@(DiaSymReaderNativePackage)" Version="[%(PackageVersion)]" />
+    <PackageReference Include="Microsoft.DiaSymReader.Native" GeneratePathProperty="true" ExcludeAssets="all"/>
   </ItemGroup>
+
 </Project>
