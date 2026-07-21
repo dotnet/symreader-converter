@@ -8,5 +8,8 @@
     <Nullable>annotations</Nullable>
     <Nullable Condition="'$(TargetFramework)' != 'net472'">enable</Nullable>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+    <!-- Bump minimum supported .NET Framework version -->
+    <NetFrameworkMinimum>net472</NetFrameworkMinimum>
   </PropertyGroup>
 </Project>
