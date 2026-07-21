@@ -1,0 +1,35 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- roslyn -->
+    <PackageReference Include="Microsoft.CodeAnalysis.Debugging" Version="4.1.0-1.21523.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.PooledObjects" Version="4.1.0-1.21523.2" />
+
+    <!-- roslyn-debug -->
+    <PackageReference Include="Microsoft.DiaSymReader.Native" Version="17.0.0-beta1.21524.1" />
+
+    <!-- sourcelink-->
+    <PackageReference Include="Microsoft.SourceLink.Tools" Version="10.0.301" />
+
+    <!-- symreader -->
+    <PackageReference Include="Microsoft.DiaSymReader" Version="2.2.10" />
+
+    <!-- symreader-portable -->
+    <PackageReference Include="Microsoft.DiaSymReader.PortablePdb" Version="1.7.0-beta-21525-03" />
+
+    <!-- runtime-->
+    <PackageReference Include="System.Collections.Immutable" Version="10.0.10" />
+    <PackageReference Include="System.Reflection.Metadata" Version="10.0.10" />
+    <PackageReference Include="System.Text.Json" Version="10.0.10" />
+
+    <!-- external -->
+    <PackageReference Include="Microsoft.Metadata.Visualizer" Version="1.0.0-beta3.21151.2" />
+    <PackageReference Include="xunit.assert" Version="$(XunitVersion)" />
+  </ItemGroup>
+
+</Project>

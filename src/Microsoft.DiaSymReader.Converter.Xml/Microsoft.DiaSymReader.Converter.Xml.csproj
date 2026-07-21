@@ -2,7 +2,7 @@
 <!-- Licensed to the .NET Foundation under one or more agreements. The .NET Foundation licenses this file to you under the MIT license. See the License.txt file in the project root for more information. -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net472</TargetFrameworks>
+    <TargetFrameworks>$(NetMinimum);$(NetFrameworkMinimum)</TargetFrameworks>
     <RootNamespace>Microsoft.DiaSymReader.Tools</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -24,13 +24,13 @@
     <Compile Include="..\Microsoft.DiaSymReader.Converter\Utilities\DummySymReaderMetadataProvider.cs" Link="Utilities\DummySymReaderMetadataProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.DiaSymReader" Version="$(MicrosoftDiaSymReaderVersion)" />
-    <PackageReference Include="Microsoft.DiaSymReader.Native" Version="$(MicrosoftDiaSymReaderNativeVersion)" />
-    <PackageReference Include="Microsoft.DiaSymReader.PortablePdb" Version="$(MicrosoftDiaSymReaderPortablePdbVersion)" />
-    <PackageReference Include="System.Collections.Immutable" Version="$(SystemCollectionsImmutableVersion)" />
-    <PackageReference Include="System.Reflection.Metadata" Version="$(SystemReflectionMetadataVersion)" />
-    <PackageReference Include="Microsoft.CodeAnalysis.PooledObjects" Version="$(MicrosoftCodeAnalysisPooledObjectsVersion)" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Debugging" Version="$(MicrosoftCodeAnalysisDebuggingVersion)" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.DiaSymReader" />
+    <PackageReference Include="Microsoft.DiaSymReader.Native" />
+    <PackageReference Include="Microsoft.DiaSymReader.PortablePdb" />
+    <PackageReference Include="System.Collections.Immutable" Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp'" />
+    <PackageReference Include="System.Reflection.Metadata" Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp'" />
+    <PackageReference Include="Microsoft.CodeAnalysis.PooledObjects" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Debugging" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="PdbToXmlResources.resx" GenerateSource="true" />
