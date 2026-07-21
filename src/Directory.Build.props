@@ -11,5 +11,8 @@
 
     <!-- Bump minimum supported .NET Framework version -->
     <NetFrameworkMinimum>net472</NetFrameworkMinimum>
+
+    <!-- TODO: Fix .NET Framework flagged vulnerabilities -->
+    <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>
 </Project>

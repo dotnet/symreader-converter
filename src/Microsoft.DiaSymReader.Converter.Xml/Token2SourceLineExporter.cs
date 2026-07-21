@@ -6,6 +6,7 @@
 #pragma warning disable IDE0018 // Inline variable declaration
 #pragma warning disable IDE0059 // Unnecessary assignment of a value
 #pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable CS8981 // he type name 'bucket' only contains lower-cased ascii characters. Such names may become reserved for the language.
 
 using System;
 using System.Collections.Generic;
@@ -77,7 +78,11 @@ namespace Microsoft.DiaSymReader.Tools
             internal void FillBuffer(Stream stream, int capacity)
             {
                 MinCapacity(capacity);
+#if NET
+                stream.ReadExactly(_buffer, 0, capacity);
+#else
                 stream.Read(_buffer, 0, capacity);
+#endif
                 _offset = 0;
             }
 
@@ -90,7 +95,11 @@ namespace Microsoft.DiaSymReader.Tools
                     Array.Copy(_buffer, newBuffer, _buffer.Length);
                     _buffer = newBuffer;
                 }
+#if NET
+                stream.ReadExactly(_buffer, _offset, count);
+#else
                 stream.Read(_buffer, _offset, count);
+#endif
                 _offset += count;
             }
 
@@ -867,7 +876,11 @@ namespace Microsoft.DiaSymReader.Tools
 
             internal void Read(byte[] bytes, int offset, int count)
             {
+#if NET
+                reader.ReadExactly(bytes, offset, count);
+#else
                 reader.Read(bytes, offset, count);
+#endif
             }
 
             internal int PagesFromSize(int size)

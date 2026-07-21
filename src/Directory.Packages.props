@@ -3,6 +3,7 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    <NoWarn>$(NoWarn);NU1507</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,7 +30,7 @@
 
     <!-- external -->
     <PackageVersion Include="Microsoft.Metadata.Visualizer" Version="1.0.0-beta3.21151.2" />
-    <PackageVersion Include="xunit.assert" Version="$(XunitVersion)" />
+    <PackageVersion Include="xunit.assert" Version="$(XunitVersion)" Condition="'$(IsTestProject)' != 'true'" />
   </ItemGroup>
 
 </Project>
