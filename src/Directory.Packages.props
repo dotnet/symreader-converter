@@ -21,7 +21,7 @@
     <PackageVersion Include="Microsoft.DiaSymReader" Version="2.2.10" />
 
     <!-- symreader-portable -->
-    <PackageVersion Include="Microsoft.DiaSymReader.PortablePdb" Version="1.7.0-beta-21525-03" />
+    <PackageVersion Include="Microsoft.DiaSymReader.PortablePdb" Version="2.0.0-beta-26059-01" />
 
     <!-- runtime-->
     <PackageVersion Include="System.Collections.Immutable" Version="10.0.10" />
