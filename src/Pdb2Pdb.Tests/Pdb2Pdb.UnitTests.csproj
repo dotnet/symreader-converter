@@ -4,6 +4,8 @@
   <PropertyGroup>
     <TargetFramework>$(NetFrameworkCurrent)</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Host-arch native DSRN from the .NET runtime; avoid 32-bit on x64. -->
+    <TestArchitectures>x64</TestArchitectures>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.DiaSymReader.Converter.Xml\Microsoft.DiaSymReader.Converter.Xml.csproj" />
@@ -12,6 +14,4 @@
     <ProjectReference Include="..\PdbTestResources\PdbTestResources.csproj" />
     <ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />
   </ItemGroup>
-
-  <Import Project="$(RepositoryEngineeringDir)DiaSymReaderNative.targets" />
 </Project>

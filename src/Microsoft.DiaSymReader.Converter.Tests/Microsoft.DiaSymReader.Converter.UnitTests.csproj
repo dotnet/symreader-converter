@@ -19,6 +19,4 @@
     <ProjectReference Include="..\PdbTestResources\PdbTestResources.csproj" />
     <ProjectReference Include="..\TestUtilities\TestUtilities.csproj" />
   </ItemGroup>
-
-  <Import Project="$(RepositoryEngineeringDir)DiaSymReaderNative.targets" />
 </Project>

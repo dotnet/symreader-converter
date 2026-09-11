@@ -14,25 +14,4 @@
     <PlatformTarget Condition="'$(PlatformTarget)' == ''">AnyCPU</PlatformTarget>
   </PropertyGroup>
 
-  <!--
-    Copy Microsoft.DiaSymReader.Native.*.dll from the .NET shared framework into the output directory.
-    The runtime ships these binaries; the Microsoft.DiaSymReader.Native package is no longer needed.
-  -->
-  <PropertyGroup>
-    <_DotNetRoot Condition="'$(_DotNetRoot)' == ''">$(DOTNET_ROOT)</_DotNetRoot>
-    <_DotNetRoot Condition="'$(_DotNetRoot)' == ''">$(DOTNET_INSTALL_DIR)</_DotNetRoot>
-    <_DotNetRoot Condition="'$(_DotNetRoot)' == ''">$(NetCoreRoot)</_DotNetRoot>
-    <_DiaSymReaderNativeDir Condition="'$(_DotNetRoot)' != '' and '$(BundledNETCoreAppPackageVersion)' != ''">$([MSBuild]::NormalizeDirectory('$(_DotNetRoot)', 'shared', 'Microsoft.NETCore.App', '$(BundledNETCoreAppPackageVersion)'))</_DiaSymReaderNativeDir>
-    <_DiaSymReaderNativeDir Condition="'$(_DiaSymReaderNativeDir)' == ''">$([System.Runtime.InteropServices.RuntimeEnvironment]::GetRuntimeDirectory())</_DiaSymReaderNativeDir>
-  </PropertyGroup>
-
-  <ItemGroup Condition="'$(OS)' == 'Windows_NT' and '$(DotNetBuildFromSource)' != 'true'">
-    <Content Include="$(_DiaSymReaderNativeDir)Microsoft.DiaSymReader.Native.*.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-      <Pack>false</Pack>
-      <Link>%(Filename)%(Extension)</Link>
-    </Content>
-  </ItemGroup>
-
 </Project>

@@ -17,13 +17,6 @@ namespace Microsoft.DiaSymReader.Tools.UnitTests
 {
     internal static class PdbValidationXml
     {
-        static PdbValidationXml()
-        {
-            // Make sure we load DSRN from the directory containing the unit tests and not from a runtime directory on .NET 5+.
-            Environment.SetEnvironmentVariable("MICROSOFT_DIASYMREADER_NATIVE_ALT_LOAD_PATH", Path.GetDirectoryName(typeof(PdbValidationXml).Assembly.Location));
-            Environment.SetEnvironmentVariable("MICROSOFT_DIASYMREADER_NATIVE_USE_ALT_LOAD_PATH_ONLY", "1");
-        }
-
         private const PdbToXmlOptions Options = PdbToXmlOptions.IncludeSourceServerInformation | PdbToXmlOptions.IncludeEmbeddedSources | PdbToXmlOptions.ResolveTokens | PdbToXmlOptions.IncludeModuleDebugInfo | PdbToXmlOptions.SymReaderLoadPolicyUseAlternateDirectory;
         private const SymUnmanagedReaderCreationOptions ReaderCreationOptions = SymUnmanagedReaderCreationOptions.UseAlternativeLoadPath;
         private const SymUnmanagedWriterCreationOptions WriterCreationOptions = SymUnmanagedWriterCreationOptions.UseAlternativeLoadPath | SymUnmanagedWriterCreationOptions.Deterministic;
