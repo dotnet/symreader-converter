@@ -8,6 +8,8 @@
     <LargeAddressAware>true</LargeAddressAware>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <!-- Host-arch native DSRN from the .NET runtime; avoid 32-bit on x64. -->
+    <Prefer32Bit>false</Prefer32Bit>
 
     <!-- NuGet -->
     <IsPackable>true</IsPackable>

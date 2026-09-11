@@ -14,24 +14,25 @@
     <PlatformTarget Condition="'$(PlatformTarget)' == ''">AnyCPU</PlatformTarget>
   </PropertyGroup>
 
-  <!-- 
-    This is adding the diasymreader native assets to the output directory of our binaries. The 
-    package can't be referenced directly but rather has to have it's assets manually copied 
-    out. This logic is responsible for doing that.
+  <!--
+    Copy Microsoft.DiaSymReader.Native.*.dll from the .NET shared framework into the output directory.
+    The runtime ships these binaries; the Microsoft.DiaSymReader.Native package is no longer needed.
   -->
-  <ItemGroup Condition="'$(DotNetBuildFromSource)' != 'true'">
-    <Content Include="$(PkgMicrosoft_DiaSymReader_Native)\runtimes\win\native\Microsoft.DiaSymReader.Native.x86.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-      <Pack>false</Pack>
-    </Content>
-    <Content Include="$(PkgMicrosoft_DiaSymReader_Native)\runtimes\win\native\Microsoft.DiaSymReader.Native.amd64.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-      <Pack>false</Pack>
-    </Content>
+  <PropertyGroup>
+    <_DotNetRoot Condition="'$(_DotNetRoot)' == ''">$(DOTNET_ROOT)</_DotNetRoot>
+    <_DotNetRoot Condition="'$(_DotNetRoot)' == ''">$(DOTNET_INSTALL_DIR)</_DotNetRoot>
+    <_DotNetRoot Condition="'$(_DotNetRoot)' == ''">$(NetCoreRoot)</_DotNetRoot>
+    <_DiaSymReaderNativeDir Condition="'$(_DotNetRoot)' != '' and '$(BundledNETCoreAppPackageVersion)' != ''">$([MSBuild]::NormalizeDirectory('$(_DotNetRoot)', 'shared', 'Microsoft.NETCore.App', '$(BundledNETCoreAppPackageVersion)'))</_DiaSymReaderNativeDir>
+    <_DiaSymReaderNativeDir Condition="'$(_DiaSymReaderNativeDir)' == ''">$([System.Runtime.InteropServices.RuntimeEnvironment]::GetRuntimeDirectory())</_DiaSymReaderNativeDir>
+  </PropertyGroup>
 
-    <PackageReference Include="Microsoft.DiaSymReader.Native" GeneratePathProperty="true" ExcludeAssets="all"/>
+  <ItemGroup Condition="'$(OS)' == 'Windows_NT' and '$(DotNetBuildFromSource)' != 'true'">
+    <Content Include="$(_DiaSymReaderNativeDir)Microsoft.DiaSymReader.Native.*.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+      <Pack>false</Pack>
+      <Link>%(Filename)%(Extension)</Link>
+    </Content>
   </ItemGroup>
 
 </Project>
