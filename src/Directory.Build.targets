@@ -3,6 +3,12 @@
 <Project>
   <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 
+  <PropertyGroup>
+    <!-- Framework x86 uses xunit.console.x86.exe. Core x86 needs a Microsoft.DiaSymReader
+         that passes Guid by pointer (not yet in the 2.2.10 package). -->
+    <TestArchitectures Condition="'$(OS)' == 'Windows_NT' and '$(TargetFrameworkIdentifier)' == '.NETFramework'">x64;x86</TestArchitectures>
+  </PropertyGroup>
+
   <!-- 
     Workaround for https://github.com/NuGet/Home/issues/6754: cyclic dependency.
   -->

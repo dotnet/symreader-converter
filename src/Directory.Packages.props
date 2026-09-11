@@ -11,9 +11,6 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.Debugging" Version="4.1.0-1.21523.2" />
     <PackageVersion Include="Microsoft.CodeAnalysis.PooledObjects" Version="4.1.0-1.21523.2" />
 
-    <!-- roslyn-debug -->
-    <PackageVersion Include="Microsoft.DiaSymReader.Native" Version="17.0.0-beta1.21524.1" />
-
     <!-- sourcelink-->
     <PackageVersion Include="Microsoft.SourceLink.Tools" Version="10.0.301" />
 

@@ -25,7 +25,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.DiaSymReader" />
-    <PackageReference Include="Microsoft.DiaSymReader.Native" />
     <PackageReference Include="Microsoft.DiaSymReader.PortablePdb" />
     <PackageReference Include="System.Collections.Immutable" Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp'" />
     <PackageReference Include="System.Reflection.Metadata" Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp'" />

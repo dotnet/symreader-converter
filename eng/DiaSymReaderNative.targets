@@ -14,24 +14,4 @@
     <PlatformTarget Condition="'$(PlatformTarget)' == ''">AnyCPU</PlatformTarget>
   </PropertyGroup>
 
-  <!-- 
-    This is adding the diasymreader native assets to the output directory of our binaries. The 
-    package can't be referenced directly but rather has to have it's assets manually copied 
-    out. This logic is responsible for doing that.
-  -->
-  <ItemGroup Condition="'$(DotNetBuildFromSource)' != 'true'">
-    <Content Include="$(PkgMicrosoft_DiaSymReader_Native)\runtimes\win\native\Microsoft.DiaSymReader.Native.x86.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-      <Pack>false</Pack>
-    </Content>
-    <Content Include="$(PkgMicrosoft_DiaSymReader_Native)\runtimes\win\native\Microsoft.DiaSymReader.Native.amd64.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-      <Pack>false</Pack>
-    </Content>
-
-    <PackageReference Include="Microsoft.DiaSymReader.Native" GeneratePathProperty="true" ExcludeAssets="all"/>
-  </ItemGroup>
-
 </Project>
